@@ -1,6 +1,6 @@
 <?php
 
-namespace Sensio\Bundle\GeneratorBundle\Model;
+namespace Wame\SensioGeneratorBundle\Model;
 
 use Symfony\Component\DependencyInjection\Container;
 

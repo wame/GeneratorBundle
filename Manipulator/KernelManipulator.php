@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Manipulator;
+namespace Wame\SensioGeneratorBundle\Manipulator;
 
 use Symfony\Component\HttpKernel\KernelInterface;
-use Sensio\Bundle\GeneratorBundle\Generator\Generator;
+use Wame\SensioGeneratorBundle\Generator\Generator;
 
 /**
  * Changes the PHP code of a Kernel.

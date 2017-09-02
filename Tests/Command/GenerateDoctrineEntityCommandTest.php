@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Tests\Command;
+namespace Wame\SensioGeneratorBundle\Tests\Command;
 
-use Sensio\Bundle\GeneratorBundle\Model\EntityGeneratorResult;
+use Wame\SensioGeneratorBundle\Model\EntityGeneratorResult;
 use Symfony\Component\Console\Tester\CommandTester;
-use Sensio\Bundle\GeneratorBundle\Command\GenerateDoctrineEntityCommand;
+use Wame\SensioGeneratorBundle\Command\GenerateDoctrineEntityCommand;
 
 class GenerateDoctrineEntityCommandTest extends GenerateCommandTest
 {
@@ -113,7 +113,7 @@ class GenerateDoctrineEntityCommandTest extends GenerateCommandTest
     {
         // get a noop generator
         return $this
-            ->getMockBuilder('Sensio\Bundle\GeneratorBundle\Generator\DoctrineEntityGenerator')
+            ->getMockBuilder('Wame\SensioGeneratorBundle\Generator\DoctrineEntityGenerator')
             ->disableOriginalConstructor()
             ->setMethods(array('generate', 'isReservedKeyword'))
             ->getMock()

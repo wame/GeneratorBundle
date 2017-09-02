@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Manipulator;
+namespace Wame\SensioGeneratorBundle\Manipulator;
 
 /**
  * Changes the PHP code of a Kernel.

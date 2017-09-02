@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Tests\Manipulator\Stubs;
+namespace Wame\SensioGeneratorBundle\Tests\Manipulator\Stubs;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

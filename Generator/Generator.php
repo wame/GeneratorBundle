@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Generator;
+namespace Wame\SensioGeneratorBundle\Generator;
 
 use Symfony\Component\Console\Output\ConsoleOutput;
 

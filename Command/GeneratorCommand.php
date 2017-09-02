@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Command;
+namespace Wame\SensioGeneratorBundle\Command;
 
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Sensio\Bundle\GeneratorBundle\Generator\Generator;
-use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
+use Wame\SensioGeneratorBundle\Generator\Generator;
+use Wame\SensioGeneratorBundle\Command\Helper\QuestionHelper;
 
 /**
  * Base class for generator commands.
@@ -58,8 +58,8 @@ abstract class GeneratorCommand extends ContainerAwareCommand
             $skeletonDirs[] = $dir;
         }
 
-        $skeletonDirs[] = __DIR__.'/../Resources/skeleton';
-        $skeletonDirs[] = __DIR__.'/../Resources';
+        $skeletonDirs[] = __DIR__ . '/../Resources/skeleton';
+        $skeletonDirs[] = __DIR__ . '/../Resources';
 
         return $skeletonDirs;
     }
@@ -67,7 +67,7 @@ abstract class GeneratorCommand extends ContainerAwareCommand
     protected function getQuestionHelper()
     {
         $question = $this->getHelperSet()->get('question');
-        if (!$question || get_class($question) !== 'Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper') {
+        if (!$question || get_class($question) !== 'Wame\SensioGeneratorBundle\Command\Helper\QuestionHelper') {
             $this->getHelperSet()->set($question = new QuestionHelper());
         }
 

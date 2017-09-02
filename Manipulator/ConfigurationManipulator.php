@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Manipulator;
+namespace Wame\SensioGeneratorBundle\Manipulator;
 
-use Sensio\Bundle\GeneratorBundle\Generator\Generator;
-use Sensio\Bundle\GeneratorBundle\Model\Bundle;
+use Wame\SensioGeneratorBundle\Generator\Generator;
+use Wame\SensioGeneratorBundle\Model\Bundle;
 use Symfony\Component\Yaml\Yaml;
 
 /**

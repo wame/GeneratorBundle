@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Command;
+namespace Wame\SensioGeneratorBundle\Command;
 
-use Sensio\Bundle\GeneratorBundle\Generator\DoctrineEntityGenerator;
-use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
+use Wame\SensioGeneratorBundle\Generator\DoctrineEntityGenerator;
+use Wame\SensioGeneratorBundle\Command\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
@@ -139,7 +139,7 @@ EOT
 
         while (true) {
             $question = new Question($questionHelper->getQuestion('The Entity shortcut name', $input->getArgument('entity')), $input->getArgument('entity'));
-            $question->setValidator(array('Sensio\Bundle\GeneratorBundle\Command\Validators', 'validateEntityName'));
+            $question->setValidator(array('Wame\SensioGeneratorBundle\Command\Validators', 'validateEntityName'));
             $question->setAutocompleterValues($bundleNames);
             $entity = $questionHelper->ask($input, $output, $question);
 
@@ -175,7 +175,7 @@ EOT
         $formats = array('yml', 'xml', 'php', 'annotation');
 
         $question = new Question($questionHelper->getQuestion('Configuration format (yml, xml, php, or annotation)', $input->getOption('format')), $input->getOption('format'));
-        $question->setValidator(array('Sensio\Bundle\GeneratorBundle\Command\Validators', 'validateFormat'));
+        $question->setValidator(array('Wame\SensioGeneratorBundle\Command\Validators', 'validateFormat'));
         $question->setAutocompleterValues($formats);
         $format = $questionHelper->ask($input, $output, $question);
         $input->setOption('format', $format);

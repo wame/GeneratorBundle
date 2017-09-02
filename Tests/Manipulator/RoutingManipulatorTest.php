@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Tests\Manipulator;
+namespace Wame\SensioGeneratorBundle\Tests\Manipulator;
 
-use Sensio\Bundle\GeneratorBundle\Manipulator\RoutingManipulator;
+use Wame\SensioGeneratorBundle\Manipulator\RoutingManipulator;
 
 class RoutingManipulatorTest extends \PHPUnit_Framework_TestCase
 {

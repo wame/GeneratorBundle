@@ -9,19 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Command;
+namespace Wame\SensioGeneratorBundle\Command;
 
-use Sensio\Bundle\GeneratorBundle\Manipulator\ConfigurationManipulator;
-use Sensio\Bundle\GeneratorBundle\Model\Bundle;
+use Wame\SensioGeneratorBundle\Manipulator\ConfigurationManipulator;
+use Wame\SensioGeneratorBundle\Model\Bundle;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Sensio\Bundle\GeneratorBundle\Generator\BundleGenerator;
-use Sensio\Bundle\GeneratorBundle\Manipulator\KernelManipulator;
-use Sensio\Bundle\GeneratorBundle\Manipulator\RoutingManipulator;
+use Wame\SensioGeneratorBundle\Generator\BundleGenerator;
+use Wame\SensioGeneratorBundle\Manipulator\KernelManipulator;
+use Wame\SensioGeneratorBundle\Manipulator\RoutingManipulator;
 
 /**
  * Generates bundles.
@@ -210,7 +210,7 @@ EOT
                 $bundle
             ), $bundle);
             $question->setValidator(
-                array('Sensio\Bundle\GeneratorBundle\Command\Validators', 'validateBundleName')
+                array('Wame\SensioGeneratorBundle\Command\Validators', 'validateBundleName')
             );
             $bundle = $questionHelper->ask($input, $output, $question);
             $input->setOption('bundle-name', $bundle);

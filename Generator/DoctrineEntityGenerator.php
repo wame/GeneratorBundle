@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Generator;
+namespace Wame\SensioGeneratorBundle\Generator;
 
-use Sensio\Bundle\GeneratorBundle\Model\EntityGeneratorResult;
+use Wame\SensioGeneratorBundle\Model\EntityGeneratorResult;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;

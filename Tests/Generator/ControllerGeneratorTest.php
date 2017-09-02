@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Tests\Generator;
+namespace Wame\SensioGeneratorBundle\Tests\Generator;
 
-use Sensio\Bundle\GeneratorBundle\Generator\ControllerGenerator;
+use Wame\SensioGeneratorBundle\Generator\ControllerGenerator;
 
 class ControllerGeneratorTest extends GeneratorTest
 {
@@ -122,7 +122,7 @@ class ControllerGeneratorTest extends GeneratorTest
     protected function getGenerator()
     {
         $generator = new ControllerGenerator($this->filesystem);
-        $generator->setSkeletonDirs(__DIR__.'/../../Resources/skeleton');
+        $generator->setSkeletonDirs(__DIR__ . '/../../Resources/skeleton');
 
         return $generator;
     }

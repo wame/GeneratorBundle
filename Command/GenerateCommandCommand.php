@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Command;
+namespace Wame\SensioGeneratorBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
-use Sensio\Bundle\GeneratorBundle\Generator\CommandGenerator;
+use Wame\SensioGeneratorBundle\Generator\CommandGenerator;
 
 /**
  * Generates commands.

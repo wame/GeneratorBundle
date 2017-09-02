@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Sensio\Bundle\GeneratorBundle;
+namespace Wame\SensioGeneratorBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -18,6 +18,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class SensioGeneratorBundle extends Bundle
+class WameSensioGeneratorBundle extends Bundle
 {
 }

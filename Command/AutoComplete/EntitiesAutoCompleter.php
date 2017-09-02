@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Command\AutoComplete;
+namespace Wame\SensioGeneratorBundle\Command\AutoComplete;
 
 use Doctrine\ORM\EntityManagerInterface;
 

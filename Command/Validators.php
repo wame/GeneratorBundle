@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Command;
+namespace Wame\SensioGeneratorBundle\Command;
 
 /**
  * Validator functions.

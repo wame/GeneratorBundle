@@ -9,16 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Command;
+namespace Wame\SensioGeneratorBundle\Command;
 
-use Sensio\Bundle\GeneratorBundle\Manipulator\RoutingManipulator;
+use Wame\SensioGeneratorBundle\Manipulator\RoutingManipulator;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
-use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
-use Sensio\Bundle\GeneratorBundle\Generator\ControllerGenerator;
+use Wame\SensioGeneratorBundle\Command\Helper\QuestionHelper;
+use Wame\SensioGeneratorBundle\Generator\ControllerGenerator;
 
 /**
  * Generates controllers.
@@ -140,7 +140,7 @@ EOT
         while (true) {
             $question = new Question($questionHelper->getQuestion('Controller name', $input->getOption('controller')), $input->getOption('controller'));
             $question->setAutocompleterValues($bundleNames);
-            $question->setValidator(array('Sensio\Bundle\GeneratorBundle\Command\Validators', 'validateControllerName'));
+            $question->setValidator(array('Wame\SensioGeneratorBundle\Command\Validators', 'validateControllerName'));
             $controller = $questionHelper->ask($input, $output, $question);
             list($bundle, $controller) = $this->parseShortcutNotation($controller);
 
@@ -166,7 +166,7 @@ EOT
             '',
         ));
         $question = new Question($questionHelper->getQuestion('Routing format (php, xml, yml, annotation)', $defaultFormat), $defaultFormat);
-        $question->setValidator(array('Sensio\Bundle\GeneratorBundle\Command\Validators', 'validateFormat'));
+        $question->setValidator(array('Wame\SensioGeneratorBundle\Command\Validators', 'validateFormat'));
         $routeFormat = $questionHelper->ask($input, $output, $question);
         $input->setOption('route-format', $routeFormat);
 

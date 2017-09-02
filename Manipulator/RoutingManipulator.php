@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Manipulator;
+namespace Wame\SensioGeneratorBundle\Manipulator;
 
 use Symfony\Component\DependencyInjection\Container;
-use Sensio\Bundle\GeneratorBundle\Generator\DoctrineCrudGenerator;
-use Sensio\Bundle\GeneratorBundle\Generator\Generator;
+use Wame\SensioGeneratorBundle\Generator\DoctrineCrudGenerator;
+use Wame\SensioGeneratorBundle\Generator\Generator;
 use Symfony\Component\Yaml\Yaml;
 
 /**

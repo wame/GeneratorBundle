@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Command;
+namespace Wame\SensioGeneratorBundle\Command;
 
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -19,11 +19,11 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Sensio\Bundle\GeneratorBundle\Command\AutoComplete\EntitiesAutoCompleter;
-use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
-use Sensio\Bundle\GeneratorBundle\Generator\DoctrineCrudGenerator;
-use Sensio\Bundle\GeneratorBundle\Generator\DoctrineFormGenerator;
-use Sensio\Bundle\GeneratorBundle\Manipulator\RoutingManipulator;
+use Wame\SensioGeneratorBundle\Command\AutoComplete\EntitiesAutoCompleter;
+use Wame\SensioGeneratorBundle\Command\Helper\QuestionHelper;
+use Wame\SensioGeneratorBundle\Generator\DoctrineCrudGenerator;
+use Wame\SensioGeneratorBundle\Generator\DoctrineFormGenerator;
+use Wame\SensioGeneratorBundle\Manipulator\RoutingManipulator;
 
 /**
  * Generates a CRUD for a Doctrine entity.
@@ -166,7 +166,7 @@ EOT
         }
 
         $question = new Question($questionHelper->getQuestion('The Entity shortcut name', $input->getArgument('entity')), $input->getArgument('entity'));
-        $question->setValidator(array('Sensio\Bundle\GeneratorBundle\Command\Validators', 'validateEntityName'));
+        $question->setValidator(array('Wame\SensioGeneratorBundle\Command\Validators', 'validateEntityName'));
 
         $autocompleter = new EntitiesAutoCompleter($this->getContainer()->get('doctrine')->getManager());
         $autocompleteEntities = $autocompleter->getSuggestions();
@@ -204,7 +204,7 @@ EOT
             '',
         ));
         $question = new Question($questionHelper->getQuestion('Configuration format (yml, xml, php, or annotation)', $format), $format);
-        $question->setValidator(array('Sensio\Bundle\GeneratorBundle\Command\Validators', 'validateFormat'));
+        $question->setValidator(array('Wame\SensioGeneratorBundle\Command\Validators', 'validateFormat'));
         $format = $questionHelper->ask($input, $output, $question);
         $input->setOption('format', $format);
 
