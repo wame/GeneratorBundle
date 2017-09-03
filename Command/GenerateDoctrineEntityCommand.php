@@ -26,10 +26,11 @@ use Doctrine\DBAL\Types\Type;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class GenerateDoctrineEntityCommand extends GenerateDoctrineCommand
+class GenerateDoctrineEntityCommand extends GenerateWameEntityCommand
 {
     protected function configure()
     {
+        parent::configure();
         $this
             ->setName('wame:generate:entity')
             ->setDescription('Generates a new Doctrine entity inside a bundle')
@@ -179,8 +180,14 @@ EOT
         $format = $questionHelper->ask($input, $output, $question);
         $input->setOption('format', $format);
 
+        //WAME: add behavior options
+        $this->addBehaviorInteraction($input, $output);
+
         // fields
         $input->setOption('fields', $this->addFields($input, $output, $questionHelper));
+
+        //WAME: questions for using __toString
+        $this->addDisplayFieldInteraction($input, $output);
     }
 
     private function parseFields($input)
@@ -242,7 +249,8 @@ EOT
         ));
         $output->write('<info>Available types:</info> ');
 
-        $types = array_keys(Type::getTypesMap());
+        //WAME: we want to add some types, so call our getTypes function isntead of array_keys(Type::getTypesMap())
+        $types = array_keys($this->getTypes());
         $count = 20;
         foreach ($types as $i => $type) {
             if ($count > 50) {
@@ -362,6 +370,8 @@ EOT
             } elseif (substr($columnName, 0, 4) == 'has_') {
                 $defaultType = 'boolean';
             }
+            //WAME: additional field type guesses
+            $defaultType = $this->guessMoreFieldTypes($columnName, $defaultType);
 
             $question = new Question($questionHelper->getQuestion('Field type', $defaultType), $defaultType);
             $question->setValidator($fieldValidator);
@@ -385,6 +395,10 @@ EOT
                 $question->setValidator($scaleValidator);
                 $data['scale'] = $questionHelper->ask($input, $output, $question);
             }
+            //WAME: additional settings/questions for relation-types
+            $this->addInteractionForRelationTypes($input, $output, $data, $type);
+            //WAME: additional settings/questions for enum-types
+            $this->addInteractionForEnumTypes($input, $output, $data, $type);
 
             $question = new Question($questionHelper->getQuestion('Is nullable', 'false'), false);
             $question->setValidator($boolValidator);
@@ -399,6 +413,9 @@ EOT
             if ($unique = $questionHelper->ask($input, $output, $question)) {
                 $data['unique'] = $unique;
             }
+
+            //WAME: additional settings/questions for validations
+            $this->addInteractionForValidations($input, $output, $data);
 
             $fields[$columnName] = $data;
         }
