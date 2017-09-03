@@ -94,7 +94,8 @@ EOT
 
         /** @var DoctrineEntityGenerator $generator */
         $generator = $this->getGenerator();
-        $generatorResult = $generator->generate($bundle, $entity, $format, array_values($fields));
+        //WAME: we add 'input' as a parameter, so we can access our additional options
+        $generatorResult = $generator->generate($bundle, $entity, $format, array_values($fields), $input);
 
         $output->writeln(sprintf(
             '> Generating entity class <info>%s</info>: <comment>OK!</comment>',
@@ -180,7 +181,7 @@ EOT
         $format = $questionHelper->ask($input, $output, $question);
         $input->setOption('format', $format);
 
-        //WAME: add behavior options
+        //WAME: add behaviour options
         $this->addBehaviorInteraction($input, $output);
 
         // fields
