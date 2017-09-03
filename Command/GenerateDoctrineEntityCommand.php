@@ -20,6 +20,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Console\Question\Question;
 use Doctrine\DBAL\Types\Type;
+use Wame\SensioGeneratorBundle\Generator\EntityByTwigGenerator;
+use Wame\SensioGeneratorBundle\Generator\WameEntityGenerator;
 
 /**
  * Initializes a Doctrine entity inside a bundle.
@@ -426,6 +428,7 @@ EOT
 
     protected function createGenerator()
     {
-        return new DoctrineEntityGenerator($this->getContainer()->get('filesystem'), $this->getContainer()->get('doctrine'));
+        //Wame: Use different generator
+        return new WameEntityGenerator($this->getContainer()->get('filesystem'), $this->getContainer()->get('doctrine'));
     }
 }

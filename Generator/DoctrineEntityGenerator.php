@@ -11,7 +11,6 @@
 
 namespace Wame\SensioGeneratorBundle\Generator;
 
-use Symfony\Component\Console\Input\InputInterface;
 use Wame\SensioGeneratorBundle\Model\EntityGeneratorResult;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
@@ -27,7 +26,7 @@ use Doctrine\Common\Util\Inflector;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Jonathan H. Wage <jonwage@gmail.com>
  */
-class DoctrineEntityGenerator extends WameEntityGenerator
+class DoctrineEntityGenerator extends Generator
 {
     private $filesystem;
     private $registry;
@@ -48,7 +47,7 @@ class DoctrineEntityGenerator extends WameEntityGenerator
      *
      * @throws \Doctrine\ORM\Tools\Export\ExportException
      */
-    public function generate(BundleInterface $bundle, $entity, $format, array $fields, InputInterface $input)
+    public function generate(BundleInterface $bundle, $entity, $format, array $fields)
     {
         // configure the bundle (needed if the bundle does not contain any Entities yet)
         $config = $this->registry->getManager(null)->getConfiguration();
@@ -68,8 +67,7 @@ class DoctrineEntityGenerator extends WameEntityGenerator
         $class->mapField(array('fieldName' => 'id', 'type' => 'integer', 'id' => true));
         $class->setIdGeneratorType(ClassMetadataInfo::GENERATOR_TYPE_AUTO);
         foreach ($fields as $field) {
-            //WAME: we have some checks to do instead of directly calling $class->mapField($field)
-            $this->mapField($field, $class);
+            $class->mapField($field);
         }
 
         $entityGenerator = $this->getEntityGenerator();

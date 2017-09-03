@@ -1,0 +1,37 @@
+{% use 'entity/property.php.twig' %}
+<?php
+
+{{ meta_entity.namespace }}
+
+use Doctrine\ORM\Mapping as ORM;
+{% if meta_entity.hasTrait('SoftDeleteable') -%}
+use Gedmo\Mapping\Annotation as Gedmo;
+{% endif -%}
+use Symfony\Component\Validator\Constraints as Assert;
+{% for trait in meta_entity.traits -%}
+use {{ trait.namespace }}\{{ trait.name }};
+{% endfor %}
+
+/**
+ * {{ meta_entity.entityName }}
+ *
+ * @ORM\Table(name="{{ meta_entity.tableName }}")
+ * @ORM\Entity(repositoryClass="{{ meta_entity.matchingRepositoryClass }}")
+{% if meta_entity.hasTrait('SoftDeleteable') %}
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
+{% endif %}
+ */
+class {{ meta_entity.entityName }}
+{
+    {% for trait in meta_entity.traits -%}
+    use {{ trait.name }};
+    {% endfor %}
+
+    {% for property in meta_entity.properties -%}
+        {{ block('property') }}
+    {% endfor %}
+
+    {%- for property in meta_entity.properties -%}
+        {{ block('property_methods') -}}
+    {% endfor %}
+{{ '}' }}
