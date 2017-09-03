@@ -31,8 +31,7 @@ class GenerateDoctrineFormCommand extends GenerateDoctrineCommand
     protected function configure()
     {
         $this
-            ->setName('doctrine:generate:form')
-            ->setAliases(array('generate:doctrine:form'))
+            ->setName('wame:generate:form')
             ->setDescription('Generates a form type class based on a Doctrine entity')
             ->setDefinition(array(
                 new InputArgument('entity', InputArgument::REQUIRED, 'The entity class name to initialize (shortcut notation)'),

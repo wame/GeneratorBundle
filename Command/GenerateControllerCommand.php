@@ -33,7 +33,7 @@ class GenerateControllerCommand extends GeneratorCommand
     public function configure()
     {
         $this
-            ->setName('generate:controller')
+            ->setName('wame:generate:controller')
             ->setDescription('Generates a controller')
             ->setDefinition(array(
                 new InputOption('controller', '', InputOption::VALUE_REQUIRED, 'The name of the controller to create'),

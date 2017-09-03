@@ -31,8 +31,7 @@ class GenerateDoctrineEntityCommand extends GenerateDoctrineCommand
     protected function configure()
     {
         $this
-            ->setName('doctrine:generate:entity')
-            ->setAliases(array('generate:doctrine:entity'))
+            ->setName('wame:generate:entity')
             ->setDescription('Generates a new Doctrine entity inside a bundle')
             ->addArgument('entity', InputArgument::OPTIONAL, 'The entity class name to initialize (shortcut notation)')
             ->addOption('entity', null, InputOption::VALUE_OPTIONAL, 'The entity class name to initialize (shortcut notation)')

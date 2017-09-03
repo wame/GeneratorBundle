@@ -40,8 +40,7 @@ class GenerateDoctrineCrudCommand extends GenerateDoctrineCommand
     protected function configure()
     {
         $this
-            ->setName('doctrine:generate:crud')
-            ->setAliases(array('generate:doctrine:crud'))
+            ->setName('wame:generate:crud')
             ->setDescription('Generates a CRUD based on a Doctrine entity')
             ->addArgument('entity', InputArgument::OPTIONAL, 'The entity class name to initialize (shortcut notation)')
             ->addOption('entity', null, InputOption::VALUE_OPTIONAL, 'The entity class name to initialize (shortcut notation)')

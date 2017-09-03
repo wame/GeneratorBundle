@@ -32,7 +32,7 @@ class GenerateCommandCommand extends GeneratorCommand
     public function configure()
     {
         $this
-            ->setName('generate:command')
+            ->setName('wame:generate:command')
             ->setDescription('Generates a console command')
             ->setDefinition(array(
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle where the command is generated'),

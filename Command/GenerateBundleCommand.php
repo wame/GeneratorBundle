@@ -36,7 +36,7 @@ class GenerateBundleCommand extends GeneratorCommand
     protected function configure()
     {
         $this
-            ->setName('generate:bundle')
+            ->setName('wame:generate:bundle')
             ->setDescription('Generates a bundle')
             ->setDefinition(array(
                 new InputOption('namespace', '', InputOption::VALUE_REQUIRED, 'The namespace of the bundle to create'),
