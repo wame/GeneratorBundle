@@ -193,7 +193,8 @@ EOT
         $this->addDisplayFieldInteraction($input, $output);
     }
 
-    private function parseFields($input)
+    //WAME: change private to protected, otherwise this function could not override our parent-method
+    protected function parseFields($input)
     {
         if (is_array($input)) {
             return $input;
@@ -238,7 +239,7 @@ EOT
             }
         }
 
-        return $fields;
+        return parent::parseFields($fields);
     }
 
     private function addFields(InputInterface $input, OutputInterface $output, QuestionHelper $questionHelper)

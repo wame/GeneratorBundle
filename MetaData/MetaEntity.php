@@ -15,7 +15,7 @@ class MetaEntity
     protected $tableName;
 
     /** @var string */
-    protected $namespace;
+    protected $bundleNamespace;
 
     /** @var MetaInterface[]|ArrayCollection */
     protected $interfaces;
@@ -40,7 +40,7 @@ class MetaEntity
     {
         $reflectionClass = $classMetadata->getReflectionClass();
         $entityMetadata = (new self())
-            ->setNamespace($classMetadata->namespace)
+            ->setBundleNamespace($classMetadata->namespace)
             ->setEntityName($reflectionClass->getShortName())
             ->setTableName($classMetadata->getTableName())
         ;
@@ -67,14 +67,16 @@ class MetaEntity
                     }
                 }
             }
-            $entityMetadata->addProperty((new MetaProperty())
-                ->setId($fieldMapping['id'] ?? false)
-                ->setName($fieldName)
-                ->setType($fieldMapping['type'] ?? null)
-                ->setNullable($fieldMapping['nullable'] ?? false)
-                ->setLength(isset($fieldMapping['length']) ? (int) $fieldMapping['length'] : null)
-                ->setScale(isset($fieldMapping['scale']) ? (int) $fieldMapping['scale'] : null)
-                ->setPrecision(isset($fieldMapping['precision']) ? (int) $fieldMapping['precision'] : null)
+            $entityMetadata->addProperty(
+                (new MetaProperty())
+                    ->setEntity($entityMetadata)
+                    ->setId($fieldMapping['id'] ?? false)
+                    ->setName($fieldName)
+                    ->setType($fieldMapping['type'] ?? null)
+                    ->setNullable($fieldMapping['nullable'] ?? false)
+                    ->setLength(isset($fieldMapping['length']) ? (int) $fieldMapping['length'] : null)
+                    ->setScale(isset($fieldMapping['scale']) ? (int) $fieldMapping['scale'] : null)
+                    ->setPrecision(isset($fieldMapping['precision']) ? (int) $fieldMapping['precision'] : null)
             );
         }
 
@@ -103,14 +105,14 @@ class MetaEntity
         return $this;
     }
 
-    public function getNamespace(): ?string
+    public function getBundleNamespace(): ?string
     {
-        return $this->namespace;
+        return $this->bundleNamespace;
     }
 
-    public function setNamespace(string $namespace): self
+    public function setBundleNamespace(string $bundleNamespace): self
     {
-        $this->namespace = $namespace;
+        $this->bundleNamespace = $bundleNamespace;
         return $this;
     }
 
@@ -168,6 +170,7 @@ class MetaEntity
     public function addProperty(MetaProperty $property): self
     {
         $this->properties->add($property);
+        $property->setEntity($this);
         return $this;
     }
 
@@ -203,12 +206,6 @@ class MetaEntity
         return $this;
     }
 
-    public function getMatchingRepositoryClass()
-    {
-        return str_replace('Entity', 'Repository', $this->getNamespace())
-            .'\\'.$this->getEntityName().'Repository';
-    }
-
     public function hasTrait($traitName)
     {
         foreach ($this->getTraits() as $trait) {
@@ -218,5 +215,4 @@ class MetaEntity
         }
         return false;
     }
-
 }

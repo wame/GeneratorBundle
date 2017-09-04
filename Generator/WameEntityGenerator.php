@@ -12,18 +12,35 @@ use Wame\SensioGeneratorBundle\MetaData\MetaProperty;
 use Wame\SensioGeneratorBundle\MetaData\MetaTrait;
 use Wame\SensioGeneratorBundle\MetaData\MetaValidation;
 use Wame\SensioGeneratorBundle\Model\EntityGeneratorResult;
+use Wame\SensioGeneratorBundle\Twig\InflectorExtension;
 
 class WameEntityGenerator extends DoctrineEntityGenerator
 {
+    protected $skeletonDirs;
+
     protected $behaviourTraits = [
         'softdeleteable' => '\\Gedmo\\SoftDeleteable\\Traits\\SoftDeleteableEntity',
         'timestampable'  => '\\Gedmo\\Timestampable\\Traits\\TimestampableEntity',
         'blameable'      => '\\Gedmo\\Blameable\\Traits\\BlameableEntity',
     ];
 
-    public function generate(BundleInterface $bundle, $entity, $format, array $fields, InputInterface $input)
+    public function setSkeletonDirs($skeletonDirs)
     {
-        $entityContent = $this->render('entity/Entity.php.twig', [
+        parent::setSkeletonDirs($skeletonDirs);
+        $this->skeletonDirs[] = __DIR__.'/../Resources/skeleton';
+        $this->skeletonDirs[] = __DIR__.'/../Resources';
+    }
+
+    protected function getTwigEnvironment()
+    {
+        $twigEnvironment = parent::getTwigEnvironment();
+        $twigEnvironment->addExtension(new InflectorExtension());
+        return $twigEnvironment;
+    }
+
+    public function generate(BundleInterface $bundle, $entity, $format, array $fields, InputInterface $input = null)
+    {
+        $entityContent = $this->render('entity/entity.php.twig', [
             'meta_entity' => $this->getMetaEntity($bundle, $entity, $fields, $input),
         ]);
 
@@ -38,8 +55,8 @@ class WameEntityGenerator extends DoctrineEntityGenerator
     {
         $metaEntity = (new MetaEntity())
             ->setEntityName($entity)
-            ->setNamespace($bundle->getNamespace())
-            ->setTableName(Inflector::tableize($entity))
+            ->setBundleNamespace($bundle->getNamespace())
+            ->setTableName(Inflector::pluralTableize($entity))
         ;
         if ($input->hasOption('behaviours')) {
             foreach ($input->getOption('behaviours') as $behaviour) {
@@ -56,7 +73,7 @@ class WameEntityGenerator extends DoctrineEntityGenerator
         foreach ($fields as $field) {
             $metaProperty = (new MetaProperty())
                 ->setName($field['fieldName'])
-                ->setColumnName($field['columnName'])
+                ->setColumnName($field['columnName'] ?? null)
                 ->setType($field['type'] ?? null)
                 ->setLength($field['length'] ?? null)
                 ->setUnique($field['unique'] ?? false)

@@ -1,7 +1,9 @@
+{# @var meta_entity \Wame\SensioGeneratorBundle\MetaData\MetaEntity #}
 {% use 'entity/property.php.twig' %}
 <?php
+declare(strict_types=1);
 
-{{ meta_entity.namespace }}
+namespace {{ meta_entity.bundleNamespace }}\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 {% if meta_entity.hasTrait('SoftDeleteable') -%}
@@ -16,22 +18,22 @@ use {{ trait.namespace }}\{{ trait.name }};
  * {{ meta_entity.entityName }}
  *
  * @ORM\Table(name="{{ meta_entity.tableName }}")
- * @ORM\Entity(repositoryClass="{{ meta_entity.matchingRepositoryClass }}")
+ * @ORM\Entity(repositoryClass="{{ meta_entity.bundleNamespace }}\Repository\{{ meta_entity.entityName }}Repository")
 {% if meta_entity.hasTrait('SoftDeleteable') %}
  * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
 {% endif %}
  */
 class {{ meta_entity.entityName }}
 {
-    {% for trait in meta_entity.traits -%}
-    use {{ trait.name }};
-    {% endfor %}
-
-    {% for property in meta_entity.properties -%}
-        {{ block('property') }}
-    {% endfor %}
+    {%- for trait in meta_entity.traits -%}
+        {{- '    use' ~ trait.name ~ ';\n' -}}
+    {%- endfor -%}
 
     {%- for property in meta_entity.properties -%}
-        {{ block('property_methods') -}}
-    {% endfor %}
-{{ '}' }}
+        {{- block('property') -}}
+    {%- endfor -%}
+
+    {%- for property in meta_entity.properties -%}
+        {{- block('property_methods') -}}
+    {%- endfor -%}
+}

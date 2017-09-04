@@ -1,44 +1,19 @@
-{# @var property \AppBundle\MetaEntity\PropertyMetadata #}
-{% block property -%}
-    /**
-    * @var {{ property.type }}
-    *
-    * @ORM\Column({{ block('orm_column_properties') }})
-    {% if property.isId -%}
-    * @ORM\Id
-    * @ORM\GeneratedValue(strategy="AUTO")
-    {% endif -%}
-    */
-    private ${{ property.name }};
+{% use 'entity/property_dockblock.php.twig' %}
+{# @var property \Wame\SensioGeneratorBundle\MetaData\MetaProperty #}
+{% block property %}
+    {{- block('property_docblock') -}}
+    {{- '\n    private $' ~property.name ~ ';\n' -}}
 {% endblock %}
 
-{% block orm_column_properties -%}
-    name="{{ property.columnName }}", type="{{ property.type }}"
-    {%- if property.nullable -%}
-        , nullable=true
-    {%- endif -%}
-    {%- if property.unique -%}
-        , unique=true
-    {%- endif -%}
-    {%- if property.length -%}
-        , length={{ property.length }}
-    {%- endif -%}
-    {%- if property.scale -%}
-        , scale={{ property.scale }}
-    {%- endif -%}
-    {%- if property.precision -%}
-        , precision={{ property.precision }}
-    {%- endif -%}
-{% endblock %}
 
 {% block property_methods %}
 
     {{ block('property_getter') }}
     {% if property.isId != true %}{{ block('property_setter') }}{% endif %}
-{%- endblock %}
+{% endblock %}
 
-{% block property_setter -%}
-    public function set{{ property.name | capitalize }}({{ property.nullable ? '?' : '' }}{{ property.type }} ${{ property.name }}): self
+{% block property_setter %}
+    public function set{{ property.name | capitalize }}({{ property.nullable ? '?' : '' }}{{ property.returnType }} ${{ property.name }}): self
     {
         $this->{{ property.name }} = ${{ property.name }};
 
@@ -46,8 +21,8 @@
     }
 {% endblock %}
 
-{% block property_getter -%}
-    public function get{{ property.name | capitalize }}(): ?{{ property.type }}
+{% block property_getter %}
+    public function get{{ property.name | capitalize }}(): ?{{ property.returnType }}
     {
         return $this->{{ property.name }};
     }

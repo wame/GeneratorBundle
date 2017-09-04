@@ -5,9 +5,13 @@ namespace Wame\SensioGeneratorBundle\MetaData;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Util\Inflector;
+use Wame\SensioGeneratorBundle\Twig\InflectorExtension;
 
 class MetaProperty
 {
+    /** @var MetaEntity */
+    protected $entity;
+
     /** @var string */
     protected $name;
 
@@ -15,13 +19,13 @@ class MetaProperty
     protected $columnName;
 
     /** @var string */
-    protected $type;
+    protected $type = 'string';
 
     /** @var bool */
-    protected $nullable;
+    protected $nullable = false;
 
     /** @var bool */
-    protected $unique;
+    protected $unique = false;
 
     /** @var int */
     protected $length;
@@ -33,22 +37,45 @@ class MetaProperty
     protected $precision;
 
     /** @var bool */
-    protected $id;
+    protected $id = false;
 
     /** @var string */
     protected $targetEntity;
 
     /** @var string */
-    protected $referencedColumnName;
+    protected $referencedColumnName = 'id';
 
     /** @var bool */
-    protected $inversedBy;
+    protected $inversedBy = false;
 
     /** @var bool */
-    protected $orphanRemoval;
+    protected $orphanRemoval = true;
 
     /** @var MetaValidation[]|ArrayCollection */
-    protected $validations;
+    protected $validations = [];
+
+    public function __construct()
+    {
+        $this->validations = new ArrayCollection();
+    }
+
+    /**
+     * @return MetaEntity
+     */
+    public function getEntity(): MetaEntity
+    {
+        return $this->entity;
+    }
+
+    /**
+     * @param MetaEntity $entity
+     * @return MetaProperty
+     */
+    public function setEntity($entity): self
+    {
+        $this->entity = $entity;
+        return $this;
+    }
 
     /**
      * @return string
@@ -197,7 +224,7 @@ class MetaProperty
     /**
      * @return string
      */
-    public function getTargetEntity(): string
+    public function getTargetEntity(): ?string
     {
         return $this->targetEntity;
     }
@@ -270,12 +297,13 @@ class MetaProperty
         return $this;
     }
 
-    public function getValidations()
+    /** @return ArrayCollection|MetaValidation[] */
+    public function getValidations(): ArrayCollection
     {
         return $this->validations;
     }
 
-    public function setValidations($validations): self
+    public function setValidations(ArrayCollection $validations): self
     {
         $this->validations = $validations;
         return $this;
@@ -291,5 +319,39 @@ class MetaProperty
     {
         $this->validations->removeElement($validations);
         return $this;
+    }
+
+    public function isRelationType()
+    {
+        return in_array($this->getType(), ['many2one', 'many2many', 'one2many', 'one2one'], true);
+    }
+
+    public function getTabalizedTargetEntity()
+    {
+        return Inflector::tableize($this->getTargetEntity());
+    }
+
+    public function getReturnType($annotation = false)
+    {
+        //TODO: check more types. Perhaps also use constants
+        switch ($type = $this->getType()) {
+            case 'datetime':
+            case 'date':
+            case 'time':
+                return '\DateTime';
+            case 'decimal':
+                return 'float';
+            case 'one2many':
+            case 'many2many':
+                return 'Collection'. ($annotation ? '|'.$this->getTargetEntity().'[]' : '');
+            case 'many2one':
+            case 'one2one':
+                return $this->getTargetEntity();
+            case 'enum':
+            case 'text':
+                return 'string';
+            default:
+                return $type;
+        }
     }
 }

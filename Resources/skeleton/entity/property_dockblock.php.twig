@@ -1,0 +1,106 @@
+{# @var property \Wame\SensioGeneratorBundle\MetaData\MetaProperty #}
+{% block property_docblock %}
+    {{- '\n    /**\n' -}}
+    {{- block('property_dockblock_return_type') -}}
+    {%- if property.type == 'one2many' -%}
+        {{- block('property_docblock_orm_part_one2many') -}}
+    {%- elseif property.type == 'many2one' %}
+        {{- block('property_docblock_orm_part_many2one') -}}
+    {%- elseif property.type == 'many2many' -%}
+        {{- block('property_docblock_orm_part_many2many') -}}
+    {%- elseif property.type == 'one2one' %}
+        {{- block('property_docblock_orm_part_one2one') -}}
+    {%- else -%}
+        {{- block('property_docblock_orm_part_standard') -}}
+    {%- endif -%}
+    {{- block('property_dockblock_validation') -}}
+    {{- '\n    */' -}}
+{% endblock %}
+
+{% block property_dockblock_return_type %}
+    {{- '     *' ~ property.returnType(true) ~ '\n' -}}
+{% endblock %}
+
+{% block property_docblock_orm_part_standard %}
+
+    {{- '\n     ' -}}
+    * @ORM\Column({{- block('orm_column_properties') -}})
+    {%- if property.isId -%}
+        {{- '\n     ' -}}
+        * @ORM\Id'
+        {{- '\n     ' -}}
+        * @ORM\GeneratedValue(strategy="AUTO")'
+    {%- else -%}
+    {%- endif %}
+{% endblock %}
+
+{% block orm_column_properties -%}
+    name="{{ property.columnName }}", type="{{ property.type }}"
+    {%- if property.nullable -%}
+        , nullable=true
+    {%- endif -%}
+    {%- if property.unique -%}
+        , unique=true
+    {%- endif -%}
+    {%- if property.length -%}
+        , length={{ property.length }}
+    {%- endif -%}
+    {%- if property.scale -%}
+        , scale={{ property.scale }}
+    {%- endif -%}
+    {%- if property.precision -%}
+        , precision={{ property.precision }}
+    {%- endif -%}
+{% endblock %}
+
+{% block property_docblock_orm_part_many2one %}
+    {%- set inversedBy = property.inversedBy ? ', inversedBy="'~property.inversedBy~'"' : '' -%}
+    {{- '\n     ' -}}
+    * @ORM\ManyToOne(targetEntity="{{ property.entity.bundleNamespace ~ '\\Entity\\' ~ property.targetEntity }}" {{- inversedBy }})
+    {{- '\n     ' -}}
+    * @ORM\JoinColumn(name="{{ property.targetEntity | tabalize }}", referencedColumnName="{{ property.referencedColumnName | tabalize }}")
+{% endblock %}
+
+{% block property_docblock_orm_part_one2many %}
+    {# one2many MUST be mappedBy other entity #}
+    {% set mappedBy = ', mappedBy="'~ property.entity.entityName | pluralize ~'"' %}
+    {% set orphanRemoval = property.orphanRemoval ? ', orphanRemoval=true' : '' %}
+    {% set cascade = 'cascade={"persist"}'%}
+    * @ORM\OneToMany(targetEntity="{{ property.entity.bundleNamespace ~ '\\Entity\\' ~ property.targetEntity }}" {{- mappedBy ~ orphanRemoval ~cascade }})
+{% endblock %}
+
+{% block property_docblock_orm_part_one2one %}
+    {# TODO: A one2one could also be mapped by other entity. Currently we assume this entity is the mapping-side, but we might want to add possibility for doing otherwise #}
+    {% set inversedBy = ', inversedBy="'~ property.entity.entityName | pluralize ~'"' %}
+    {% set cascade = 'cascade={"persist"}'%}
+    * @ORM\OneToMany(targetEntity="{{ property.entity.bundleNamespace ~ '\\Entity\\' ~ property.targetEntity }}" {{- inversedBy ~ cascade }})
+{% endblock %}
+
+{% block property_docblock_orm_part_many2many %}
+    {% set inversedBy = property.inversedBy ? ', inversedBy="'~ property.entity.entityName | pluralize ~'"' : '' %}
+    {% set orphanRemoval = property.orphanRemoval ? ', orphanRemoval=true' : '' %}
+    {# TODO: cascade option in property-targetEntity -> also option for 'remove'? #}
+    {% set cascade = 'cascade={"persist"}'%}
+    * @ORM\ManyToMany(targetEntity="{{ property.entity.bundleNamespace ~ '\\Entity\\' ~ property.targetEntity }}" {{- inversedBy ~ orphanRemoval ~ cascade}})
+    * @ORM\JoinTable(name="{{ property.entity.tableName ~ property.tabalizedTargetEntity }}",
+    *   joinColumns={
+    *     @ORM\JoinColumn(name="{{ property.entity.entityName | tabalize }}_id", referencedColumnName="id", onDelete="CASCADE")
+    *   },
+    *   inverseJoinColumns={
+    *     @ORM\JoinColumn(name="{{ property.targetEntity | tabalize }}_id", referencedColumnName="id", onDelete="CASCADE")
+    *   }
+    * )
+{% endblock %}
+
+{% block property_dockblock_validation %}
+    {%- for validation in property.validations -%}
+        {%- set validationOptions = "" -%}
+        {%- for optionValue,optionKey in validation.options -%}
+            {%- if loop.first %}{% set validationOptions = validationOptions ~ "(" %}{% endif -%}
+            {%- if loop.first == false %}{% set validationOptions = validationOptions ~ ", " %}{% endif -%}
+            {%- set validationOptions = validationOptions ~ optionKey~"="~optionValue -%}
+            {%- if loop.last %}{% set validationOptions = validationOptions ~ ")" %}{% endif -%}
+        {%- endfor -%}
+    {{- '\n     * @Assert\\' ~ validation.type ~ validationOptions -}}
+    {%- endfor -%}
+{% endblock %}
