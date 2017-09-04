@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Instead of extending the 'GenerateDoctrineEntityCommand', this base class is used
@@ -15,6 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Validator\Constraint;
 use Wame\SensioGeneratorBundle\Command\Helper\QuestionHelper;
 use Wame\SensioGeneratorBundle\Util\ClassFunctions;
 
@@ -56,19 +58,61 @@ abstract class GenerateWameEntityCommand extends GenerateDoctrineCommand
     protected function configure()
     {
         $this
-            ->addOption('no-blameable', null, InputOption::VALUE_OPTIONAL,
-                'Do not add `blameable` fields/behaviour on the new entity')
-            ->addOption('no-timestampable', null, InputOption::VALUE_OPTIONAL,
-                'Do not add `timestampable` fields/behaviour on the new entity')
-            ->addOption('no-softdeleteable', null, InputOption::VALUE_OPTIONAL,
-                'Do not soft-delete the new entity')
-            ->addOption('behaviours', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'Internal option; use --no-* options instead')
-            ->addOption('display-field', null, InputOption::VALUE_REQUIRED,
-                'The field that can represent the entity as a string')
-            ->addOption('no-validation', null, InputOption::VALUE_NONE,
-                'Do not ask to about adding field validation')
+            ->addOption('no-blameable', null, InputOption::VALUE_OPTIONAL, 'Do not add `blameable` fields/behaviour on the new entity')
+            ->addOption('no-timestampable', null, InputOption::VALUE_OPTIONAL, 'Do not add `timestampable` fields/behaviour on the new entity')
+            ->addOption('no-softdeleteable', null, InputOption::VALUE_OPTIONAL, 'Do not soft-delete the new entity')
+            ->addOption('behaviours', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Internal option; use --no-* options instead')
+            ->addOption('display-field', null, InputOption::VALUE_REQUIRED, 'The field that can represent the entity as a string')
+            ->addOption('no-validation', null, InputOption::VALUE_NONE, 'Do not ask to about adding field validation')
         ;
+    }
+
+    protected function parseFields($fields)
+    {
+        //NOTE: we assume this method is called AFTER parseField in 'GenerateDoctrineEntityCommand'
+        foreach ($fields as &$field) {
+            $validationOption = $field['validation'] ?? null;
+            if ($validationOption && !is_array($validationOption)) {
+                $validations = explode(';', $validationOption);
+                $newValidationOption = [];
+                foreach ($validations as $validation) {
+                    $newValidationOption[] = [
+                        'type' => $validation,
+                        'options' => [],    //TODO: it might be nice if we can pass options as well
+                    ];
+                }
+                $field['validation'] = $newValidationOption;
+            }
+        }
+        return $fields;
+    }
+
+    /**
+     * @param Constraint[] $constraints
+     * @return array
+     */
+    protected function getConstraintOptions($constraints)
+    {
+        $constraintClasses = $this->getConstraintClasses($constraints);
+        $constraintOptions = !empty($constraints)
+            ? array_combine(range(1, count($constraints)), $constraintClasses)
+            : [];
+
+        return $constraintOptions;
+    }
+
+    /**
+     * @param Constraint[] $constraints
+     * @return array
+     */
+    protected function getConstraintClasses($constraints)
+    {
+        $constraintClasses = [];
+        foreach ($constraints as $constraintClass => $constraint) {
+            $name = substr($constraintClass, strrpos($constraintClass, '\\') + 1);
+            $constraintClasses[$constraintClass] = $name;
+        }
+        return $constraintClasses;
     }
 
     protected function addBehaviorInteraction(InputInterface $input, OutputInterface $output)
@@ -107,8 +151,10 @@ abstract class GenerateWameEntityCommand extends GenerateDoctrineCommand
             ''
         ]);
 
-        $displayFieldOptions = array_filter(array_map(function($field) {
-            if (!in_array($field['type'], ['string', 'text', ''])) return false;
+        $displayFieldOptions = array_filter(array_map(function ($field) {
+            if (!in_array($field['type'], ['string', 'text', ''], true)) {
+                return false;
+            }
             return $field['fieldName'];
         }, $entityFields));
 
@@ -120,13 +166,18 @@ abstract class GenerateWameEntityCommand extends GenerateDoctrineCommand
         $this->outputCompactOptionsList($output, array_flip($displayFieldOptions), 20);
 
         $defaultField = null;
-        if (isset($entityFields['title'])) $defaultField = 'title';
-        elseif (isset($entityFields['name'])) $defaultField = 'name';
+        if (isset($entityFields['title'])) {
+            $defaultField = 'title';
+        } elseif (isset($entityFields['name'])) {
+            $defaultField = 'name';
+        }
 
         $question = new Question($questionHelper->getQuestion('Which field you want to use? (leave empty to skip)', $defaultField), $defaultField);
         $question->setAutocompleterValues(array_keys($displayFieldOptions));
         $question->setValidator(function ($field) use ($displayFieldOptions) {
-            if (!$field) return null;
+            if (!$field) {
+                return null;
+            }
             if (ctype_digit($field) && isset($displayFieldOptions[$field])) {
                 return $displayFieldOptions[$field];
             }
@@ -143,17 +194,17 @@ abstract class GenerateWameEntityCommand extends GenerateDoctrineCommand
 
     protected function guessMoreFieldTypes($columnName, $defaultType)
     {
-        if (substr($columnName, -3) == '_on') {
+        if (substr($columnName, -3) === '_on') {
             return 'datetime';
-        } elseif (substr($columnName, -4) == 'date') {
+        } if (substr($columnName, -4) === 'date') {
             return 'date';
-        } elseif (substr($columnName, -3) == '_id') {
+        } if (substr($columnName, -3) === '_id') {
             return 'many2one';
-        } elseif (substr($columnName, -5) == 'count') {
+        } if (substr($columnName, -5) === 'count') {
             return 'integer';
-        } elseif (in_array($columnName, ['summary', 'description', 'text'])) {
+        } if (in_array($columnName, ['summary', 'description', 'text'])) {
             return 'text';
-        } elseif (substr($columnName, -5) == 'price') {
+        } if (substr($columnName, -5) === 'price') {
             return 'double';
         }
         return $defaultType;
@@ -172,7 +223,7 @@ abstract class GenerateWameEntityCommand extends GenerateDoctrineCommand
             ? array_combine(range(1, count($existingEntities)), array_keys($existingEntities))
             : [];
 
-        if (substr($columnName, -3) == '_id') {
+        if (substr($columnName, -3) === '_id') {
             $data['fieldName'] = lcfirst(Container::camelize(substr($columnName, 0, -3)));
         }
 
@@ -225,13 +276,17 @@ abstract class GenerateWameEntityCommand extends GenerateDoctrineCommand
 
         $question = new Question($questionHelper->getQuestion('Which enum type', ''), '');
         $question->setAutocompleterValues(array_keys($enumTypes));
-        $question->setValidator(function($type) use ($enumOptionsList) {
-            if (!$type) return null;
+        $question->setValidator(function ($type) use ($enumOptionsList) {
+            if (!$type) {
+                return null;
+            }
             if (is_int($type) || ctype_digit($type)) {
                 if (!in_array($type, $enumOptionsList)) {
                     throw new \InvalidArgumentException(sprintf("%d is not a valid option", $type));
                 }
-                if ($type == 0) return null;
+                if ($type == 0) {
+                    return null;
+                }
                 return array_search($type, $enumOptionsList);
             }
             if (!array_key_exists($type, $enumOptionsList)) {
@@ -260,10 +315,8 @@ abstract class GenerateWameEntityCommand extends GenerateDoctrineCommand
                 $data['enumType'] = $enumType;
                 $data['enumTypeClass'] = $enumClass;
                 $enumTypes[$enumType] = $enumClass;
-            } else {
-                // TODO: output warning ?
             }
-
+            // TODO: output warning if this point is reached?
         } else {
             $data['enumType'] = $enumType;
             $data['enumTypeClass'] = $enumTypes[$enumType];
@@ -312,7 +365,9 @@ abstract class GenerateWameEntityCommand extends GenerateDoctrineCommand
         $this->outputCompactOptionsList($output, array_flip($constraintOptions));
 
         $constraintValidator = function ($constraint) use ($constraintOptions) {
-            if (!$constraint) return null;
+            if (!$constraint) {
+                return null;
+            }
             if (ctype_digit($constraint) && isset($constraintOptions[$constraint])) {
                 $constraint = $constraintOptions[$constraint];
             } elseif (!in_array($constraint, $constraintOptions)) {
@@ -325,15 +380,19 @@ abstract class GenerateWameEntityCommand extends GenerateDoctrineCommand
             return $constraint;
         };
 
-        $constraintOptionNormalizer = function($value) {
+        $constraintOptionNormalizer = function ($value) {
             if (is_int($value) || ctype_digit($value)) {
                 return (int) $value;
             }
             if (is_array($value)) {
                 return $value;
             }
-            if ($value == 'yes') return true;
-            if ($value == 'no') return false;
+            if ($value === 'yes') {
+                return true;
+            }
+            if ($value === 'no') {
+                return false;
+            }
             try {
                 $decodeValue = @json_decode($value, true);
                 if (json_last_error() !== JSON_ERROR_NONE) {
@@ -382,7 +441,9 @@ abstract class GenerateWameEntityCommand extends GenerateDoctrineCommand
 
             // Make sure we set all required options
             foreach ($constraint->getRequiredOptions() as $option) {
-                if (array_key_exists($option, $fieldConstraint['options'])) continue;
+                if (array_key_exists($option, $fieldConstraint['options'])) {
+                    continue;
+                }
                 $value = null;
                 if ($constraintRef->hasProperty($option)) {
                     $value = $constraintRef->getProperty($option)->getValue($constraint);
@@ -397,10 +458,16 @@ abstract class GenerateWameEntityCommand extends GenerateDoctrineCommand
 
             // Ask about other public properties, as possible option
             foreach ($constraintRef->getDefaultProperties() as $property => $defaultValue) {
-                if (array_key_exists($property, $fieldConstraint['options'])) continue;
-                if (in_array($property, $this->ignoredConstraintOptions)) continue;
+                if (array_key_exists($property, $fieldConstraint['options'])) {
+                    continue;
+                }
+                if (in_array($property, $this->ignoredConstraintOptions)) {
+                    continue;
+                }
                 $propertyRef = $constraintRef->getProperty($property);
-                if (!$propertyRef->isPublic() || $propertyRef->isStatic()) continue;
+                if (!$propertyRef->isPublic() || $propertyRef->isStatic()) {
+                    continue;
+                }
 
                 if (is_array($defaultValue)) {
                     $defaultValueDisplay = json_encode($defaultValue, (JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) & ~JSON_PRETTY_PRINT);
@@ -449,15 +516,16 @@ abstract class GenerateWameEntityCommand extends GenerateDoctrineCommand
      */
     protected function getPropertyValidationConstraints()
     {
-        if ($this->constraints) return $this->constraints;
+        if ($this->constraints) {
+            return $this->constraints;
+        }
 
         $constraints = [];
         $componentNamespace = '\Symfony\Component\Validator\Constraints';
 
         // Try to get all default constraints by scanning the Component's Constraints folder
         $dir = dirname((new \ReflectionClass($componentNamespace.'\Valid'))->getFileName());
-        foreach (scandir($dir) as $file) {
-
+        foreach (scandir($dir, null) as $file) {
             if (preg_match('/^(.+)(?!(Validator|Provider))\.php$/', $file, $matches)) {
                 $constraintClass = $componentNamespace . '\\' . $matches[1];
                 if (!is_subclass_of($constraintClass, '\Symfony\Component\Validator\Constraint')) {
@@ -498,11 +566,13 @@ abstract class GenerateWameEntityCommand extends GenerateDoctrineCommand
 
     protected function getEnumTypes()
     {
-        $types = Type::getTypesMap() + $this->getConfiguredTypes();
+        $types = array_merge(Type::getTypesMap(), $this->getConfiguredTypes());
 
         $enumTypes = [];
         foreach ($types as $type => $class) {
-            if (strpos(ltrim($class, '\\'), 'Doctrine\DBAL\Types') === 0) continue;
+            if (strpos(ltrim($class, '\\'), 'Doctrine\DBAL\Types') === 0) {
+                continue;
+            }
             if (is_subclass_of($class, '\Fresh\DoctrineEnumBundle\DBAL\Types\AbstractEnumType')) {
                 $enumTypes[$type] = $class;
             }
@@ -512,7 +582,7 @@ abstract class GenerateWameEntityCommand extends GenerateDoctrineCommand
 
     protected function getTypes()
     {
-        $types = Type::getTypesMap() + $this->getConfiguredTypes();
+        $types = array_merge(Type::getTypesMap(), $this->getConfiguredTypes());
         $types = array_keys($types);
 
         $types = array_combine($types, array_fill(0, count($types), null));
@@ -587,7 +657,7 @@ abstract class GenerateWameEntityCommand extends GenerateDoctrineCommand
         $container = $this->getContainer();
         $bundles = $container->getParameter('kernel.bundles');
 
-        $bundles = array_map(function($namespace) {
+        $bundles = array_map(function ($namespace) {
             $namespace = rtrim($namespace, '\\');
             $namespace = substr($namespace, 0, strrpos($namespace, '\\'));
             return $namespace;
@@ -596,7 +666,8 @@ abstract class GenerateWameEntityCommand extends GenerateDoctrineCommand
         return $bundles;
     }
 
-    protected function getBundle($entityClass, $bundles = []) {
+    protected function getBundle($entityClass, $bundles = [])
+    {
         foreach ($bundles as $bundle => $bundleNamespace) {
             if (strpos($entityClass, $bundleNamespace) === 0) {
                 return $bundle;
