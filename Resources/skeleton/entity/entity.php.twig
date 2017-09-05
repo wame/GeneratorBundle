@@ -1,17 +1,22 @@
 {# @var meta_entity \Wame\SensioGeneratorBundle\MetaData\MetaEntity #}
 {% use 'entity/property.php.twig' %}
+{% use 'entity/constructor.php.twig' %}
 <?php
 declare(strict_types=1);
 
 namespace {{ meta_entity.bundleNamespace }}\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-{% if meta_entity.hasTrait('SoftDeleteable') -%}
+{% if meta_entity.hasTrait('SoftDeleteable') %}
 use Gedmo\Mapping\Annotation as Gedmo;
+{% endif -%}
+{% if meta_entity.hasCollectionProperties  -%}
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 {% endif -%}
 use Symfony\Component\Validator\Constraints as Assert;
 {% for trait in meta_entity.traits -%}
-use {{ trait.namespace }}\{{ trait.name }};
+    use {{ trait.namespace }} as {{ trait.name }};
 {% endfor %}
 
 /**
@@ -26,14 +31,20 @@ use {{ trait.namespace }}\{{ trait.name }};
 class {{ meta_entity.entityName }}
 {
     {%- for trait in meta_entity.traits -%}
-        {{- '    use' ~ trait.name ~ ';\n' -}}
+        {{- '\n    ' -}}
+        use {{ trait.name }};
+        {%- if loop.last -%}
+            {{- '\n' -}}
+        {%- endif -%}
     {%- endfor -%}
 
     {%- for property in meta_entity.properties -%}
-        {{- block('property') -}}
+        {{- block('property') ~ '\n' -}}
     {%- endfor -%}
 
+    {{- block('constructor') -}}
+
     {%- for property in meta_entity.properties -%}
-        {{- block('property_methods') -}}
+        {{- block('property_methods')  ~ '\n' -}}
     {%- endfor -%}
 }

@@ -206,7 +206,7 @@ class MetaEntity
         return $this;
     }
 
-    public function hasTrait($traitName)
+    public function hasTrait($traitName): bool
     {
         foreach ($this->getTraits() as $trait) {
             if ($trait->getName() === $traitName) {
@@ -214,5 +214,17 @@ class MetaEntity
             }
         }
         return false;
+    }
+
+    public function isHasCollectionProperties(): bool
+    {
+        return $this->getCollectionProperties()->isEmpty() === false;
+    }
+
+    public function getCollectionProperties()
+    {
+        return $this->getProperties()->filter(function (MetaProperty $property) {
+            return $property->isCollectionType();
+        });
     }
 }

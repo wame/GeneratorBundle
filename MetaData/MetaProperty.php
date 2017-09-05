@@ -22,7 +22,7 @@ class MetaProperty
     protected $type = 'string';
 
     /** @var bool */
-    protected $nullable = false;
+    protected $nullable;
 
     /** @var bool */
     protected $unique = false;
@@ -91,7 +91,7 @@ class MetaProperty
      */
     public function setName(string $name): MetaProperty
     {
-        $this->name = $name;
+        $this->name = Inflector::camelize($name);
         return $this;
     }
 
@@ -353,5 +353,10 @@ class MetaProperty
             default:
                 return $type;
         }
+    }
+
+    public function isCollectionType(): bool
+    {
+        return $this->getReturnType(false) === 'Collection';
     }
 }

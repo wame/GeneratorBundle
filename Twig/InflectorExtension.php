@@ -12,23 +12,10 @@ class InflectorExtension extends \Twig_Extension
         return [
             new \Twig_SimpleFilter('tabalize', [$this, 'tabalize']),
             new \Twig_SimpleFilter('pluralize', [$this, 'pluralize']),
+            new \Twig_SimpleFilter('singularize', [$this, 'singularize']),
+            new \Twig_SimpleFilter('camelize', [$this, 'camelize']),
+            new \Twig_SimpleFilter('classify', [$this, 'classify']),
         ];
-    }
-
-    public function getFunctions()
-    {
-        return [
-            new \Twig_SimpleFunction('nl', [$this, 'newline'])
-        ];
-    }
-
-    public function newline($spaces)
-    {
-        $newlineWithSpace = '\n';
-        for ($i=0; $i < $spaces; $i++) {
-            $newlineWithSpace .= ' ';
-        }
-        return $newlineWithSpace;
     }
 
     public function tabalize($string)
@@ -39,5 +26,20 @@ class InflectorExtension extends \Twig_Extension
     public function pluralize($string)
     {
         return Inflector::pluralize($string);
+    }
+
+    public function singularize($string)
+    {
+        return Inflector::singularize($string);
+    }
+
+    public function camelize($string)
+    {
+        return Inflector::camelize($string);
+    }
+
+    public function classify($string)
+    {
+        return Inflector::classify($string);
     }
 }
