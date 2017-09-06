@@ -16,6 +16,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 {% if meta_entity.hasValidation  -%}
 use Symfony\Component\Validator\Constraints as Assert;
 {% endif %}
+{% if meta_entity.hasEnumProperty  -%}
+use Fresh\DoctrineEnumBundle\Validator\Constraints as EnumAssert;
+{% endif %}
 {% for trait in meta_entity.traits -%}
     use {{ trait.namespace }} as {{ trait.name | classify }};
 {% endfor %}

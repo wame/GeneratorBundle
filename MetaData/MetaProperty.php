@@ -20,6 +20,9 @@ class MetaProperty
     /** @var string */
     protected $type = 'string';
 
+    /** @var string */
+    protected $enumType;
+
     /** @var bool */
     protected $nullable;
 
@@ -94,6 +97,17 @@ class MetaProperty
     public function setType(string $type): MetaProperty
     {
         $this->type = $type;
+        return $this;
+    }
+
+    public function getEnumType(): ?string
+    {
+        return $this->enumType;
+    }
+
+    public function setEnumType(?string $enumType): self
+    {
+        $this->enumType = $enumType;
         return $this;
     }
 
@@ -231,23 +245,23 @@ class MetaProperty
 
     public function getColumnName(): ?string
     {
-        return $this->columnName ??  Inflector::tableize($this->getName());
+        return $this->columnName ? $this->columnName : Inflector::tableize($this->getName());
     }
 
     public function setColumnName(?string $columnName): self
     {
-        $this->columnName = $columnName;
+        $this->columnName = Inflector::tableize($columnName);
         return $this;
     }
 
-    public function getReferencedColumnName(): ?string
+    public function getReferencedColumnName(): string
     {
         return $this->referencedColumnName;
     }
 
-    public function setReferencedColumnName(?string $referencedColumnName): self
+    public function setReferencedColumnName(string $referencedColumnName): self
     {
-        $this->referencedColumnName = $referencedColumnName;
+        $this->referencedColumnName = Inflector::tableize($referencedColumnName);
         return $this;
     }
 
@@ -290,6 +304,7 @@ class MetaProperty
         //TODO: check more types. Perhaps also use constants
         switch ($type = $this->getType()) {
             case 'datetime':
+            case 'datetimetz':
             case 'date':
             case 'time':
                 return '\DateTime';
@@ -303,7 +318,14 @@ class MetaProperty
                 return $this->getTargetEntity();
             case 'enum':
             case 'text':
+            case 'blob':
                 return 'string';
+            case 'smallint':
+            case 'bigint':
+                return 'integer';
+            case 'simple_array':
+            case 'json_array':
+                return 'array';
             default:
                 return $type;
         }

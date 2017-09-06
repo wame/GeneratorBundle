@@ -230,9 +230,22 @@ class MetaEntity
 
     public function isHasValidation(): bool
     {
-        return $this->getProperties()->filter(function (MetaProperty $property) {
-            return $property->isHasValidation();
-        })->isEmpty() === false;
+        foreach ($this->getProperties() as $property) {
+            if ($property->isHasValidation()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function isHasEnumProperty(): bool
+    {
+        foreach ($this->getProperties() as $property) {
+            if ($property->getEnumType()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function getDisplayFieldProperty(): ?MetaProperty
