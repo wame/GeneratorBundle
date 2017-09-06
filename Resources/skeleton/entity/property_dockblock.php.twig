@@ -30,9 +30,10 @@
     {{-''}}
      * @ORM\Column({{- block('orm_column_properties') }})
     {%- if property.isId %}
+        {{-''}}
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-    {% endif %}
+    {%- endif %}
 {%- endblock %}
 
 {%- block property_docblock_orm_enum %}

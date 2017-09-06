@@ -72,6 +72,13 @@ class WameEntityGenerator extends DoctrineEntityGenerator
 
         $displayField = $input->hasOption('display-field') ? $input->getOption('display-field') : null;
 
+        if (!array_key_exists('id', $fields)) {
+            array_unshift($fields, [
+                'fieldName' => 'id',
+                'id' => true,
+            ]);
+        }
+
         foreach ($fields as $field) {
             $isDisplayField = Inflector::camelize($displayField) === Inflector::camelize($field['fieldName']) || isset($field['displayField']);
             $metaProperty = (new MetaProperty())
@@ -89,6 +96,7 @@ class WameEntityGenerator extends DoctrineEntityGenerator
                 ->setDisplayField($isDisplayField)
                 ->setReferencedColumnName($field['referencedColumnName'] ?? 'id')
                 ->setEnumType($field['enumType'] ?? null)
+                ->setId($field['id'] ?? false)
             ;
             $validations = $field['validation'] ?? [];
             foreach ($validations as $validation) {

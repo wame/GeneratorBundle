@@ -42,7 +42,8 @@ class {{ meta_entity.entityName }}
         {{- loop.first ? ' ' : ', '  -}}
         {{- interface.name -}}
     {%- endfor -%}
-{%- endif %}
+{%- endif -%}
+{{-''}}
 {
     {%- for trait in meta_entity.traits -%}
         {{- '\n    ' -}}

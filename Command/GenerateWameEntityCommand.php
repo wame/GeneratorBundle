@@ -58,13 +58,39 @@ abstract class GenerateWameEntityCommand extends GenerateDoctrineCommand
     protected function configure()
     {
         $this
-            ->addOption('no-blameable', null, InputOption::VALUE_OPTIONAL, 'Do not add `blameable` fields/behaviour on the new entity')
+            ->addOption('bundle', null, InputOption::VALUE_REQUIRED,
+                'Name of the Bundle in which the entity must be generated')            ->addOption('no-blameable', null, InputOption::VALUE_OPTIONAL, 'Do not add `blameable` fields/behaviour on the new entity')
             ->addOption('no-timestampable', null, InputOption::VALUE_OPTIONAL, 'Do not add `timestampable` fields/behaviour on the new entity')
             ->addOption('no-softdeleteable', null, InputOption::VALUE_OPTIONAL, 'Do not soft-delete the new entity')
             ->addOption('behaviours', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Adds behavior (options are `blameable`,`timestampable`,`softdeleteable`)')
             ->addOption('display-field', null, InputOption::VALUE_REQUIRED, 'The field that can represent the entity as a string')
             ->addOption('no-validation', null, InputOption::VALUE_NONE, 'Do not ask to about adding field validation')
         ;
+    }
+
+    protected function prefixEntityInputWithBundle(InputInterface $input)
+    {
+        $container = $this->getContainer();
+
+        // Get Bundle name from config.yml if not supplied as command option
+        if (!$input->getOption('bundle') && $container->hasParameter('wame_generator.default_bundle')) {
+            $input->setOption('bundle', $container->getParameter('wame_generator.default_bundle'));
+        }
+
+        // Prefix entity argument with bundle, if not already set
+        if ($input->hasArgument('entity') && $input->getArgument('entity') && $input->getOption('bundle')) {
+            $entity = $input->getArgument('entity');
+            if (strpos($entity, ':') === false) {
+                $input->setArgument('entity', $input->getOption('bundle') . ':' . $entity);
+            }
+        }
+    }
+
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        parent::initialize($input, $output);
+
+        $this->prefixEntityInputWithBundle($input);
     }
 
     protected function parseFields($fields)
@@ -205,7 +231,7 @@ abstract class GenerateWameEntityCommand extends GenerateDoctrineCommand
         } if (in_array($columnName, ['summary', 'description', 'text'])) {
             return 'text';
         } if (substr($columnName, -5) === 'price') {
-            return 'double';
+            return 'decimal';
         }
         return $defaultType;
     }
@@ -525,7 +551,7 @@ abstract class GenerateWameEntityCommand extends GenerateDoctrineCommand
 
         // Try to get all default constraints by scanning the Component's Constraints folder
         $dir = dirname((new \ReflectionClass($componentNamespace.'\Valid'))->getFileName());
-        foreach (scandir($dir, null) as $file) {
+        foreach (scandir($dir, SCANDIR_SORT_ASCENDING ) as $file) {
             if (preg_match('/^(.+)(?!(Validator|Provider))\.php$/', $file, $matches)) {
                 $constraintClass = $componentNamespace . '\\' . $matches[1];
                 if (!is_subclass_of($constraintClass, '\Symfony\Component\Validator\Constraint')) {
@@ -562,6 +588,7 @@ abstract class GenerateWameEntityCommand extends GenerateDoctrineCommand
         } catch (\InvalidArgumentException $e) {
             $bundleNamespace = $bundle;
         }
+        return $bundleNamespace;
     }
 
     protected function getEnumTypes()

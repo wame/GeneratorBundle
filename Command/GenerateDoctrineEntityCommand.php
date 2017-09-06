@@ -168,20 +168,21 @@ EOT
         }
         $input->setArgument('entity', $bundle.':'.$entity);
 
-        // format
-        $output->writeln(array(
-            '',
-            'Determine the format to use for the mapping information.',
-            '',
-        ));
-
-        $formats = array('yml', 'xml', 'php', 'annotation');
-
-        $question = new Question($questionHelper->getQuestion('Configuration format (yml, xml, php, or annotation)', $input->getOption('format')), $input->getOption('format'));
-        $question->setValidator(array('Wame\SensioGeneratorBundle\Command\Validators', 'validateFormat'));
-        $question->setAutocompleterValues($formats);
-        $format = $questionHelper->ask($input, $output, $question);
-        $input->setOption('format', $format);
+        //WAME: no need for format-question as we will always use annotation.
+//        // format
+//        $output->writeln(array(
+//            '',
+//            'Determine the format to use for the mapping information.',
+//            '',
+//        ));
+//
+//        $formats = array('yml', 'xml', 'php', 'annotation');
+//
+//        $question = new Question($questionHelper->getQuestion('Configuration format (yml, xml, php, or annotation)', $input->getOption('format')), $input->getOption('format'));
+//        $question->setValidator(array('Wame\SensioGeneratorBundle\Command\Validators', 'validateFormat'));
+//        $question->setAutocompleterValues($formats);
+//        $format = $questionHelper->ask($input, $output, $question);
+//        $input->setOption('format', $format);
 
         //WAME: add behaviour options
         $this->addBehaviorInteraction($input, $output);
