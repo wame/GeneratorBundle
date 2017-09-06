@@ -4,8 +4,7 @@ declare(strict_types=1);
 namespace Wame\SensioGeneratorBundle\MetaData;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Util\Inflector;
-use Wame\SensioGeneratorBundle\Twig\InflectorExtension;
+use \Wame\SensioGeneratorBundle\Inflector\Inflector;
 
 class MetaProperty
 {
@@ -45,8 +44,11 @@ class MetaProperty
     /** @var string */
     protected $referencedColumnName = 'id';
 
-    /** @var bool */
-    protected $inversedBy = false;
+    /** @var string */
+    protected $inversedBy;
+
+    /** @var string */
+    protected $mappedBy;
 
     /** @var bool */
     protected $orphanRemoval = true;
@@ -59,135 +61,83 @@ class MetaProperty
         $this->validations = new ArrayCollection();
     }
 
-    /**
-     * @return MetaEntity
-     */
     public function getEntity(): MetaEntity
     {
         return $this->entity;
     }
 
-    /**
-     * @param MetaEntity $entity
-     * @return MetaProperty
-     */
-    public function setEntity($entity): self
+    public function setEntity(MetaEntity $entity): self
     {
         $this->entity = $entity;
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     * @return MetaProperty
-     */
     public function setName(string $name): MetaProperty
     {
         $this->name = Inflector::camelize($name);
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * @param string $type
-     * @return MetaProperty
-     */
-    public function setType(?string $type): MetaProperty
+    public function setType(string $type): MetaProperty
     {
         $this->type = $type;
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isNullable(): ?bool
     {
         return $this->nullable;
     }
 
-    /**
-     * @param bool $nullable
-     * @return MetaProperty
-     */
     public function setNullable(?bool $nullable): MetaProperty
     {
         $this->nullable = $nullable;
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isUnique(): ?bool
     {
         return $this->unique;
     }
 
-    /**
-     * @param bool $unique
-     * @return MetaProperty
-     */
     public function setUnique(bool $unique): MetaProperty
     {
         $this->unique = $unique;
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getLength(): ?int
     {
         return $this->length;
     }
 
-    /**
-     * @param int $length
-     * @return MetaProperty
-     */
     public function setLength(?int $length): MetaProperty
     {
         $this->length = $length;
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getScale(): ?int
     {
         return $this->scale;
     }
 
-    /**
-     * @param int $scale
-     * @return MetaProperty
-     */
     public function setScale(?int $scale): MetaProperty
     {
         $this->scale = $scale;
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getPrecision(): ?int
     {
         return $this->precision;
@@ -203,57 +153,47 @@ class MetaProperty
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isId(): ?bool
     {
         return $this->id;
     }
 
-    /**
-     * @param bool $id
-     * @return MetaProperty
-     */
     public function setId(bool $id): MetaProperty
     {
         $this->id = $id;
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getTargetEntity(): ?string
     {
         return $this->targetEntity;
     }
 
-    /**
-     * @param string $targetEntity
-     * @return MetaProperty
-     */
     public function setTargetEntity(?string $targetEntity): MetaProperty
     {
         $this->targetEntity = $targetEntity;
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isInversedBy(): bool
+    public function getInversedBy(): ?string
     {
         return $this->inversedBy;
     }
 
-    /**
-     * @param bool $inversedBy
-     * @return MetaProperty
-     */
-    public function setInversedBy(?bool $inversedBy): MetaProperty
+    public function setInversedBy(?string $inversedBy): MetaProperty
     {
         $this->inversedBy = $inversedBy;
+        return $this;
+    }
+
+    public function getMappedBy(): ?string
+    {
+        return $this->mappedBy;
+    }
+
+    public function setMappedBy(?string $mappedBy): self
+    {
+        $this->mappedBy = $mappedBy;
         return $this;
     }
 
@@ -358,5 +298,10 @@ class MetaProperty
     public function isCollectionType(): bool
     {
         return $this->getReturnType(false) === 'Collection';
+    }
+
+    public function isHasValidation(): bool
+    {
+        return !$this->getValidations()->isEmpty();
     }
 }

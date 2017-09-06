@@ -74,14 +74,16 @@ class WameEntityGenerator extends DoctrineEntityGenerator
             $metaProperty = (new MetaProperty())
                 ->setName($field['fieldName'])
                 ->setColumnName($field['columnName'] ?? null)
-                ->setType($field['type'] ?? null)
+                ->setType($field['type'] ?? 'string')
                 ->setLength($field['length'] ?? null)
                 ->setUnique($field['unique'] ?? false)
                 ->setNullable($field['nullable'] ?? null)
                 ->setScale($field['scale'] ?? null)
                 ->setPrecision($field['precision'] ?? null)
                 ->setTargetEntity($field['targetEntity'] ?? null)
-                ->setReferencedColumnName($field['referencedColumnName'] ?? null)
+                ->setMappedBy($field['mappedBy'] ?? null)
+                ->setInversedBy($field['inversedBy'] ?? null)
+                ->setReferencedColumnName($field['referencedColumnName'] ?? 'id')
             ;
             $validations = $field['validation'] ?? [];
             foreach ($validations as $validation) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Wame\SensioGeneratorBundle\MetaData;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 class MetaEntity
@@ -69,10 +70,9 @@ class MetaEntity
             }
             $entityMetadata->addProperty(
                 (new MetaProperty())
-                    ->setEntity($entityMetadata)
                     ->setId($fieldMapping['id'] ?? false)
                     ->setName($fieldName)
-                    ->setType($fieldMapping['type'] ?? null)
+                    ->setType($fieldMapping['type'] ?? 'string')
                     ->setNullable($fieldMapping['nullable'] ?? false)
                     ->setLength(isset($fieldMapping['length']) ? (int) $fieldMapping['length'] : null)
                     ->setScale(isset($fieldMapping['scale']) ? (int) $fieldMapping['scale'] : null)
@@ -221,10 +221,17 @@ class MetaEntity
         return $this->getCollectionProperties()->isEmpty() === false;
     }
 
-    public function getCollectionProperties()
+    public function getCollectionProperties(): Collection
     {
         return $this->getProperties()->filter(function (MetaProperty $property) {
             return $property->isCollectionType();
         });
+    }
+
+    public function isHasValidation(): bool
+    {
+        return $this->getProperties()->filter(function (MetaProperty $property) {
+            return $property->isHasValidation();
+        })->isEmpty() === false;
     }
 }

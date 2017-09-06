@@ -14,9 +14,14 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 {% endif -%}
+{% if meta_entity.hasValidation  -%}
 use Symfony\Component\Validator\Constraints as Assert;
+{% endif %}
 {% for trait in meta_entity.traits -%}
-    use {{ trait.namespace }} as {{ trait.name }};
+    use {{ trait.namespace }} as {{ trait.name | classify }};
+{% endfor %}
+{% for interface in meta_entity.interfaces -%}
+    use {{ interface.namespace }} as {{ interface.name }};
 {% endfor %}
 
 /**
@@ -29,10 +34,17 @@ use Symfony\Component\Validator\Constraints as Assert;
 {% endif %}
  */
 class {{ meta_entity.entityName }}
+{%- if meta_entity.interfaces.empty == false -%}
+    implements
+    {%- for interface in meta_entity.interfaces -%}
+        {{- loop.first ? ' ' : ', '  -}}
+        {{- interface.name -}}
+    {%- endfor -%}
+{%- endif %}
 {
     {%- for trait in meta_entity.traits -%}
         {{- '\n    ' -}}
-        use {{ trait.name }};
+        use {{ trait.name | classify }};
         {%- if loop.last -%}
             {{- '\n' -}}
         {%- endif -%}
