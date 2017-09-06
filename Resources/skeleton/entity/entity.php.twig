@@ -1,6 +1,5 @@
 {# @var meta_entity \Wame\SensioGeneratorBundle\MetaData\MetaEntity #}
 {% use 'entity/property.php.twig' %}
-{% use 'entity/constructor.php.twig' %}
 <?php
 declare(strict_types=1);
 
@@ -54,9 +53,30 @@ class {{ meta_entity.entityName }}
         {{- block('property') ~ '\n' -}}
     {%- endfor -%}
 
-    {{- block('constructor') -}}
+    {%- if meta_entity.hasCollectionProperties -%}
+    {{-''}}
+    public function __construct()
+    {
+        {%- for property in meta_entity.collectionProperties -%}
+        {{-''}}
+        $this->{{ property.name }} = new ArrayCollection();
+        {%- endfor -%}
+        {{-''}}
+    }
+    {{- '\n' -}}
+    {%- endif -%}
 
     {%- for property in meta_entity.properties -%}
         {{- block('property_methods')  ~ '\n' -}}
     {%- endfor -%}
+
+    {%- set displayFieldProperty =  meta_entity.getDisplayFieldProperty -%}
+    {%- if displayFieldProperty is not null -%}
+    {{-''}}
+    public function __toString()
+    {
+        return {{ displayFieldProperty.type == 'string' ? '' : '(string) ' }}$this->{{ displayFieldProperty.name | camelize }};
+    }
+    {{- '\n' -}}
+    {%- endif -%}
 }

@@ -38,6 +38,9 @@ class MetaProperty
     /** @var bool */
     protected $id = false;
 
+    /** @var bool */
+    protected $displayField = false;
+
     /** @var string */
     protected $targetEntity;
 
@@ -161,6 +164,17 @@ class MetaProperty
     public function setId(bool $id): MetaProperty
     {
         $this->id = $id;
+        return $this;
+    }
+
+    public function isDisplayField(): ?bool
+    {
+        return $this->displayField;
+    }
+
+    public function setDisplayField(bool $displayField): self
+    {
+        $this->displayField = $displayField;
         return $this;
     }
 

@@ -70,7 +70,10 @@ class WameEntityGenerator extends DoctrineEntityGenerator
             }
         }
 
+        $displayField = $input->hasOption('display-field') ? $input->getOption('display-field') : null;
+
         foreach ($fields as $field) {
+            $isDisplayField = $displayField === $field['fieldName'] || isset($field['displayField']);
             $metaProperty = (new MetaProperty())
                 ->setName($field['fieldName'])
                 ->setColumnName($field['columnName'] ?? null)
@@ -83,6 +86,7 @@ class WameEntityGenerator extends DoctrineEntityGenerator
                 ->setTargetEntity($field['targetEntity'] ?? null)
                 ->setMappedBy($field['mappedBy'] ?? null)
                 ->setInversedBy($field['inversedBy'] ?? null)
+                ->setDisplayField($isDisplayField)
                 ->setReferencedColumnName($field['referencedColumnName'] ?? 'id')
             ;
             $validations = $field['validation'] ?? [];

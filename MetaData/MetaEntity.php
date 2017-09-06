@@ -234,4 +234,14 @@ class MetaEntity
             return $property->isHasValidation();
         })->isEmpty() === false;
     }
+
+    public function getDisplayFieldProperty(): ?MetaProperty
+    {
+        foreach ($this->getProperties() as $property) {
+            if ($property->isDisplayField()) {
+                return $property;
+            }
+        }
+        return null;
+    }
 }
