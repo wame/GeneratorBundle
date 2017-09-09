@@ -12,43 +12,36 @@ use Wame\SensioGeneratorBundle\MetaData\MetaProperty;
 use Wame\SensioGeneratorBundle\MetaData\MetaTrait;
 use Wame\SensioGeneratorBundle\MetaData\MetaValidation;
 use Wame\SensioGeneratorBundle\Model\EntityGeneratorResult;
-use Wame\SensioGeneratorBundle\Twig\InflectorExtension;
 
 class WameEntityGenerator extends DoctrineEntityGenerator
 {
-    protected $skeletonDirs;
+    use WameGeneratorTrait;
 
     protected $behaviourTraits = [
-        'softdeleteable' => '\\Gedmo\\SoftDeleteable\\Traits\\SoftDeleteableEntity',
-        'timestampable'  => '\\Gedmo\\Timestampable\\Traits\\TimestampableEntity',
-        'blameable'      => '\\Gedmo\\Blameable\\Traits\\BlameableEntity',
+        'softdeleteable' => 'Gedmo\\SoftDeleteable\\Traits\\SoftDeleteableEntity',
+        'timestampable'  => 'Gedmo\\Timestampable\\Traits\\TimestampableEntity',
+        'blameable'      => 'Gedmo\\Blameable\\Traits\\BlameableEntity',
     ];
-
-    public function setSkeletonDirs($skeletonDirs)
-    {
-        parent::setSkeletonDirs($skeletonDirs);
-        $this->skeletonDirs[] = __DIR__.'/../Resources/skeleton';
-        $this->skeletonDirs[] = __DIR__.'/../Resources';
-    }
-
-    protected function getTwigEnvironment()
-    {
-        $twigEnvironment = parent::getTwigEnvironment();
-        $twigEnvironment->addExtension(new InflectorExtension());
-        return $twigEnvironment;
-    }
 
     public function generate(BundleInterface $bundle, $entity, $format, array $fields, InputInterface $input = null)
     {
+        $metaEntity = $this->getMetaEntity($bundle, $entity, $fields, $input);
         $entityContent = $this->render('entity/entity.php.twig', [
-            'meta_entity' => $this->getMetaEntity($bundle, $entity, $fields, $input),
+            'meta_entity' => $metaEntity,
         ]);
 
         $fs = new Filesystem();
         $entityPath = $bundle->getPath().'/Entity/'.$entity.'.php';
         $fs->dumpFile($entityPath, $entityContent);
 
-        return new EntityGeneratorResult($entityPath, null, null);
+        $repositoryPath = $this->getRepositoryGenerator()->generate($bundle, $metaEntity);
+
+        return new EntityGeneratorResult($entityPath, $repositoryPath, null);
+    }
+
+    protected function getRepositoryGenerator()
+    {
+        return new WameRepositoryGenerator();
     }
 
     protected function getMetaEntity(BundleInterface $bundle, $entity, array $fields, InputInterface $input) : MetaEntity
