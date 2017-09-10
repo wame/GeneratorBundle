@@ -2,12 +2,15 @@
 
 namespace Wame\SensioGeneratorBundle\Form;
 
+use phpDocumentor\Reflection\DocBlock\Tags\Property;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
@@ -95,7 +98,7 @@ class EntityType extends AbstractType
                 'required' => false,
                 'mapped' => false,
             ])
-            ->add('generate_controller', CheckboxType::class, [
+            ->add('generate_crud', CheckboxType::class, [
                 'required' => false,
                 'mapped' => false,
             ])
@@ -108,6 +111,15 @@ class EntityType extends AbstractType
                 'mapped' => false,
             ])
         ;
+
+        $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
+            /** @var MetaEntity $metaEntity */
+           $metaEntity = $event->getData();
+           foreach ($metaEntity->getProperties() as $property) {
+               $property->setEntity($metaEntity);
+           }
+
+        });
     }
 
     protected function getTraitOptions()
@@ -140,7 +152,7 @@ class EntityType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Wame\SensioGeneratorBundle\MetaData\MetaEntity'
+            'data_class' => 'Wame\SensioGeneratorBundle\MetaData\MetaEntity',
         ));
     }
 

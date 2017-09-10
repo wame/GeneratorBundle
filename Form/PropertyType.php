@@ -140,7 +140,7 @@ class PropertyType extends AbstractType
         $entities = [];
         foreach ($entityMetadata as $meta) {
             $entityName = str_replace($meta->namespace.'\\', '', $meta->getName());
-            $entities[$entityName] = $meta->getName();
+            $entities[$entityName] = $entityName;
         }
 
         return $entities;

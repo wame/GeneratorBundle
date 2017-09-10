@@ -1,0 +1,132 @@
+<?php
+declare(strict_types=1);
+
+namespace {{ bundle_namespace }}\Datatable;
+
+use Sg\DatatablesBundle\Datatable\AbstractDatatable as SgDatatable;
+use Sg\DatatablesBundle\Datatable\Column\Column;
+use Sg\DatatablesBundle\Datatable\Column\ActionColumn;
+
+abstract class AppDatatable extends SgDatatable
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function buildDatatable(array $options = array())
+    {
+        $this->language->set([]);
+
+        $this->ajax->set([]);
+
+        $this->options->set(array_merge(
+                ['classes' => 'table table-condensed'],
+                $options)
+        );
+
+        $this->features->set([]);
+
+        $this->addColumns();
+
+        $this->addActions();
+    }
+
+    abstract protected function addColumns();
+
+    protected function addActions()
+    {
+        $actions = $this->getActions();
+        $this->columnBuilder
+            ->add(null, ActionColumn::class, [
+                'title' => $this->translator->trans('sg.datatables.actions.title'),
+                'actions' => $actions,
+                'width' => count($actions) * 40 . 'px',
+            ])
+        ;
+    }
+
+    protected function getActions()
+    {
+        return [
+            [
+                'route' => $this->getRoute('show'),
+                'route_parameters' => $this->getRouteParams('show'),
+                'label' => null,
+                'icon' => 'glyphicon glyphicon-eye-open',
+                'attributes' => [
+                    'rel' => 'tooltip',
+                    'title' => $this->translator->trans('sg.datatables.actions.show'),
+                    'class' => 'btn btn-default btn-sm',
+                    'role' => 'button'
+                ],
+                'render_if' => function ($row) {
+                    return $this->checkIsGranted('VIEW', $row['id']);
+                },
+            ],
+            [
+                'route' => $this->getRoute('edit'),
+                'route_parameters' => $this->getRouteParams('edit'),
+                'label' => null,
+                'icon' => 'glyphicon glyphicon-edit',
+                'attributes' => [
+                    'rel' => 'tooltip',
+                    'title' => $this->translator->trans('sg.datatables.actions.edit'),
+                    'class' => 'btn btn-warning btn-sm',
+                    'role' => 'button'
+                ],
+                'render_if' => function ($row) {
+                    return $this->checkIsGranted('EDIT', $row['id']);
+                },
+            ]
+        ];
+    }
+
+    protected function checkIsGranted($voterSuffix, $entryId)
+    {
+        return $this->authorizationChecker->isGranted(
+            strtoupper($this->getEntityName().'_'.$voterSuffix),
+            $this->getEntityManager()->getReference($this->getEntity(), $entryId)
+        );
+    }
+
+    protected function getRouteParams($suffix)
+    {
+        $params = ['id' => 'id'];
+        if (strstr($this->getRoute($suffix), 'admin_crud_')) {
+            $params['name'] = str_replace('_datatable', '', $this->getName());
+        }
+        return $params;
+    }
+
+    protected function getRoute($suffix)
+    {
+        $routeName = str_replace('datatable', '', $this->getName()).$suffix;
+        if (!$this->router->getRouteCollection()->get($routeName)) {
+            $routeName = 'admin_crud_'.$suffix;
+        }
+        return $routeName;
+    }
+
+    protected function getEntityName()
+    {
+        return str_replace(['{{ bundle_namespace }}\Datatable', 'Datatable', '\\'], '', get_class($this));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEntity()
+    {
+        return str_replace(['{{ bundle_namespace }}\Datatable', 'Datatable'], ['{{ bundle_namespace }}\Entity', ''], get_class($this));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        $className = get_class($this);
+        $name = str_replace('{{ bundle_namespace }}\Datatable\\', '', $className);
+        //SomeDatatable becomes some_datatable
+        return strtolower(preg_replace('/\B([A-Z])/', '_$1', $name));
+    }
+}

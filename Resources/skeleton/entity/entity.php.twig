@@ -79,7 +79,7 @@ class {{ meta_entity.entityName }}
     {{-''}}
     public function __toString()
     {
-        return {{ displayFieldProperty.type == 'string' ? '' : '(string) ' }}$this->{{ displayFieldProperty.name | camelize }};
+        return {{ displayFieldProperty.type == 'string' ? '' : '(string) ' }}$this->get{{ displayFieldProperty.name | classify }}();
     }
     {{- '\n' -}}
     {%- endif -%}

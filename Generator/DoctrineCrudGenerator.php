@@ -23,6 +23,8 @@ use Doctrine\Common\Inflector\Inflector;
  */
 class DoctrineCrudGenerator extends Generator
 {
+    use WameGeneratorTrait;
+
     protected $filesystem;
     protected $rootDir;
     protected $routePrefix;

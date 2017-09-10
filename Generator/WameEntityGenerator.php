@@ -60,7 +60,7 @@ class WameEntityGenerator extends DoctrineEntityGenerator
                 return;
             }
         }
-        $idProperty = (new MetaProperty())->setName('id')->setId(true);
+        $idProperty = (new MetaProperty())->setName('id')->setId(true)->setType('integer')->setEntity($metaEntity);
         $propertyArray = array_merge([$idProperty], $metaEntity->getProperties()->toArray());
         $propertyCollection = new ArrayCollection($propertyArray);
         $metaEntity->setProperties($propertyCollection);

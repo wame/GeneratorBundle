@@ -22,7 +22,7 @@
 {%- endblock %}
 
 {%- block property_dockblock_return_type %}
-     * {{ property.returnType(true) }}
+     * @var {{ property.returnType(true) }}
      *
 {%- endblock %}
 
@@ -66,7 +66,7 @@
     {%- set inversedBy = property.inversedBy ? ', inversedBy="'~property.inversedBy~'"' : '' %}
     {%- set nullable = property.nullable is not null and property.nullable == false ? ', nullable=false' : '' %}
     {{-''}}
-     * @ORM\ManyToOne(targetEntity="'{{  property.entity.bundleNamespace ~ '\\Entity\\' ~ property.targetEntity }}" {{- inversedBy ~ nullable}})
+     * @ORM\ManyToOne(targetEntity="{{  property.entity.bundleNamespace ~ '\\Entity\\' ~ property.targetEntity }}" {{- inversedBy ~ nullable}})
      * @ORM\JoinColumn(name="{{ property.targetEntity|tabalize  }}", referencedColumnName="{{ property.referencedColumnName | tabalize }}")
 {%- endblock %}
 
@@ -76,7 +76,7 @@
     {%- set orphanRemoval = property.orphanRemoval ? ', orphanRemoval=true' : '' %}
     {%- set cascade = ', cascade={"persist"}' %}
     {{-''}}
-     * @ORM\OneToMany(targetEntity="'{{  property.entity.bundleNamespace ~ '\\Entity\\' ~ property.targetEntity }}" {{- mappedBy ~ orphanRemoval ~ cascade }})
+     * @ORM\OneToMany(targetEntity="{{  property.entity.bundleNamespace ~ '\\Entity\\' ~ property.targetEntity }}" {{- mappedBy ~ orphanRemoval ~ cascade }})
 {%- endblock %}
 
 {%- block property_docblock_orm_part_one2one %}
@@ -86,7 +86,7 @@
     {#- nullable in relationships is true by default, so only add if specifically set to false. #}
     {%- set nullable = property.nullable is not null and property.nullable == false ? ', nullable=false' : '' %}
     {{-''}}
-     * @ORM\one2one(targetEntity="'{{  property.entity.bundleNamespace ~ '\\Entity\\' ~ property.targetEntity }}" {{- inversedBy ~ mappedBy ~ cascade ~ nullable -}})
+     * @ORM\one2one(targetEntity="{{  property.entity.bundleNamespace ~ '\\Entity\\' ~ property.targetEntity }}" {{- inversedBy ~ mappedBy ~ cascade ~ nullable -}})
     {%- if mappedBy != '' %}
         {{-''}}
      * @ORM\JoinColumn(name="{{ property.targetEntity|tabalize  }}", referencedColumnName="{{ property.referencedColumnName | tabalize }}")
