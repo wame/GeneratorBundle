@@ -1,0 +1,8 @@
+{% for alertType in ['primary', 'secondary', 'success','danger','warning','info','light','dark'] %}
+    {% for flashMessage in app.session.flashbag.get(alertType) %}
+        <div class="alert alert-dismissible alert-{{ alertType }}">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            {{ flashMessage }}
+        </div>
+    {% endfor %}
+{% endfor %}

@@ -6,6 +6,8 @@ namespace Wame\SensioGeneratorBundle\MetaData;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Wame\SensioGeneratorBundle\Model\Bundle;
 
 class MetaEntity
 {
@@ -15,8 +17,8 @@ class MetaEntity
     /** @var string */
     protected $tableName;
 
-    /** @var string */
-    protected $bundleNamespace;
+    /** @var BundleInterface */
+    protected $bundle;
 
     /** @var MetaInterface[]|ArrayCollection */
     protected $interfaces;
@@ -41,7 +43,8 @@ class MetaEntity
     {
         $reflectionClass = $classMetadata->getReflectionClass();
         $entityMetadata = (new self())
-            ->setBundleNamespace($classMetadata->namespace)
+            //TODO: determine bundle-object -> this will now result in an error
+            ->setBundle($classMetadata->namespace)
             ->setEntityName($reflectionClass->getShortName())
             ->setTableName($classMetadata->getTableName())
         ;
@@ -105,14 +108,19 @@ class MetaEntity
         return $this;
     }
 
-    public function getBundleNamespace(): ?string
+    public function getBundle(): ?BundleInterface
     {
-        return $this->bundleNamespace;
+        return $this->bundle;
     }
 
-    public function setBundleNamespace(string $bundleNamespace): self
+    public function getBundleNamespace(): ?string
     {
-        $this->bundleNamespace = $bundleNamespace;
+        return $this->getBundle() ? $this->getBundle()->getNamespace() : null;
+    }
+
+    public function setBundle(BundleInterface $bundle): self
+    {
+        $this->bundle = $bundle;
         return $this;
     }
 

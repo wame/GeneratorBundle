@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Wame\SensioGeneratorBundle\Generator;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
@@ -17,6 +19,13 @@ class WameEntityGenerator extends DoctrineEntityGenerator
 {
     use WameGeneratorTrait;
 
+    public function __construct(?Filesystem $filesystem = null, ?RegistryInterface $registry = null)
+    {
+        if ($filesystem && $registry) {
+            parent::__construct($filesystem, $registry);
+        }
+    }
+
     protected $behaviourTraits = [
         'softdeleteable' => 'Gedmo\\SoftDeleteable\\Traits\\SoftDeleteableEntity',
         'timestampable'  => 'Gedmo\\Timestampable\\Traits\\TimestampableEntity',
@@ -26,17 +35,35 @@ class WameEntityGenerator extends DoctrineEntityGenerator
     public function generate(BundleInterface $bundle, $entity, $format, array $fields, InputInterface $input = null)
     {
         $metaEntity = $this->getMetaEntity($bundle, $entity, $fields, $input);
+        return $this->generateByMetaEntity($metaEntity);
+    }
+
+    public function generateByMetaEntity(MetaEntity $metaEntity, $includeRepo = true)
+    {
+        $this->addIdFieldIfMissing($metaEntity);
+        $fs = new Filesystem();
         $entityContent = $this->render('entity/entity.php.twig', [
             'meta_entity' => $metaEntity,
         ]);
-
-        $fs = new Filesystem();
-        $entityPath = $bundle->getPath().'/Entity/'.$entity.'.php';
+        $entityPath = $metaEntity->getBundle()->getPath().'/Entity/'.$metaEntity->getEntityName().'.php';
         $fs->dumpFile($entityPath, $entityContent);
 
-        $repositoryPath = $this->getRepositoryGenerator()->generate($bundle, $metaEntity);
+        $repositoryPath = $includeRepo ? $this->getRepositoryGenerator()->generate($metaEntity) : null;
 
         return new EntityGeneratorResult($entityPath, $repositoryPath, null);
+    }
+
+    protected function addIdFieldIfMissing(MetaEntity $metaEntity)
+    {
+        foreach ($metaEntity->getProperties() as $property) {
+            if ($property->isId()) {
+                return;
+            }
+        }
+        $idProperty = (new MetaProperty())->setName('id')->setId(true);
+        $propertyArray = array_merge([$idProperty], $metaEntity->getProperties()->toArray());
+        $propertyCollection = new ArrayCollection($propertyArray);
+        $metaEntity->setProperties($propertyCollection);
     }
 
     protected function getRepositoryGenerator()
@@ -48,7 +75,7 @@ class WameEntityGenerator extends DoctrineEntityGenerator
     {
         $metaEntity = (new MetaEntity())
             ->setEntityName($entity)
-            ->setBundleNamespace($bundle->getNamespace())
+            ->setBundle($bundle)
             ->setTableName(Inflector::pluralTableize($entity))
         ;
         if ($input->hasOption('behaviours')) {
@@ -64,13 +91,6 @@ class WameEntityGenerator extends DoctrineEntityGenerator
         }
 
         $displayField = $input->hasOption('display-field') ? $input->getOption('display-field') : null;
-
-        if (!array_key_exists('id', $fields)) {
-            array_unshift($fields, [
-                'fieldName' => 'id',
-                'id' => true,
-            ]);
-        }
 
         foreach ($fields as $field) {
             $isDisplayField = Inflector::camelize($displayField) === Inflector::camelize($field['fieldName']) || isset($field['displayField']);
@@ -101,6 +121,7 @@ class WameEntityGenerator extends DoctrineEntityGenerator
             }
             $metaEntity->addProperty($metaProperty);
         }
+
         return $metaEntity;
     }
 }

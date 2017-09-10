@@ -32,4 +32,9 @@ class MetaTrait
         $this->namespace = $namespace;
         return $this;
     }
+
+    public function __toString()
+    {
+        return $this->getName();
+    }
 }

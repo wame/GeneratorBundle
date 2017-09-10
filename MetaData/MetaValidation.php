@@ -32,4 +32,9 @@ class MetaValidation
         $this->options = $options;
         return $this;
     }
+
+    public function __toString()
+    {
+        return $this->getType();
+    }
 }
