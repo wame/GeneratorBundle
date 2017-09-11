@@ -40,7 +40,7 @@ class GenerateDoctrineCrudCommand extends GenerateDoctrineCommand
     protected function configure()
     {
         $this
-            ->setName('wame:generate:crud')
+            ->setName('wame:doctrine:generate:crud')
             ->setDescription('Generates a CRUD based on a Doctrine entity')
             ->addArgument('entity', InputArgument::OPTIONAL, 'The entity class name to initialize (shortcut notation)')
             ->addOption('entity', null, InputOption::VALUE_OPTIONAL, 'The entity class name to initialize (shortcut notation)')
@@ -106,6 +106,8 @@ EOT
         $prefix = $this->getRoutePrefix($input, $entity);
         $withWrite = $input->getOption('with-write');
         $forceOverwrite = $input->getOption('overwrite');
+        $withDatatable = $input->hasOption('with-datatable') ? $input->getOption('with-datatable') : false;
+        $withVoter = $input->hasOption('with-voter') ? $input->getOption('with-voter') : false;
 
         $questionHelper->writeSection($output, 'CRUD generation');
 
@@ -119,7 +121,7 @@ EOT
         $bundle = $this->getContainer()->get('kernel')->getBundle($bundle);
 
         $generator = $this->getGenerator($bundle);
-        $generator->generate($bundle, $entity, $metadata[0], $format, $prefix, $withWrite, $forceOverwrite);
+        $generator->generate($bundle, $entity, $metadata[0], $format, $prefix, $withWrite, $forceOverwrite, $withDatatable, $withVoter);
 
         $output->writeln('Generating the CRUD code: <info>OK</info>');
 

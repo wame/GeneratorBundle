@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace {{ namespace }}\Controller{{ entity_namespace ? '\\' ~ entity_namespace : '' }};
 
@@ -11,11 +12,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 {% if 'annotation' == format -%}
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-{%- endif %}
-{% if 'new' in actions or 'edit' in actions or 'delete' in actions %}
+{% endif %}
+{% if 'new' in actions or 'edit' in actions or 'delete' in actions -%}
 use Symfony\Component\HttpFoundation\Request;
-{%- endif %}
-
+{% endif %}
+{% if use_voter is defined and use_voter -%}
+use {{ namespace }}\Security\{{ entity }}Voter;
+{% endif %}
 {% endblock use_statements %}
 
 /**

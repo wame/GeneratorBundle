@@ -36,6 +36,9 @@ class DoctrineCrudGenerator extends Generator
     protected $metadata;
     protected $format;
     protected $actions;
+    protected $useDatatable;
+    protected $useVoter;
+
 
     /**
      * @param Filesystem $filesystem
@@ -60,8 +63,10 @@ class DoctrineCrudGenerator extends Generator
      *
      * @throws \RuntimeException
      */
-    public function generate(BundleInterface $bundle, $entity, ClassMetadataInfo $metadata, $format, $routePrefix, $needWriteActions, $forceOverwrite)
+    public function generate(BundleInterface $bundle, $entity, ClassMetadataInfo $metadata, $format, $routePrefix, $needWriteActions, $forceOverwrite, $useDatatable, $useVoter)
     {
+        $this->useDatatable = $useDatatable;
+        $this->useVoter = $useVoter;
         $this->routePrefix = $routePrefix;
         $this->routeNamePrefix = self::getRouteNamePrefix($routePrefix);
         $this->actions = $needWriteActions ? array('index', 'show', 'new', 'edit', 'delete') : array('index', 'show');
@@ -82,7 +87,7 @@ class DoctrineCrudGenerator extends Generator
 
         $this->generateControllerClass($forceOverwrite);
 
-        $dir = sprintf('%s/Resources/views/%s', $this->rootDir, strtolower($entity));
+        $dir = sprintf('%s/Resources/views/%s', $this->rootDir, Inflector::tableize($entity));
 
         if (!file_exists($dir)) {
             self::mkdir($dir);
@@ -189,6 +194,8 @@ class DoctrineCrudGenerator extends Generator
             'format' => $this->format,
             // BC with Symfony 2.7
             'use_form_type_instance' => !method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix'),
+            'use_datatable' => $this->useDatatable,
+            'use_voter' => $this->useVoter,
         ));
     }
 
@@ -235,6 +242,7 @@ class DoctrineCrudGenerator extends Generator
             'record_actions' => $this->getRecordActions(),
             'route_prefix' => $this->routePrefix,
             'route_name_prefix' => $this->routeNamePrefix,
+            'use_datatable' => $this->useDatatable,
         ));
     }
 
@@ -254,6 +262,7 @@ class DoctrineCrudGenerator extends Generator
             'actions' => $this->actions,
             'route_prefix' => $this->routePrefix,
             'route_name_prefix' => $this->routeNamePrefix,
+            'use_voter' => $this->useVoter,
         ));
     }
 
@@ -272,6 +281,7 @@ class DoctrineCrudGenerator extends Generator
             'route_name_prefix' => $this->routeNamePrefix,
             'actions' => $this->actions,
             'fields' => $this->metadata->fieldMappings,
+            'use_voter' => $this->useVoter,
         ));
     }
 
@@ -291,6 +301,7 @@ class DoctrineCrudGenerator extends Generator
             'fields' => $this->metadata->fieldMappings,
             'bundle' => $this->bundle->getName(),
             'actions' => $this->actions,
+            'use_voter' => $this->useVoter,
         ));
     }
 

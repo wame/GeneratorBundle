@@ -39,12 +39,11 @@ class MetaEntity
         $this->traits = new ArrayCollection();
     }
 
-    public static function createFromClassMetadata(ClassMetadata $classMetadata)
+    public static function createFromClassMetadata(ClassMetadata $classMetadata, BundleInterface $bundle)
     {
         $reflectionClass = $classMetadata->getReflectionClass();
         $entityMetadata = (new self())
-            //TODO: determine bundle-object -> this will now result in an error
-            ->setBundle($classMetadata->namespace)
+            ->setBundle($bundle)
             ->setEntityName($reflectionClass->getShortName())
             ->setTableName($classMetadata->getTableName())
         ;

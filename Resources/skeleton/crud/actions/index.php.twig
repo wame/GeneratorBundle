@@ -15,14 +15,18 @@
 {% endblock method_definition %}
     {
 {% block method_body %}
+    {%- if use_voter is defined and use_voter %}
+        $this->denyAccessUnlessGranted({{ entity }}Voter::INDEX);
+        {{- '\n' -}}
+    {%- endif %}
         $em = $this->getDoctrine()->getManager();
 
         ${{ entity_pluralized }} = $em->getRepository('{{ bundle }}:{{ entity }}')->findAll();
 {% endblock method_body %}
 
 {% block method_return %}
-        return $this->render('{{ entity|lower|replace({'\\': '/'}) }}/index.html.twig', array(
+        return $this->render('{{ entity|tabalize|replace({'\\': '/'}) }}/index.html.twig', [
             '{{ entity_pluralized }}' => ${{ entity_pluralized }},
-        ));
+        ]);
 {% endblock method_return %}
     }

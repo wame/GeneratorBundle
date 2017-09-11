@@ -37,9 +37,9 @@
 
 {%- block property_adder %}
     {{-''}}
-    public function add{{ property.name | singularize | classify }}({{ property.targetEntity }} ${{ property.name }}): self
+    public function add{{ property.name | singularize | classify }}({{ property.targetEntity }} ${{ property.name | singularize }}): self
     {
-        $this->{{ property.name }}->add(${{ property.name }});
+        $this->{{ property.name }}->add(${{ property.name | singularize  }});
 
         return $this;
     }

@@ -105,7 +105,7 @@
     * @ORM\ManyToMany(targetEntity="{{ property.entity.bundleNamespace ~ '\\Entity\\' ~ property.targetEntity }}" {{- inversedBy ~ orphanRemoval ~ cascade ~ nullable}})
     * @ORM\JoinTable(name="{{ property.entity.tableName ~ '_' ~ property.tabalizedTargetEntity | pluralize }}",
     {%- if mappedBy != '' %}
-        {{- '' }}
+        {{-''}}
     *   joinColumns={
     *     @ORM\JoinColumn(name="{{ property.entity.entityName | tabalize }}_id", referencedColumnName="id", onDelete="CASCADE")
     *   },
@@ -125,7 +125,7 @@
             {%- set validationOptions = validationOptions ~ optionKey~"="~optionValue %}
             {%- if loop.last %}{% set validationOptions = validationOptions ~ ")" %}{% endif %}
         {%- endfor -%}
-    {{- '' }}
+    {{-''}}
      * @Assert\{{ validation.type ~ validationOptions }}
     {%- endfor -%}
 {%- endblock %}

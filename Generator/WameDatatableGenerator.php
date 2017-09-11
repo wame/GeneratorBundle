@@ -16,17 +16,16 @@ class WameDatatableGenerator extends Generator
 
         //Add the AppDatatable if it doesn't exist yet.
         $path = $metaEntity->getBundle()->getPath().'/Datatable/AppDatatable.php';
-        if ($fs->exists($path) === false){
-            $content = $this->render('datatable/AppDatatable.php.twig', [
+        if ($fs->exists($path) === false) {
+            $appDatatableContent = $this->render('datatable/AppDatatable.php.twig', [
                 'bundle_namespace' => $metaEntity->getBundleNamespace(),
             ]);
-            $fs->dumpFile($path, $content);
+            $fs->dumpFile($path, $appDatatableContent);
         }
 
         $content = $this->render('datatable/datatable.php.twig', [
             'meta_entity' => $metaEntity,
         ]);
-
         $path = $metaEntity->getBundle()->getPath().'/Datatable/'.$metaEntity->getEntityName().'Datatable.php';
         $fs->dumpFile($path, $content);
 

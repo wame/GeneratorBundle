@@ -27,15 +27,15 @@
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('{{ route_name_prefix }}_edit', array('{{ identifier }}' => ${{ entity_singularized }}->get{{ identifier|capitalize }}()));
+            return $this->redirectToRoute('{{ route_name_prefix }}_edit', ['{{ identifier }}' => ${{ entity_singularized }}->get{{ identifier|capitalize }}()]);
         }
 {% endblock method_body %}
 
 {% block method_return %}
-        return $this->render('{{ entity|lower|replace({'\\': '/'}) }}/edit.html.twig', array(
+        return $this->render('{{ entity|tabalize|replace({'\\': '/'}) }}/edit.html.twig', [
             '{{ entity_singularized }}' => ${{ entity_singularized }},
             'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
-        ));
+        ]);
 {% endblock method_return %}
     }
