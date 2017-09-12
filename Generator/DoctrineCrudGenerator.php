@@ -231,7 +231,8 @@ class DoctrineCrudGenerator extends Generator
      */
     protected function generateIndexView($dir)
     {
-        $this->renderFile('crud/views/index.html.twig.twig', $dir.'/index.html.twig', array(
+        $templateFile = $this->useDatatable ? 'crud/views/index-with-datatable.html.twig.twig' : 'crud/views/index.html.twig.twig';
+        $this->renderFile($templateFile, $dir.'/index.html.twig', array(
             'bundle' => $this->bundle->getName(),
             'entity' => $this->entity,
             'entity_pluralized' => $this->entityPluralized,
@@ -242,7 +243,6 @@ class DoctrineCrudGenerator extends Generator
             'record_actions' => $this->getRecordActions(),
             'route_prefix' => $this->routePrefix,
             'route_name_prefix' => $this->routeNamePrefix,
-            'use_datatable' => $this->useDatatable,
         ));
     }
 

@@ -7,7 +7,7 @@
 {% endblock phpdoc_method_annotations %}
      */
 {% block method_definition %}
-    public function indexAction(): Response
+    public function indexAction({{ entity }}Datatable $datatable): Response
 {% endblock method_definition %}
     {
 {% block method_body %}
@@ -15,14 +15,12 @@
         $this->denyAccessUnlessGranted({{ entity }}Voter::INDEX);
         {{- '\n\n' -}}
     {%- endif %}
-        $em = $this->getDoctrine()->getManager();
-
-        ${{ entity_pluralized }} = $em->getRepository('{{ bundle }}:{{ entity }}')->findAll();
+        $datatable->buildDatatable();
 {% endblock method_body %}
 
 {% block method_return %}
         return $this->render('{{ entity|tabalize|replace({'\\': '/'}) }}/index.html.twig', [
-            '{{ entity_pluralized }}' => ${{ entity_pluralized }},
+            'datatable' => $datatable,
         ]);
 {% endblock method_return %}
     }

@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 class {{ meta_entity.entityName }}Voter extends AppVoter
 {
     const INDEX     = '{{ attributePrefix }}_INDEX';
+    const SEARCH    = '{{ attributePrefix }}_SEARCH';
     const VIEW      = '{{ attributePrefix }}_VIEW';
     const CREATE    = '{{ attributePrefix }}_CREATE';
     const EDIT      = '{{ attributePrefix }}_EDIT';
@@ -18,6 +19,7 @@ class {{ meta_entity.entityName }}Voter extends AppVoter
 
     static protected $supportedAttributes = [
         self::INDEX,
+        self::SEARCH,
         self::VIEW,
         self::CREATE,
         self::EDIT,
@@ -32,6 +34,7 @@ class {{ meta_entity.entityName }}Voter extends AppVoter
     {
         switch ($attribute) {
             case self::INDEX:
+            case self::SEARCH:
             case self::VIEW:
             case self::CREATE:
             case self::EDIT:

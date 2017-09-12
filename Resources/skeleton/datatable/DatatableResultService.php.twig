@@ -1,0 +1,32 @@
+<?php
+declare(strict_types=1);
+
+namespace {{ bundle_namespace }}\Datatable;
+
+use Sg\DatatablesBundle\Response\DatatableResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
+
+class DatatableResultService
+{
+    /** @var  DatatableResponse */
+    private $responseService;
+
+    public function __construct(DatatableResponse $responseService)
+    {
+        $this->responseService = $responseService;
+    }
+
+    public function getDatatableResult(AppDatatable $datatable): JsonResponse
+    {
+        $datatable->buildDatatable();
+        $this->responseService->setDatatable($datatable);
+
+        $datatableQueryBuilder = $this->responseService->getDatatableQueryBuilder();
+        $datatableQueryBuilder->buildQuery();
+
+        $qb = $datatableQueryBuilder->getQb();
+        $datatable->modifyQuery($qb);
+
+        return $this->responseService->getResponse();
+    }
+}

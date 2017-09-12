@@ -17,7 +17,7 @@ use Sg\DatatablesBundle\Datatable\Column\Column;
 {{- '\n\n' -}}
 class {{ meta_entity.entityName }}Datatable extends AppDatatable
 {
-    protected function addColumns()
+    protected function addColumns(?array $options = []): void
     {
         $this->columnBuilder
         {%- for property in meta_entity.properties -%}

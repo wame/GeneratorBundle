@@ -1,0 +1,23 @@
+{% block extends %}
+{{ "{% extends 'base.html.twig' %}" }}
+{% endblock extends %}
+
+{% block body %}
+{{ "{% block body %}" }}
+    <h1>{{ entity_pluralized|capitalize }} list</h1>
+
+    <div class="box">
+        <div class="box-body">
+            {{ '{{ sg_datatables_render_html(datatable) }}' }}
+        </div>
+    </div>
+
+{{ "{% endblock %}" }}
+{% endblock body %}
+
+{% block javascripts %}
+{{ "{% block javascripts %}" }}
+    {{ '{{ parent() }}' }}
+    {{ '{{ sg_datatables_render_js(datatable) }}' }}
+{{ "{% endblock %}" }}
+{% endblock javascripts %}

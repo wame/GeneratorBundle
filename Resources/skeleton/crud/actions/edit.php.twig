@@ -1,9 +1,6 @@
 
     /**
-{% block phpdoc_method_header %}
-     * Displays a form to edit an existing {{ entity_singularized }} entity.
-{% endblock phpdoc_method_header %}
-     *
+{% block phpdoc_method_header %}{% endblock phpdoc_method_header %}
 {% block phpdoc_method_annotations %}
 {% if 'annotation' == format %}
      * @Route("/{{ '{' ~ identifier ~ '}' }}/edit", name="{{ route_name_prefix }}_edit")
@@ -12,16 +9,16 @@
 {% endblock phpdoc_method_annotations %}
      */
 {% block method_definition %}
-    public function editAction(Request $request, {{ entity_class }} ${{ entity_singularized }})
+    public function editAction(Request $request, {{ entity_class }} ${{ entity_singularized }}): Response
 {% endblock method_definition %}
     {
 {% block method_body %}
+    {%- if use_voter is defined and use_voter %}
+        $this->denyAccessUnlessGranted({{ entity }}Voter::EDIT, ${{ entity_singularized }});
+        {{- '\n\n' -}}
+    {%- endif %}
         $deleteForm = $this->createDeleteForm(${{ entity_singularized }});
-        {% if use_form_type_instance -%}
-            $editForm = $this->createForm(new {{ entity_singularized|capitalize }}Type(), ${{ entity_singularized }});
-        {% else -%}
-            $editForm = $this->createForm('{{ namespace }}\Form\{{ entity }}Type', ${{ entity_singularized }});
-        {% endif -%}
+        $editForm = $this->createForm({{ entity_class }}Type::class, ${{ entity_singularized }});
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {

@@ -14,14 +14,8 @@ class WameDatatableGenerator extends Generator
     {
         $fs = new Filesystem();
 
-        //Add the AppDatatable if it doesn't exist yet.
-        $path = $metaEntity->getBundle()->getPath().'/Datatable/AppDatatable.php';
-        if ($fs->exists($path) === false) {
-            $appDatatableContent = $this->render('datatable/AppDatatable.php.twig', [
-                'bundle_namespace' => $metaEntity->getBundleNamespace(),
-            ]);
-            $fs->dumpFile($path, $appDatatableContent);
-        }
+        $this->addAppDatatable($fs, $metaEntity);
+        $this->addDatatableResultService($fs, $metaEntity);
 
         $content = $this->render('datatable/datatable.php.twig', [
             'meta_entity' => $metaEntity,
@@ -30,5 +24,29 @@ class WameDatatableGenerator extends Generator
         $fs->dumpFile($path, $content);
 
         return $path;
+    }
+
+    protected function addAppDatatable(Filesystem $fs, MetaEntity $metaEntity)
+    {
+        //Add the AppDatatable if it doesn't exist yet.
+        $path = $metaEntity->getBundle()->getPath().'/Datatable/AppDatatable.php';
+        if ($fs->exists($path) === false) {
+            $appDatatableContent = $this->render('datatable/AppDatatable.php.twig', [
+                'bundle_namespace' => $metaEntity->getBundleNamespace(),
+            ]);
+            $fs->dumpFile($path, $appDatatableContent);
+        }
+    }
+
+    protected function addDatatableResultService(Filesystem $fs, MetaEntity $metaEntity)
+    {
+        //Add the DatatableResultService if it doesn't exist yet.
+        $path = $metaEntity->getBundle()->getPath().'/Datatable/DatatableResultService.php';
+        if ($fs->exists($path) === false) {
+            $appDatatableContent = $this->render('datatable/DatatableResultService.php.twig', [
+                'bundle_namespace' => $metaEntity->getBundleNamespace(),
+            ]);
+            $fs->dumpFile($path, $appDatatableContent);
+        }
     }
 }

@@ -1,9 +1,5 @@
 
     /**
-{% block phpdoc_method_header %}
-     * Finds and displays a {{ entity_singularized }} entity.
-{% endblock phpdoc_method_header %}
-     *
 {% block phpdoc_method_annotations %}
 {% if 'annotation' == format %}
      * @Route("/{{ '{' ~ identifier ~ '}' }}", name="{{ route_name_prefix }}_show")
@@ -12,10 +8,14 @@
 {% endblock phpdoc_method_annotations %}
      */
 {% block method_definition %}
-    public function showAction({{ entity_class }} ${{ entity_singularized }})
+    public function showAction({{ entity_class }} ${{ entity_singularized }}): Response
 {% endblock method_definition %}
     {
 {% block method_body %}
+    {%- if use_voter is defined and use_voter %}
+        $this->denyAccessUnlessGranted({{ entity }}Voter::VIEW, ${{ entity_singularized }});
+        {{- '\n' -}}
+    {%- endif %}
 {% if 'delete' in actions %}
         $deleteForm = $this->createDeleteForm(${{ entity_singularized }});
 {% endif %}
