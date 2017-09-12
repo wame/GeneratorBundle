@@ -225,9 +225,6 @@ class MetaProperty
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isOrphanRemoval(): bool
     {
         return $this->orphanRemoval;
@@ -322,7 +319,7 @@ class MetaProperty
                 return 'string';
             case 'smallint':
             case 'bigint':
-                return 'integer';
+                return 'int';
             case 'simple_array':
             case 'json_array':
                 return 'array';

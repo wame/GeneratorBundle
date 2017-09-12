@@ -8,6 +8,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\Yaml\Yaml;
 use Wame\SensioGeneratorBundle\Inflector\Inflector;
 use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
 use Wame\SensioGeneratorBundle\MetaData\MetaProperty;
@@ -33,45 +34,6 @@ class WameEntityGenerator extends DoctrineEntityGenerator
     ];
 
     public function generate(BundleInterface $bundle, $entity, $format, array $fields, InputInterface $input = null)
-    {
-        $metaEntity = $this->getMetaEntity($bundle, $entity, $fields, $input);
-        return $this->generateByMetaEntity($metaEntity);
-    }
-
-    public function generateByMetaEntity(MetaEntity $metaEntity, $includeRepo = true)
-    {
-        $this->addIdFieldIfMissing($metaEntity);
-        $fs = new Filesystem();
-        $entityContent = $this->render('entity/entity.php.twig', [
-            'meta_entity' => $metaEntity,
-        ]);
-        $entityPath = $metaEntity->getBundle()->getPath().'/Entity/'.$metaEntity->getEntityName().'.php';
-        $fs->dumpFile($entityPath, $entityContent);
-
-        $repositoryPath = $includeRepo ? $this->getRepositoryGenerator()->generate($metaEntity) : null;
-
-        return new EntityGeneratorResult($entityPath, $repositoryPath, null);
-    }
-
-    protected function addIdFieldIfMissing(MetaEntity $metaEntity)
-    {
-        foreach ($metaEntity->getProperties() as $property) {
-            if ($property->isId()) {
-                return;
-            }
-        }
-        $idProperty = (new MetaProperty())->setName('id')->setId(true)->setType('integer')->setEntity($metaEntity);
-        $propertyArray = array_merge([$idProperty], $metaEntity->getProperties()->toArray());
-        $propertyCollection = new ArrayCollection($propertyArray);
-        $metaEntity->setProperties($propertyCollection);
-    }
-
-    protected function getRepositoryGenerator()
-    {
-        return new WameRepositoryGenerator();
-    }
-
-    protected function getMetaEntity(BundleInterface $bundle, $entity, array $fields, InputInterface $input) : MetaEntity
     {
         $metaEntity = (new MetaEntity())
             ->setEntityName($entity)
@@ -122,6 +84,42 @@ class WameEntityGenerator extends DoctrineEntityGenerator
             $metaEntity->addProperty($metaProperty);
         }
 
-        return $metaEntity;
+        return $this->generateByMetaEntity($metaEntity);
+    }
+
+    public function generateByMetaEntity(MetaEntity $metaEntity, $includeRepo = true)
+    {
+        $this->addIdFieldIfMissing($metaEntity);
+        $fs = new Filesystem();
+        $entityContent = $this->render('entity/entity.php.twig', [
+            'meta_entity' => $metaEntity,
+        ]);
+        $entityPath = $metaEntity->getBundle()->getPath().'/Entity/'.$metaEntity->getEntityName().'.php';
+        $fs->dumpFile($entityPath, $entityContent);
+
+        $repositoryPath = $includeRepo ? $this->getRepositoryGenerator()->generate($metaEntity) : null;
+
+        $translatorGenerator = new WameTranslationGenerator();
+        $translatorGenerator->updateTranslationsByMetaEntity($metaEntity);
+
+        return new EntityGeneratorResult($entityPath, $repositoryPath, null);
+    }
+
+    protected function addIdFieldIfMissing(MetaEntity $metaEntity)
+    {
+        foreach ($metaEntity->getProperties() as $property) {
+            if ($property->isId()) {
+                return;
+            }
+        }
+        $idProperty = (new MetaProperty())->setName('id')->setId(true)->setType('integer')->setEntity($metaEntity);
+        $propertyArray = array_merge([$idProperty], $metaEntity->getProperties()->toArray());
+        $propertyCollection = new ArrayCollection($propertyArray);
+        $metaEntity->setProperties($propertyCollection);
+    }
+
+    protected function getRepositoryGenerator()
+    {
+        return new WameRepositoryGenerator();
     }
 }
