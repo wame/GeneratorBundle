@@ -5,9 +5,7 @@ namespace Wame\SensioGeneratorBundle\MetaData;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Wame\SensioGeneratorBundle\Model\Bundle;
 
 class MetaEntity
 {
@@ -37,52 +35,6 @@ class MetaEntity
         $this->properties = new ArrayCollection();
         $this->interfaces = new ArrayCollection();
         $this->traits = new ArrayCollection();
-    }
-
-    public static function createFromClassMetadata(ClassMetadata $classMetadata, BundleInterface $bundle)
-    {
-        $reflectionClass = $classMetadata->getReflectionClass();
-        $entityMetadata = (new self())
-            ->setBundle($bundle)
-            ->setEntityName($reflectionClass->getShortName())
-            ->setTableName($classMetadata->getTableName())
-        ;
-        foreach ($reflectionClass->getInterfaces() as $interface) {
-            $entityMetadata->addInterface(
-                (new MetaInterface())
-                    ->setNamespace($interface->getNamespaceName())
-                    ->setName($interface->getShortName())
-            );
-        }
-        foreach ($reflectionClass->getTraits() as $trait) {
-            $entityMetadata->addTrait(
-                (new MetaTrait())
-                    ->setName($trait->getShortName())
-                    ->setNamespace($trait->getNamespaceName())
-            );
-        }
-
-        foreach ($classMetadata->fieldMappings as $fieldName => $fieldMapping) {
-            foreach ($reflectionClass->getTraits() as $trait) {
-                foreach ($trait->getProperties() as $traitProperty) {
-                    if ($traitProperty->getName() === $fieldName) {
-                        continue 3;
-                    }
-                }
-            }
-            $entityMetadata->addProperty(
-                (new MetaProperty())
-                    ->setId($fieldMapping['id'] ?? false)
-                    ->setName($fieldName)
-                    ->setType($fieldMapping['type'] ?? 'string')
-                    ->setNullable($fieldMapping['nullable'] ?? false)
-                    ->setLength(isset($fieldMapping['length']) ? (int) $fieldMapping['length'] : null)
-                    ->setScale(isset($fieldMapping['scale']) ? (int) $fieldMapping['scale'] : null)
-                    ->setPrecision(isset($fieldMapping['precision']) ? (int) $fieldMapping['precision'] : null)
-            );
-        }
-
-        return $entityMetadata;
     }
 
     public function getEntityName(): ?string
@@ -255,13 +207,24 @@ class MetaEntity
         return false;
     }
 
+    public function getIdProperty(): ?MetaProperty
+    {
+        foreach ($this->getProperties() as $property) {
+            if ($property->isId()) {
+                return $property;
+            }
+        }
+        return null;
+    }
+
     public function getDisplayFieldProperty(): ?MetaProperty
     {
+        $idProperty = null;
         foreach ($this->getProperties() as $property) {
             if ($property->isDisplayField()) {
                 return $property;
             }
         }
-        return null;
+        return $this->getIdProperty();
     }
 }

@@ -10,6 +10,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Wame\SensioGeneratorBundle\Generator\WameDatatableGenerator;
 use Wame\SensioGeneratorBundle\Generator\WameVoterGenerator;
 use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
+use Wame\SensioGeneratorBundle\MetaData\MetaEntityFactory;
 
 /**
  * Generates a CRUD for a Doctrine entity.
@@ -43,7 +44,7 @@ class WameCrudCommand extends GenerateDoctrineCrudCommand
             $this->getDatatableGenerator()->generate($metaEntity);
         }
         if ($input->getOption('with-voter')) {
-            $this->getVoterGenerator()->generate($metaEntity);
+            $this->getVoterGenerator()->generateByMetaEntity($metaEntity);
         }
     }
 
@@ -59,7 +60,7 @@ class WameCrudCommand extends GenerateDoctrineCrudCommand
         $entityClassname = $bundle->getNamespace().'\\Entity\\'.$entity;
         $classMetaData = $em->getClassMetadata($entityClassname);
 
-        return MetaEntity::createFromClassMetadata($classMetaData, $bundle);
+        return MetaEntityFactory::createFromClassMetadata($classMetaData, $bundle);
     }
 
     protected function interact(InputInterface $input, OutputInterface $output)

@@ -14,10 +14,10 @@ class WameEnumGenerator extends Generator
     public function generate(BundleInterface $bundle, string $className, array $enumOptions): string
     {
         $metaEnum = MetaEnumType::createFromArray($enumOptions)->setBundle($bundle)->setClassName($className);
-        return $this->generateFromMetaEnumType($metaEnum);
+        return $this->generateByMetaEnumType($metaEnum);
     }
 
-    public function generateFromMetaEnumType(MetaEnumType $metaEnumType): string
+    public function generateByMetaEnumType(MetaEnumType $metaEnumType): string
     {
         $fs = new Filesystem();
 

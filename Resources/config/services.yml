@@ -14,3 +14,14 @@ services:
     Wame\SensioGeneratorBundle\Form\PropertyType:
         arguments: ['@service_container']
         tags: [form.type]
+    Wame\SensioGeneratorBundle\Generator\WameDatatableGenerator:
+    Wame\SensioGeneratorBundle\Generator\WameEntityGenerator:
+    Wame\SensioGeneratorBundle\Generator\WameEnumGenerator:
+    Wame\SensioGeneratorBundle\Generator\WameRepositoryGenerator:
+    Wame\SensioGeneratorBundle\Generator\WameFormGenerator:
+        public: true
+    Wame\SensioGeneratorBundle\Generator\WameTranslationGenerator:
+        public: true
+        arguments:
+            - '%kernel.root_dir%/Resources/Translations'
+            - '%locale%'

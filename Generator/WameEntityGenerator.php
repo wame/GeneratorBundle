@@ -8,7 +8,6 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Symfony\Component\Yaml\Yaml;
 use Wame\SensioGeneratorBundle\Inflector\Inflector;
 use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
 use Wame\SensioGeneratorBundle\MetaData\MetaProperty;
@@ -20,11 +19,23 @@ class WameEntityGenerator extends DoctrineEntityGenerator
 {
     use WameGeneratorTrait;
 
-    public function __construct(?Filesystem $filesystem = null, ?RegistryInterface $registry = null)
+    /** @var  WameTranslationGenerator */
+    protected $translationGenerator;
+
+    /** @var  WameRepositoryGenerator */
+    protected $repositoryGenerator;
+
+    public function __construct(
+        Filesystem $filesystem,
+        RegistryInterface $registry,
+        WameTranslationGenerator $translationGenerator,
+        WameRepositoryGenerator $repositoryGenerator
+    )
     {
-        if ($filesystem && $registry) {
-            parent::__construct($filesystem, $registry);
-        }
+        parent::__construct($filesystem, $registry);
+
+        $this->translationGenerator = $translationGenerator;
+        $this->repositoryGenerator = $repositoryGenerator;
     }
 
     protected $behaviourTraits = [
@@ -97,10 +108,9 @@ class WameEntityGenerator extends DoctrineEntityGenerator
         $entityPath = $metaEntity->getBundle()->getPath().'/Entity/'.$metaEntity->getEntityName().'.php';
         $fs->dumpFile($entityPath, $entityContent);
 
-        $repositoryPath = $includeRepo ? $this->getRepositoryGenerator()->generate($metaEntity) : null;
+        $repositoryPath = $includeRepo ? $this->repositoryGenerator->generateByMetaEntity($metaEntity) : null;
 
-        $translatorGenerator = new WameTranslationGenerator();
-        $translatorGenerator->updateTranslationsByMetaEntity($metaEntity);
+        $this->translationGenerator->updateByMetaEntity($metaEntity);
 
         return new EntityGeneratorResult($entityPath, $repositoryPath, null);
     }
@@ -116,10 +126,5 @@ class WameEntityGenerator extends DoctrineEntityGenerator
         $propertyArray = array_merge([$idProperty], $metaEntity->getProperties()->toArray());
         $propertyCollection = new ArrayCollection($propertyArray);
         $metaEntity->setProperties($propertyCollection);
-    }
-
-    protected function getRepositoryGenerator()
-    {
-        return new WameRepositoryGenerator();
     }
 }

@@ -23,6 +23,7 @@ use Wame\SensioGeneratorBundle\Command\AutoComplete\EntitiesAutoCompleter;
 use Wame\SensioGeneratorBundle\Command\Helper\QuestionHelper;
 use Wame\SensioGeneratorBundle\Generator\DoctrineCrudGenerator;
 use Wame\SensioGeneratorBundle\Generator\DoctrineFormGenerator;
+use Wame\SensioGeneratorBundle\Generator\WameFormGenerator;
 use Wame\SensioGeneratorBundle\Manipulator\RoutingManipulator;
 
 /**
@@ -236,7 +237,10 @@ EOT
      */
     protected function generateForm($bundle, $entity, $metadata, $forceOverwrite = false)
     {
-        $this->getFormGenerator($bundle)->generate($bundle, $entity, $metadata[0], $forceOverwrite);
+        /** @var WameFormGenerator $formGenerator */
+        $formGenerator = new WameFormGenerator($this->getContainer()->get('doctrine'));
+        $formGenerator->generateByBundleAndEntityName($bundle, $entity);
+//        $this->getFormGenerator($bundle)->generate($bundle, $entity, $metadata[0], $forceOverwrite);
     }
 
     protected function updateRouting(QuestionHelper $questionHelper, InputInterface $input, OutputInterface $output, BundleInterface $bundle, $format, $entity, $prefix)

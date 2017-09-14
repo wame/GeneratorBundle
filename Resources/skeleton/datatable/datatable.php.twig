@@ -22,11 +22,15 @@ class {{ meta_entity.entityName }}Datatable extends AppDatatable
         $this->columnBuilder
         {%- for property in meta_entity.properties -%}
             {%- if property.returnType == '\DateTime' -%}
-                {{- '\n          ' -}}
-                ->add('{{ property.name }}', DateTimeColumn::class, ['title' => '{{ meta_entity.entityName | tabalize }}.{{ property.columnName }}' ])
+                {{- '\n            ' -}}
+            ->add('{{ property.name }}', DateTimeColumn::class, [
+                'title' => $this->translator->trans({{ meta_entity.entityName | tabalize }}.{{ property.columnName }}'),
+            ])
             {%- elseif property.relationType == false -%}
-                {{- '\n          ' -}}
-                ->add('{{ property.name }}', Column::class, ['title' => '{{ meta_entity.entityName | tabalize }}.{{ property.columnName }}' ])
+                {{- '\n            ' -}}
+            ->add('{{ property.name }}', Column::class, [
+                'title' => $this->translator->trans('{{ meta_entity.entityName | tabalize }}.{{ property.columnName }}'),
+            ])
             {%- endif -%}
         {%- endfor -%}
         {{-''}}

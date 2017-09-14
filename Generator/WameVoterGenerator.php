@@ -10,7 +10,7 @@ class WameVoterGenerator extends Generator
 {
     use WameGeneratorTrait;
 
-    public function generate(MetaEntity $metaEntity)
+    public function generateByMetaEntity(MetaEntity $metaEntity)
     {
         $fs = new Filesystem();
 

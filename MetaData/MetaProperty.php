@@ -216,6 +216,10 @@ class MetaProperty
 
     public function getMappedBy(): ?string
     {
+        //One2many MUST be mapped by other entity
+        if ($this->mappedBy === null && $this->type === 'one2many') {
+            return Inflector::pluralize(Inflector::camelize($this->getEntity()->getEntityName()));
+        }
         return $this->mappedBy;
     }
 
@@ -227,7 +231,8 @@ class MetaProperty
 
     public function isOrphanRemoval(): bool
     {
-        return $this->orphanRemoval;
+        //Can only be true for many2many or one2many
+        return in_array($this->type, ['many2many', 'one2many'], true) && $this->orphanRemoval;
     }
 
     /**
@@ -317,6 +322,7 @@ class MetaProperty
             case 'text':
             case 'blob':
                 return 'string';
+            case 'integer':
             case 'smallint':
             case 'bigint':
                 return 'int';

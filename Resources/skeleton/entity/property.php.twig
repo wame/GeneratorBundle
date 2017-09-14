@@ -47,9 +47,9 @@
 
 {%- block property_remover %}
     {{-''}}
-    public function remove{{ property.name | singularize | classify }}({{ property.targetEntity }} ${{ property.name }}): self
+    public function remove{{ property.name | singularize | classify }}({{ property.targetEntity }} ${{ property.name | singularize }}): self
     {
-        $this->{{ property.name }}->remove(${{ property.name }});
+        $this->{{ property.name }}->remove(${{ property.name | singularize }});
 
         return $this;
     }

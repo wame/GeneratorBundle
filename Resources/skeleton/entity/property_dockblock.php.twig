@@ -37,9 +37,10 @@
 {%- endblock %}
 
 {%- block property_docblock_orm_enum %}
-    {%- set nullable = property.nullable is not null ? ', nullable='~(property.nullable ? 'true' : 'false') : '' %}
+    {%- set nullable = property.nullable ? ', nullable=true' : '' %}
+    {%- set unique = property.unique ? ', unique=true' : '' %}
     {{-''}}
-     * @ORM\Column(name="{{ property.enumType }}"{{ nullable }})
+     * @ORM\Column(name="{{ property.enumType }}"{{ nullable ~ unique }})
      * @EnumAssert\Enum(entity="{{ property.entity.bundleNamespace }}\DBAL\Types\{{ property.enumType }}")
 {%- endblock %}
 
@@ -62,47 +63,49 @@
     {%- endif -%}
 {%- endblock -%}
 
+{%- block orm_relation_properties -%}
+    targetEntity="{{ property.entity.bundleNamespace ~ '\\Entity\\' ~ property.targetEntity }}"
+    {%- if property.mappedBy -%}
+        , mappedBy="{{ property.mappedBy }}"
+    {%- elseif property.inversedBy -%}
+        , inversedBy="{{ property.inversedBy }}"
+    {%- endif -%}
+    {%- if property.orphanRemoval -%}
+        , orphanRemoval=true
+    {%- endif -%}
+    , cascade={"persist"}
+{%- endblock -%}
+
+{%- block orm_join_column_properties -%}
+    name="{{ property.columnName ?: property.targetEntity|tabalize  }}", referencedColumnName="{{ property.referencedColumnName | tabalize }}"
+    {%- if property.nullable != true -%}
+        , nullable=false
+    {%- endif -%}
+{%- endblock -%}
+
 {%- block property_docblock_orm_part_many2one %}
-    {%- set inversedBy = property.inversedBy ? ', inversedBy="'~property.inversedBy~'"' : '' %}
-    {%- set nullable = property.nullable is not null and property.nullable == false ? ', nullable=false' : '' %}
     {{-''}}
-     * @ORM\ManyToOne(targetEntity="{{  property.entity.bundleNamespace ~ '\\Entity\\' ~ property.targetEntity }}" {{- inversedBy ~ nullable}})
-     * @ORM\JoinColumn(name="{{ property.targetEntity|tabalize  }}", referencedColumnName="{{ property.referencedColumnName | tabalize }}")
+     * @ORM\ManyToOne({{ block('orm_relation_properties') }})
+     * @ORM\JoinColumn({{ block('orm_join_column_properties') }})
 {%- endblock %}
 
 {%- block property_docblock_orm_part_one2many %}
-    {#- one2many MUST be mappedBy other entity #}
-    {%- set mappedBy = ', mappedBy="'~ (property.mappedBy ? property.mappedBy : property.entity.entityName | camelize | pluralize) ~'"' %}
-    {%- set orphanRemoval = property.orphanRemoval ? ', orphanRemoval=true' : '' %}
-    {%- set cascade = ', cascade={"persist"}' %}
     {{-''}}
-     * @ORM\OneToMany(targetEntity="{{  property.entity.bundleNamespace ~ '\\Entity\\' ~ property.targetEntity }}" {{- mappedBy ~ orphanRemoval ~ cascade }})
+     * @ORM\OneToMany({{ block('orm_relation_properties') }})
 {%- endblock %}
 
 {%- block property_docblock_orm_part_one2one %}
-    {%- set inversedBy = property.inversedBy ? ', inversedBy="'~property.inversedBy~'"' : '' %}
-    {%- set mappedBy = property.mappedBy ? ', mappedBy="'~property.mappedBy~'"' : '' %}
-    {%- set cascade = ', cascade={"persist"}' %}
-    {#- nullable in relationships is true by default, so only add if specifically set to false. #}
-    {%- set nullable = property.nullable is not null and property.nullable == false ? ', nullable=false' : '' %}
     {{-''}}
-     * @ORM\one2one(targetEntity="{{  property.entity.bundleNamespace ~ '\\Entity\\' ~ property.targetEntity }}" {{- inversedBy ~ mappedBy ~ cascade ~ nullable -}})
+     * @ORM\oneToOne({{ block('orm_relation_properties') }})
     {%- if mappedBy != '' %}
         {{-''}}
-     * @ORM\JoinColumn(name="{{ property.targetEntity|tabalize  }}", referencedColumnName="{{ property.referencedColumnName | tabalize }}")
+     * @ORM\JoinColumn({{ block('orm_join_column_properties') }})
     {%- endif %}
 {%- endblock %}
 
 {%- block property_docblock_orm_part_many2many %}
-    {%- set inversedBy = property.inversedBy ? ', inversedBy="'~ property.entity.entityName | pluralize ~'"' : '' %}
-    {%- set mappedBy = property.mappedBy ? ', mappedBy="'~property.mappedBy~'"' : '' %}
-    {%- set orphanRemoval = property.orphanRemoval ? ', orphanRemoval=true' : '' %}
-    {#- TODO: cascade option in property-targetEntity -> also option for 'remove'? #}
-    {%- set cascade = ', cascade={"persist"}'%}
-    {#- nullable in relationships is true by default, so only add if specifically set to false. #}
-    {%- set nullable = property.nullable is not null and property.nullable == false ? ', nullable=false' : '' %}
     {{-''}}
-    * @ORM\ManyToMany(targetEntity="{{ property.entity.bundleNamespace ~ '\\Entity\\' ~ property.targetEntity }}" {{- inversedBy ~ orphanRemoval ~ cascade ~ nullable}})
+    * @ORM\ManyToMany({{ block('orm_relation_properties') }})
     * @ORM\JoinTable(name="{{ property.entity.tableName ~ '_' ~ property.tabalizedTargetEntity | pluralize }}",
     {%- if mappedBy != '' %}
         {{-''}}

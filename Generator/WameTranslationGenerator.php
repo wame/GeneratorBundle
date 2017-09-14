@@ -10,7 +10,16 @@ use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
 
 class WameTranslationGenerator
 {
-    public function updateTranslationsByMetaEntity(MetaEntity $metaEntity)
+    protected $translationsDir;
+    protected $locale;
+
+    public function __construct(string $translationsDir, string $locale)
+    {
+        $this->translationsDir = $translationsDir;
+        $this->locale = $locale;
+    }
+
+    public function updateByMetaEntity(MetaEntity $metaEntity)
     {
         $messageArray = [];
 
@@ -33,8 +42,7 @@ class WameTranslationGenerator
             $messageArray[$tableizedEntityName][Inflector::tableize($propertyName)] = Inflector::humanize($propertyName);
         }
 
-        //TODO: or retrieve the path by kernel instead.
-        $path = $metaEntity->getBundle()->getPath().'/../../app/Resources/translations/messages.en.yml';
+        $path = $this-> getMessagesPath();
         $fs = new Filesystem();
         if ($fs->exists($path)) {
             $originalMessageArray = Yaml::parse(file_get_contents($path));
@@ -44,5 +52,10 @@ class WameTranslationGenerator
         $yaml = Yaml::dump($messageArray);
 
         $fs->dumpFile($path, $yaml);
+    }
+
+    protected function getMessagesPath(): string
+    {
+        return $this->translationsDir.'/messages.'.$this->locale.'.yml';
     }
 }
