@@ -9,8 +9,6 @@ use Doctrine\ORM\QueryBuilder;
 
 abstract class AppDatatable extends SgDatatable
 {
-    const ACTION_BTN_WIDTH = 40;
-
     /** @var callable */
     protected $modifyQueryCallback;
 
@@ -75,7 +73,7 @@ abstract class AppDatatable extends SgDatatable
             ->add(null, ActionColumn::class, [
                 'title' => $this->translator->trans('sg.datatables.actions.title'),
                 'actions' => $actions,
-                'width' => count($actions) * static::ACTION_BTN_WIDTH . 'px',
+                'class_name' => 'action-column',
             ])
         ;
     }

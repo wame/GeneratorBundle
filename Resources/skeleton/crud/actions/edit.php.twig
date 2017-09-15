@@ -24,6 +24,8 @@
         if ($editForm->isSubmitted() && $editForm->isValid()) {
             $this->getDoctrine()->getManager()->flush();
 
+            $this->addFlash('success', '{{ route_name_prefix }}.edit_success');
+
             return $this->redirectToRoute('{{ route_name_prefix }}_edit', ['{{ identifier }}' => ${{ entity_singularized }}->get{{ identifier|capitalize }}()]);
         }
 {% endblock method_body %}
