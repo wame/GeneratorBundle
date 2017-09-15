@@ -23,5 +23,5 @@ services:
     Wame\SensioGeneratorBundle\Generator\WameTranslationGenerator:
         public: true
         arguments:
-            - '%kernel.root_dir%/Resources/Translations'
+            - '%kernel.root_dir%/Resources/translations'
             - '%locale%'

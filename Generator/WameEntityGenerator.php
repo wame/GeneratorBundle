@@ -30,8 +30,7 @@ class WameEntityGenerator extends DoctrineEntityGenerator
         RegistryInterface $registry,
         WameTranslationGenerator $translationGenerator,
         WameRepositoryGenerator $repositoryGenerator
-    )
-    {
+    ) {
         parent::__construct($filesystem, $registry);
 
         $this->translationGenerator = $translationGenerator;

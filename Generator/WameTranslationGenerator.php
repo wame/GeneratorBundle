@@ -8,8 +8,10 @@ use Symfony\Component\Yaml\Yaml;
 use Wame\SensioGeneratorBundle\Inflector\Inflector;
 use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
 
-class WameTranslationGenerator
+class WameTranslationGenerator extends Generator
 {
+    use WameGeneratorTrait;
+
     protected $translationsDir;
     protected $locale;
 
@@ -21,37 +23,24 @@ class WameTranslationGenerator
 
     public function updateByMetaEntity(MetaEntity $metaEntity)
     {
-        $messageArray = [];
-
-        $tableizedEntityName = Inflector::tableize($metaEntity->getEntityName());
-        $humanizedEntityName = Inflector::humanize($metaEntity->getEntityName());
-
-        $messageArray[ucfirst($tableizedEntityName)] = ucfirst($humanizedEntityName);
-        $messageArray[ucfirst(Inflector::pluralize($tableizedEntityName))] = ucfirst(Inflector::pluralize($humanizedEntityName));
-        $messageArray[$tableizedEntityName] = [
-            'index_title' => $humanizedEntityName. ' overview',
-            'new_title' => 'Create ' . $humanizedEntityName,
-            'edit_title' => 'Edit ' . $humanizedEntityName,
-            'show_title' => 'View ' . $humanizedEntityName,
-            'create_success' => $humanizedEntityName. ' created',
-            'edit_success' => $humanizedEntityName. ' updated',
-            'delete_success' => $humanizedEntityName. ' removed',
-        ];
-        foreach ($metaEntity->getProperties() as $metaProperty) {
-            $propertyName = $metaProperty->getName();
-            $messageArray[$tableizedEntityName][Inflector::tableize($propertyName)] = Inflector::humanize($propertyName);
-        }
-
-        $path = $this-> getMessagesPath();
+        $path = $this->getMessagesPath();
         $fs = new Filesystem();
-        if ($fs->exists($path)) {
+
+        if ($fs->exists($path) === false) {
+            $messagesFile = $this->render('translations/messages.'.$this->locale.'.yml.twig', []);
+            $fs->dumpFile($path, $messagesFile);
+        } else {
             $originalMessageArray = Yaml::parse(file_get_contents($path));
-            $messageArray = array_replace_recursive($messageArray, $originalMessageArray);
+            //Only add to message-file if there hasn't been set anything for this entity yet
+            if (array_key_exists(Inflector::tableize($metaEntity->getEntityName()), $originalMessageArray)) {
+                return;
+            }
         }
 
-        $yaml = Yaml::dump($messageArray);
-
-        $fs->dumpFile($path, $yaml);
+        $addMessagesFile = $this->render('translations/_add_messages.'.$this->locale.'.yml.twig', [
+            'meta_entity' => $metaEntity,
+        ]);
+        $fs->appendToFile($path, $addMessagesFile);
     }
 
     protected function getMessagesPath(): string

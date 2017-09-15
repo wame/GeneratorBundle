@@ -16,19 +16,19 @@ class WameVoterGenerator extends Generator
 
         //Add the AppVoter if it doesn't exist yet.
         $path = $metaEntity->getBundle()->getPath().'/Security/AppVoter.php';
-        if ($fs->exists($path) === false){
-            $content = $this->render('security/AppVoter.php.twig', [
+        if ($fs->exists($path) === false) {
+            $appVoterContent = $this->render('security/AppVoter.php.twig', [
                 'bundle_namespace' => $metaEntity->getBundleNamespace(),
             ]);
-            $fs->dumpFile($path, $content);
+            $fs->dumpFile($path, $appVoterContent);
         }
 
-        $content = $this->render('security/voter.php.twig', [
+        $voterContent = $this->render('security/voter.php.twig', [
             'meta_entity' => $metaEntity,
         ]);
 
         $path = $metaEntity->getBundle()->getPath().'/Security/'.$metaEntity->getEntityName().'Voter.php';
-        $fs->dumpFile($path, $content);
+        $fs->dumpFile($path, $voterContent);
 
         return $path;
     }

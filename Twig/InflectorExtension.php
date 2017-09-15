@@ -15,6 +15,7 @@ class InflectorExtension extends \Twig_Extension
             new \Twig_SimpleFilter('singularize', [$this, 'singularize']),
             new \Twig_SimpleFilter('camelize', [$this, 'camelize']),
             new \Twig_SimpleFilter('classify', [$this, 'classify']),
+            new \Twig_SimpleFilter('humanize', [$this, 'humanize']),
         ];
     }
 
@@ -41,5 +42,10 @@ class InflectorExtension extends \Twig_Extension
     public function classify($string)
     {
         return Inflector::classify($string);
+    }
+
+    public function humanize($string)
+    {
+        return Inflector::humanize($string);
     }
 }
