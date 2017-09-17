@@ -5,7 +5,6 @@ namespace Wame\SensioGeneratorBundle\Generator;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Wame\SensioGeneratorBundle\Inflector\Inflector;
@@ -43,32 +42,26 @@ class WameEntityGenerator extends DoctrineEntityGenerator
         'blameable'      => 'Gedmo\\Blameable\\Traits\\BlameableEntity',
     ];
 
-    public function generate(BundleInterface $bundle, $entity, $format, array $fields, InputInterface $input = null)
+    public function generateFromCommand(BundleInterface $bundle, $entity, array $fields, array $behaviours = [])
     {
         $metaEntity = (new MetaEntity())
             ->setEntityName($entity)
             ->setBundle($bundle)
             ->setTableName(Inflector::pluralTableize($entity))
         ;
-        if ($input->hasOption('behaviours')) {
-            foreach ($input->getOption('behaviours') as $behaviour) {
-                if (array_key_exists($behaviour, $this->behaviourTraits)) {
-                    $metaEntity->addTrait(
-                        (new MetaTrait())
-                            ->setName($behaviour)
-                            ->setNamespace($this->behaviourTraits[$behaviour])
-                    );
-                }
+        foreach ($behaviours as $behaviour) {
+            if (array_key_exists($behaviour, $this->behaviourTraits)) {
+                $metaEntity->addTrait(
+                    (new MetaTrait())
+                        ->setName($behaviour)
+                        ->setNamespace($this->behaviourTraits[$behaviour])
+                );
             }
         }
-
-        $displayField = $input->hasOption('display-field') ? $input->getOption('display-field') : null;
-
         foreach ($fields as $field) {
-            $isDisplayField = Inflector::camelize($displayField) === Inflector::camelize($field['fieldName']) || isset($field['displayField']);
             $metaProperty = (new MetaProperty())
-                ->setName($field['fieldName'])
-                ->setColumnName($field['columnName'] ?? null)
+                ->setName(isset($field['fieldName']) ? $field['fieldName'] : $field['columnName'])
+                ->setColumnName(isset($field['columnName']) ? $field['columnName'] : $field['columnName'])
                 ->setType($field['type'] ?? 'string')
                 ->setLength($field['length'] ?? null)
                 ->setUnique($field['unique'] ?? false)
@@ -78,7 +71,7 @@ class WameEntityGenerator extends DoctrineEntityGenerator
                 ->setTargetEntity($field['targetEntity'] ?? null)
                 ->setMappedBy($field['mappedBy'] ?? null)
                 ->setInversedBy($field['inversedBy'] ?? null)
-                ->setDisplayField($isDisplayField)
+                ->setDisplayField($field['displayField'] ?? false)
                 ->setReferencedColumnName($field['referencedColumnName'] ?? 'id')
                 ->setEnumType($field['enumType'] ?? null)
                 ->setId($field['id'] ?? false)
