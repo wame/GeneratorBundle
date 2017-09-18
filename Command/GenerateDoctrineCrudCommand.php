@@ -178,11 +178,11 @@ EOT
         }
 
         // write?
-        $withWrite = $input->getOption('with-write') ?: false;
+        $withWrite = $input->getOption('with-write') ?: true;
         $output->writeln(array(
             '',
-            'By default, the generator creates two actions: list and show.',
-            'You can also ask it to generate "write" actions: new, update, and delete.',
+            'By default, the generator creates all actions.',
+            'You can also ask it to generate only index and show.',
             '',
         ));
         $question = new ConfirmationQuestion($questionHelper->getQuestion('Do you want to generate the "write" actions', $withWrite ? 'yes' : 'no', '?', $withWrite), $withWrite);
@@ -230,7 +230,7 @@ EOT
     protected function generateForm($bundle, $entity, $metadata, $forceOverwrite = false)
     {
         /** @var WameFormGenerator $formGenerator */
-        $formGenerator = new WameFormGenerator($this->getContainer()->get('doctrine'));
+        $formGenerator = $this->getContainer()->get(WameFormGenerator::class);
         $formGenerator->generateByBundleAndEntityName($bundle, $entity);
 //        $this->getFormGenerator($bundle)->generate($bundle, $entity, $metadata[0], $forceOverwrite);
     }

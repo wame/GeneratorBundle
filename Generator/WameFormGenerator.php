@@ -16,8 +16,9 @@ class WameFormGenerator extends Generator
 
     protected $registry;
 
-    public function __construct(RegistryInterface $registry)
+    public function __construct(RegistryInterface $registry, string $rootDir)
     {
+        $this->rootDir = $rootDir;
         $this->registry = $registry;
     }
 

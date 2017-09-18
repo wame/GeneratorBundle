@@ -20,6 +20,7 @@ services:
     Wame\SensioGeneratorBundle\Generator\WameFormGenerator:
         public: true
         arguments:
+            - '@doctrine'
             - '%kernel.root_dir%'
     Wame\SensioGeneratorBundle\Generator\WameVoterGenerator:
         public: true

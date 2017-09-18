@@ -33,7 +33,6 @@ class WameEntityCommand extends GenerateDoctrineEntityCommand
         parent::configure();
         $this->setName('wame:generate:entity')
             ->addArgument('entity', InputArgument::OPTIONAL, 'The entity class name to initialize (shortcut notation)')
-            ->addOption('bundle', null, InputOption::VALUE_REQUIRED, 'Name of the Bundle in which the entity must be generated')            ->addOption('no-blameable', null, InputOption::VALUE_OPTIONAL, 'Do not add `blameable` fields/behaviour on the new entity')
             ->addOption('no-blameable', null, InputOption::VALUE_OPTIONAL, 'Do not add `blameable` fields/behaviour on the new entity')
             ->addOption('no-timestampable', null, InputOption::VALUE_OPTIONAL, 'Do not add `timestampable` fields/behaviour on the new entity')
             ->addOption('no-softdeleteable', null, InputOption::VALUE_OPTIONAL, 'Do not soft-delete the new entity')

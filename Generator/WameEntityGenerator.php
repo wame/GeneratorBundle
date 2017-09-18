@@ -8,7 +8,6 @@ use Sensio\Bundle\GeneratorBundle\Generator\DoctrineEntityGenerator;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Wame\SensioGeneratorBundle\Inflector\Inflector;
 use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
 use Wame\SensioGeneratorBundle\MetaData\MetaProperty;
 use Wame\SensioGeneratorBundle\MetaData\MetaTrait;

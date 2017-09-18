@@ -1,5 +1,5 @@
 {
-    "name": "sensio/generator-bundle",
+    "name": "wame/sensio-generator-bundle",
     "description": "This bundle generates code for you",
     "keywords": [],
     "type": "symfony-bundle",
@@ -8,6 +8,14 @@
         {
             "name": "Fabien Potencier",
             "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Kevin Driessen",
+            "email": "kevin@wame.nl"
+        },
+        {
+            "name": "Ruud Bijnen",
+            "email": "ruud@wame.nl"
         }
     ],
     "require": {
@@ -29,10 +37,5 @@
             "/Tests/"
         ]
     },
-    "minimum-stability": "dev",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "3.1.x-dev"
-        }
-    }
+    "minimum-stability": "dev"
 }
