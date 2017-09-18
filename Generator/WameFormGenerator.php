@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Wame\SensioGeneratorBundle\Generator;
 
-use Sensio\Bundle\GeneratorBundle\Generator\Generator;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
@@ -12,13 +11,11 @@ use Wame\SensioGeneratorBundle\MetaData\MetaEntityFactory;
 
 class WameFormGenerator extends Generator
 {
-    use WameGeneratorTrait;
-
     protected $registry;
 
     public function __construct(RegistryInterface $registry, string $rootDir)
     {
-        $this->rootDir = $rootDir;
+        parent::__construct($rootDir);
         $this->registry = $registry;
     }
 
@@ -37,7 +34,7 @@ class WameFormGenerator extends Generator
         ]);
 
         $path = $metaEntity->getBundle()->getPath().'/Form/'.$metaEntity->getEntityName().'Type.php';
-        $fs->dumpFile($path, $content);
+        static::dump($path, $content);
 
         return $path;
     }

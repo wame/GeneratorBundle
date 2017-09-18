@@ -3,33 +3,27 @@ declare(strict_types=1);
 
 namespace Wame\SensioGeneratorBundle\Generator;
 
-use Sensio\Bundle\GeneratorBundle\Generator\Generator;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 use Wame\SensioGeneratorBundle\Inflector\Inflector;
 use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
 
 class WameTranslationGenerator extends Generator
 {
-    use WameGeneratorTrait;
-
-    protected $translationsDir;
     protected $locale;
 
-    public function __construct(string $translationsDir, string $locale)
+    public function __construct(string $rootDir, string $locale)
     {
-        $this->translationsDir = $translationsDir;
+        parent::__construct($rootDir);
         $this->locale = $locale;
     }
 
     public function updateByMetaEntity(MetaEntity $metaEntity)
     {
         $path = $this->getMessagesPath();
-        $fs = new Filesystem();
 
-        if ($fs->exists($path) === false) {
+        if (file_exists($path) === false) {
             $messagesFile = $this->render('translations/messages.'.$this->locale.'.yml.twig', []);
-            $fs->dumpFile($path, $messagesFile);
+            static::dump($path, $messagesFile);
         } else {
             $originalMessageArray = Yaml::parse(file_get_contents($path));
             //Only add to message-file if there hasn't been set anything for this entity yet
@@ -41,11 +35,11 @@ class WameTranslationGenerator extends Generator
         $addMessagesFile = $this->render('translations/_add_messages.'.$this->locale.'.yml.twig', [
             'meta_entity' => $metaEntity,
         ]);
-        $fs->appendToFile($path, $addMessagesFile);
+        static::append($path, $addMessagesFile);
     }
 
     protected function getMessagesPath(): string
     {
-        return $this->translationsDir.'/messages.'.$this->locale.'.yml';
+        return $this->rootDir.'/Resources/translations/messages.'.$this->locale.'.yml';
     }
 }

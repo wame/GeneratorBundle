@@ -13,9 +13,7 @@ use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
 use Wame\SensioGeneratorBundle\MetaData\MetaEntityFactory;
 
 /**
- * Generates a CRUD for a Doctrine entity.
- *
- * @author Fabien Potencier <fabien@symfony.com>
+ * WAME Additions for CRUD generation
  */
 class WameCrudCommand extends GenerateDoctrineCrudCommand
 {

@@ -4,38 +4,26 @@ declare(strict_types=1);
 namespace Wame\SensioGeneratorBundle\Generator;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Sensio\Bundle\GeneratorBundle\Generator\DoctrineEntityGenerator;
-use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
 use Wame\SensioGeneratorBundle\MetaData\MetaProperty;
 use Wame\SensioGeneratorBundle\MetaData\MetaTrait;
 use Wame\SensioGeneratorBundle\MetaData\MetaValidation;
 
-class WameEntityGenerator extends DoctrineEntityGenerator
+class WameEntityGenerator extends Generator
 {
-    use WameGeneratorTrait;
-
     /** @var  WameTranslationGenerator */
     protected $translationGenerator;
 
     /** @var  WameRepositoryGenerator */
     protected $repositoryGenerator;
 
-    public function __construct(
-        Filesystem $filesystem,
-        RegistryInterface $registry,
-        WameTranslationGenerator $translationGenerator,
-        WameRepositoryGenerator $repositoryGenerator,
-        $rootDir
-    ) {
-        parent::__construct($filesystem, $registry);
+    public function __construct(WameTranslationGenerator $translationGenerator, WameRepositoryGenerator $repositoryGenerator, $rootDir)
+    {
+        parent::__construct($rootDir);
 
         $this->translationGenerator = $translationGenerator;
         $this->repositoryGenerator = $repositoryGenerator;
-
-        $this->rootDir = $rootDir;
     }
 
     protected static $behaviourTraits = [
@@ -44,7 +32,7 @@ class WameEntityGenerator extends DoctrineEntityGenerator
         'blameable'      => 'Gedmo\\Blameable\\Traits\\BlameableEntity',
     ];
 
-    public function generateFromCommand(BundleInterface $bundle, $entity, array $fields, array $behaviours = []): void
+    public function generate(BundleInterface $bundle, $entity, array $fields, array $behaviours = []): void
     {
         $metaEntity = new MetaEntity($bundle, $entity);
         foreach ($behaviours as $behaviour) {
@@ -91,12 +79,11 @@ class WameEntityGenerator extends DoctrineEntityGenerator
     public function generateByMetaEntity(MetaEntity $metaEntity, $includeRepo = true): void
     {
         $this->addIdFieldIfMissing($metaEntity);
-        $fs = new Filesystem();
         $entityContent = $this->render('entity/entity.php.twig', [
             'meta_entity' => $metaEntity,
         ]);
         $entityPath = $metaEntity->getBundle()->getPath().'/Entity/'.$metaEntity->getEntityName().'.php';
-        $fs->dumpFile($entityPath, $entityContent);
+        static::dump($entityPath, $entityContent);
 
         $includeRepo ? $this->repositoryGenerator->generateByMetaEntity($metaEntity) : null;
 

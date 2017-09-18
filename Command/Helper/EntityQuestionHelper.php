@@ -5,19 +5,18 @@ namespace Wame\SensioGeneratorBundle\Command\Helper;
 
 use Doctrine\DBAL\Types\Type;
 use Fresh\DoctrineEnumBundle\DBAL\Types\AbstractEnumType;
-use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Validator\Constraint;
-use Wame\SensioGeneratorBundle\Command\Validators;
+use Wame\SensioGeneratorBundle\Command\WameValidators;
 
 /**
  * Generates bundles.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+ * @author Kevin Driessen <kevin@wame.nl>
  */
 class EntityQuestionHelper extends QuestionHelper
 {
@@ -125,7 +124,7 @@ class EntityQuestionHelper extends QuestionHelper
 
         $question = new Question($this->getQuestion('Which field you want to use? (leave empty to skip)', $defaultField), $defaultField);
         $question->setAutocompleterValues(array_keys($displayFieldOptions));
-        $question->setValidator(Validators::getDisplayFieldValidator($displayFieldOptions));
+        $question->setValidator(WameValidators::getDisplayFieldValidator($displayFieldOptions));
 
         $displayField = $this->ask($input, $output, $question);
 
@@ -139,7 +138,7 @@ class EntityQuestionHelper extends QuestionHelper
     public function askFieldName(InputInterface $input, OutputInterface $output, $fields): ?string
     {
         $question = new Question($this->getQuestion('New field name (press <return> to stop adding fields)', null), null);
-        $question->setValidator(Validators::getFieldNameValidator($fields));
+        $question->setValidator(WameValidators::getFieldNameValidator($fields));
 
         return $this->ask($input, $output, $question);
     }
@@ -153,8 +152,8 @@ class EntityQuestionHelper extends QuestionHelper
         $defaultType = $this->guessFieldType($columnName);
 
         $question = new Question($this->getQuestion('Field type', $defaultType), $defaultType);
-        $question->setNormalizer(Validators::getTypeNormalizer($types));
-        $question->setValidator(Validators::getTypeValidator($typeOptions));
+        $question->setNormalizer(WameValidators::getTypeNormalizer($types));
+        $question->setValidator(WameValidators::getTypeValidator($typeOptions));
         $question->setAutocompleterValues(array_merge($typeOptions, static::$typeAliases));
         return $this->ask($input, $output, $question);
     }
@@ -162,7 +161,7 @@ class EntityQuestionHelper extends QuestionHelper
     public function askFieldLength(InputInterface $input, OutputInterface $output): ?int
     {
         $question = new Question($this->getQuestion('Field length', 255), 255);
-        $question->setValidator(Validators::getLengthValidator());
+        $question->setValidator(WameValidators::getLengthValidator());
         return $this->ask($input, $output, $question);
     }
 
@@ -170,7 +169,7 @@ class EntityQuestionHelper extends QuestionHelper
     {
         // 10 is the default value given in \Doctrine\DBAL\Schema\Column::$_precision
         $question = new Question($this->getQuestion('Precision', 10), 10);
-        $question->setValidator(Validators::getPrecisionValidator());
+        $question->setValidator(WameValidators::getPrecisionValidator());
         return (int) $this->ask($input, $output, $question);
     }
 
@@ -178,14 +177,14 @@ class EntityQuestionHelper extends QuestionHelper
     {
         // 0 is the default value given in \Doctrine\DBAL\Schema\Column::$_scale
         $question = new Question($this->getQuestion('Scale', 0), 0);
-        $question->setValidator(Validators::getScaleValidator());
+        $question->setValidator(WameValidators::getScaleValidator());
         return (int) $this->ask($input, $output, $question);
     }
 
     public function askFieldNullable(InputInterface $input, OutputInterface $output): ?bool
     {
         $question = new Question($this->getQuestion('Is nullable', 'false'), false);
-        $question->setValidator(Validators::getBoolValidator());
+        $question->setValidator(WameValidators::getBoolValidator());
         $question->setAutocompleterValues(['true', 'false']);
         return $this->ask($input, $output, $question);
     }
@@ -193,7 +192,7 @@ class EntityQuestionHelper extends QuestionHelper
     public function askFieldUnique(InputInterface $input, OutputInterface $output): ?bool
     {
         $question =  new Question($this->getQuestion('Unique', 'false'), false);
-        $question->setValidator(Validators::getBoolValidator());
+        $question->setValidator(WameValidators::getBoolValidator());
         $question->setAutocompleterValues(['true', 'false']);
         return $this->ask($input, $output, $question);
     }
@@ -212,7 +211,7 @@ class EntityQuestionHelper extends QuestionHelper
         //TODO: add default value to show suggestion based on column-name
         $question = new Question($this->getQuestion('Related Entity', null), null);
         $question->setAutocompleterValues(array_keys($existingEntities));
-        $question->setNormalizer(Validators::getEntityNormalizer($bundleName, $existingEntityOptions));
+        $question->setNormalizer(WameValidators::getEntityNormalizer($bundleName, $existingEntityOptions));
         // TODO: should we add a validator that checks if the entity exists?
         return $this->ask($input, $output, $question);
     }
@@ -246,7 +245,7 @@ class EntityQuestionHelper extends QuestionHelper
 
         $question = new Question($this->getQuestion('Which enum type', ''), '');
         $question->setAutocompleterValues(array_keys($enumTypes));
-        $question->setValidator(Validators::getEnumTypeValidator($enumOptionsList));
+        $question->setValidator(WameValidators::getEnumTypeValidator($enumOptionsList));
 
         return $this->ask($input, $output, $question);
     }
@@ -279,7 +278,7 @@ class EntityQuestionHelper extends QuestionHelper
         while (true) {
             $output->writeln('');
             $question = new Question($this->getQuestion('Add validation (press <return> to stop adding)', null));
-            $question->setValidator(Validators::getConstraintValidator($constraintOptions));
+            $question->setValidator(WameValidators::getConstraintValidator($constraintOptions));
             $type = $this->ask($input, $output, $question);
 
             if (!$type) {

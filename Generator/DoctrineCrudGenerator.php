@@ -7,8 +7,6 @@ declare(strict_types=1);
 
 namespace Wame\SensioGeneratorBundle\Generator;
 
-use Sensio\Bundle\GeneratorBundle\Generator\Generator;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Common\Inflector\Inflector;
@@ -19,9 +17,6 @@ use Doctrine\Common\Inflector\Inflector;
  */
 class DoctrineCrudGenerator extends Generator
 {
-    use WameGeneratorTrait;
-
-    protected $filesystem;
     protected $rootDir;
     protected $routePrefix;
     protected $routeNamePrefix;
@@ -34,17 +29,6 @@ class DoctrineCrudGenerator extends Generator
     protected $actions;
     protected $useDatatable;
     protected $useVoter;
-
-
-    /**
-     * @param Filesystem $filesystem
-     * @param string     $rootDir
-     */
-    public function __construct(Filesystem $filesystem, $rootDir)
-    {
-        $this->filesystem = $filesystem;
-        $this->rootDir = $rootDir;
-    }
 
     /**
      * Generate the CRUD controller.
