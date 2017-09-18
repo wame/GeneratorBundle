@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Tests\Command\AutoComplete;
+namespace Wame\SensioGeneratorBundle\Tests\Command\AutoComplete;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Sensio\Bundle\GeneratorBundle\Command\AutoComplete\EntitiesAutoCompleter;
+use Wame\SensioGeneratorBundle\Command\AutoComplete\EntitiesAutoCompleter;
 
 class EntitiesAutoCompleterTest extends \PHPUnit_Framework_TestCase
 {

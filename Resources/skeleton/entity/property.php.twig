@@ -1,0 +1,56 @@
+{% use 'entity/property_dockblock.php.twig' %}
+{# @var property \Wame\SensioGeneratorBundle\MetaData\MetaProperty #}
+{%- block property %}
+    {{- block('property_docblock') }}
+    private ${{ property.name }};
+{%- endblock %}
+
+{%- block property_methods %}
+    {{- block('property_getter') -}}
+    {%- if property.collectionType -%}
+        {{- '\n' ~ block('property_adder') -}}
+        {{- '\n' ~  block('property_remover') -}}
+    {%- else -%}
+        {%- if property.isId != true -%}
+            {{- '\n' ~ block('property_setter') -}}
+        {%- endif -%}
+    {%- endif -%}
+{%- endblock %}
+
+{%- block property_setter %}
+    {{-''}}
+    public function set{{ property.name | capitalize }}({{ property.nullable ? '?' : '' }}{{ property.returnType }} ${{ property.name }}): self
+    {
+        $this->{{ property.name }} = ${{ property.name }};
+
+        return $this;
+    }
+{%- endblock %}
+
+{%- block property_getter %}
+    {{-''}}
+    public function get{{ property.name | capitalize }}(): ?{{ property.returnType }}
+    {
+        return $this->{{ property.name }};
+    }
+{%- endblock %}
+
+{%- block property_adder %}
+    {{-''}}
+    public function add{{ property.name | singularize | classify }}({{ property.targetEntity }} ${{ property.name | singularize }}): self
+    {
+        $this->{{ property.name }}->add(${{ property.name | singularize  }});
+
+        return $this;
+    }
+{%- endblock %}
+
+{%- block property_remover %}
+    {{-''}}
+    public function remove{{ property.name | singularize | classify }}({{ property.targetEntity }} ${{ property.name | singularize }}): self
+    {
+        $this->{{ property.name }}->remove(${{ property.name | singularize }});
+
+        return $this;
+    }
+{%- endblock %}

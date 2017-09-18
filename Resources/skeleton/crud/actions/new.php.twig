@@ -1,9 +1,5 @@
 
     /**
-{% block phpdoc_method_header %}
-     * Creates a new {{ entity_singularized }} entity.
-{% endblock phpdoc_method_header %}
-     *
 {% block phpdoc_method_annotations %}
 {% if 'annotation' == format %}
      * @Route("/new", name="{{ route_name_prefix }}_new")
@@ -12,16 +8,16 @@
 {% endblock phpdoc_method_annotations %}
      */
 {% block method_definition %}
-    public function newAction(Request $request)
+    public function newAction(Request $request): Response
 {% endblock method_definition %}
     {
 {% block method_body %}
-        ${{ entity_singularized }} = new {{ entity_singularized|capitalize }}();
-        {% if use_form_type_instance -%}
-            $form = $this->createForm(new {{ entity_singularized|capitalize }}Type(), ${{ entity_singularized }});
-        {% else -%}
-            $form = $this->createForm('{{ namespace }}\Form\{{ entity }}Type', ${{ entity_singularized }});
-        {% endif -%}
+    {%- if use_voter is defined and use_voter %}
+        $this->denyAccessUnlessGranted({{ entity }}Voter::CREATE);
+        {{- '\n\n' -}}
+    {%- endif %}
+        ${{ entity_singularized }} = new {{ entity_class }}();
+        $form = $this->createForm({{ entity_class }}Type::class, ${{ entity_singularized }});
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -29,8 +25,10 @@
             $em->persist(${{ entity_singularized }});
             $em->flush();
 
+            $this->addFlash('success', '{{ route_name_prefix }}.create_success');
+
             {% if 'show' in actions -%}
-                return $this->redirectToRoute('{{ route_name_prefix }}_show', array('{{ identifier }}' => ${{ entity_singularized }}->get{{ identifier|capitalize }}()));
+                return $this->redirectToRoute('{{ route_name_prefix }}_show', ['{{ identifier }}' => ${{ entity_singularized }}->get{{ identifier|capitalize }}()]);
             {%- else -%}
                 return $this->redirectToRoute('{{ route_name_prefix }}_index'));
             {%- endif %}
@@ -39,9 +37,9 @@
 {% endblock method_body %}
 
 {% block method_return %}
-        return $this->render('{{ entity|lower|replace({'\\': '/'}) }}/new.html.twig', array(
+        return $this->render('{{ entity|tabalize|replace({'\\': '/'}) }}/new.html.twig', [
             '{{ entity_singularized }}' => ${{ entity_singularized }},
             'form' => $form->createView(),
-        ));
+        ]);
 {% endblock method_return %}
     }

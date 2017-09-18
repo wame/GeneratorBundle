@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Tests\Generator;
+namespace Wame\SensioGeneratorBundle\Tests\Generator;
 
-use Sensio\Bundle\GeneratorBundle\Generator\BundleGenerator;
-use Sensio\Bundle\GeneratorBundle\Model\Bundle;
+use Wame\SensioGeneratorBundle\Generator\BundleGenerator;
+use Wame\SensioGeneratorBundle\Model\Bundle;
 
 class BundleGeneratorTest extends GeneratorTest
 {
@@ -148,7 +148,7 @@ class BundleGeneratorTest extends GeneratorTest
     protected function getGenerator()
     {
         $generator = new BundleGenerator($this->filesystem);
-        $generator->setSkeletonDirs(__DIR__.'/../../Resources/skeleton');
+        $generator->setSkeletonDirs(__DIR__ . '/../../Resources/skeleton');
 
         return $generator;
     }

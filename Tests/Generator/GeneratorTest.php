@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Tests\Generator;
+namespace Wame\SensioGeneratorBundle\Tests\Generator;
 
 use Symfony\Component\Filesystem\Filesystem;
 

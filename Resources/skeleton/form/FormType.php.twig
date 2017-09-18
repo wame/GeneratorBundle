@@ -1,61 +1,44 @@
+{# @var meta_entity \Wame\SensioGeneratorBundle\MetaData\MetaEntity #}
 <?php
+declare(strict_types=1);
 
-namespace {{ namespace }}\Form{{ entity_namespace ? '\\' ~ entity_namespace : '' }};
+namespace {{ meta_entity.bundleNamespace }}\Form;
 
 {% block use_statements %}
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use {{ meta_entity.bundleNamespace }}\Entity\{{ meta_entity.entityName }};
 {% endblock use_statements %}
 
 {% block class_definition %}
-class {{ form_class }} extends AbstractType
+class {{ meta_entity.entityName }}Type extends AbstractType
 {% endblock class_definition %}
 {
 {% block class_body %}
-    {%- if fields|length > 0 %}
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            {%- for field in fields -%}
-
-                ->add('{{ field }}')
-
-            {%- endfor %};
+            {% for property in meta_entity.properties if property.id == false -%}
+            {{- '\n            ' -}}
+            ->add('{{ property.name }}', null, [
+                'label' => '{{ meta_entity.entityName | tabalize ~ '.' ~ property.name | tabalize }}'
+            ])
+            {%- endfor %}
+            {{-''}}
+        ;
     }
-    {% endif %}
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(array(
-            'data_class' => '{{ namespace }}\Entity{{ entity_namespace ? '\\' ~ entity_namespace : '' }}\{{ entity_class }}'
-        ));
+        $resolver->setDefaults([
+            'data_class' => {{ meta_entity.entityName }}::class,
+        ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
-        return '{{ form_type_name }}';
+        return '{{ meta_entity.entityName | tabalize ~ '_type' }}';
     }
-
-{# BC with Symfony 2.7 #}
-{%- if get_name_required %}
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-{% endif %}
-
 {% endblock class_body %}
 }

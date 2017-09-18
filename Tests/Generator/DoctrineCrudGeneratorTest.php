@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Tests\Generator;
+namespace Wame\SensioGeneratorBundle\Tests\Generator;
 
-use Sensio\Bundle\GeneratorBundle\Generator\DoctrineCrudGenerator;
+use Wame\SensioGeneratorBundle\Generator\DoctrineCrudGenerator;
 
 class DoctrineCrudGeneratorTest extends GeneratorTest
 {
@@ -261,7 +261,7 @@ class DoctrineCrudGeneratorTest extends GeneratorTest
     protected function getGenerator()
     {
         $generator = new DoctrineCrudGenerator($this->filesystem, $this->tmpDir);
-        $generator->setSkeletonDirs(__DIR__.'/../../Resources/skeleton');
+        $generator->setSkeletonDirs(__DIR__ . '/../../Resources/skeleton');
 
         return $generator;
     }

@@ -1,210 +1,214 @@
 <?php
+declare(strict_types=1);
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+namespace Wame\SensioGeneratorBundle\Command;
 
-namespace Sensio\Bundle\GeneratorBundle\Command;
+use Sensio\Bundle\GeneratorBundle\Command\Validators as SensioValidators;
+use Wame\SensioGeneratorBundle\Inflector\Inflector;
 
-/**
- * Validator functions.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- */
-class Validators
+class Validators extends SensioValidators
 {
-    /**
-     * Validates that the given namespace (e.g. Acme\FooBundle) is a valid format.
-     *
-     * If $requireVendorNamespace is true, then we require you to have a vendor
-     * namespace (e.g. Acme).
-     *
-     * @param $namespace
-     * @param bool $requireVendorNamespace
-     *
-     * @return string
-     */
-    public static function validateBundleNamespace($namespace, $requireVendorNamespace = true)
+    public static function getFieldNameValidator(array $fields = []): callable
     {
-        if (!preg_match('/Bundle$/', $namespace)) {
-            throw new \InvalidArgumentException('The namespace must end with Bundle.');
-        }
-
-        $namespace = strtr($namespace, '/', '\\');
-        if (!preg_match('/^(?:[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*\\\?)+$/', $namespace)) {
-            throw new \InvalidArgumentException('The namespace contains invalid characters.');
-        }
-
-        // validate reserved keywords
-        $reserved = self::getReservedWords();
-        foreach (explode('\\', $namespace) as $word) {
-            if (in_array(strtolower($word), $reserved)) {
-                throw new \InvalidArgumentException(sprintf('The namespace cannot contain PHP reserved words ("%s").', $word));
+        return function ($name) use ($fields) {
+            $name = Inflector::tableize($name);
+            if ('id' === $name || isset($fields[$name])) {
+                throw new \InvalidArgumentException(sprintf('Field "%s" is already defined.', $name));
             }
-        }
 
-        // validate that the namespace is at least one level deep
-        if ($requireVendorNamespace && false === strpos($namespace, '\\')) {
-            $msg = array();
-            $msg[] = sprintf('The namespace must contain a vendor namespace (e.g. "VendorName\%s" instead of simply "%s").', $namespace, $namespace);
-            $msg[] = 'If you\'ve specified a vendor namespace, did you forget to surround it with quotes (init:bundle "Acme\BlogBundle")?';
+            // check reserved words
+            if (in_array($name, static::getReservedWords())) {
+                throw new \InvalidArgumentException(sprintf('Name "%s" is a reserved word.', $name));
+            }
 
-            throw new \InvalidArgumentException(implode("\n\n", $msg));
-        }
-
-        return $namespace;
+            return $name;
+        };
     }
 
-    public static function validateBundleName($bundle)
+    public static function getTypeValidator(array $types): callable
     {
-        if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $bundle)) {
-            throw new \InvalidArgumentException(sprintf('The bundle name %s contains invalid characters.', $bundle));
-        }
-
-        if (!preg_match('/Bundle$/', $bundle)) {
-            throw new \InvalidArgumentException('The bundle name must end with Bundle.');
-        }
-
-        return $bundle;
+        return function ($type) use ($types) {
+            if (!in_array($type, $types, true)) {
+                throw new \InvalidArgumentException(sprintf('Invalid type "%s".', $type));
+            }
+            return $type;
+        };
     }
 
-    public static function validateControllerName($controller)
+    public static function getTypeNormalizer(array $types): callable
     {
-        try {
-            self::validateEntityName($controller);
-        } catch (\InvalidArgumentException $e) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'The controller name must contain a : ("%s" given, expecting something like AcmeBlogBundle:Post)',
-                    $controller
-                )
-            );
-        }
-
-        return $controller;
+        return function ($type) use ($types) {
+            if (in_array($type, $types, true)) {
+                return array_search($type, $types);
+            }
+            return $type;
+        };
     }
 
-    public static function validateFormat($format)
+    public static function getLengthValidator(): callable
     {
-        if (!$format) {
-            throw new \RuntimeException('Please enter a configuration format.');
-        }
+        return function ($length) {
+            if (!$length) {
+                return $length;
+            }
 
-        $format = strtolower($format);
+            $result = filter_var($length, FILTER_VALIDATE_INT, array(
+                'options' => array('min_range' => 1),
+            ));
 
-        // in case they typed "yaml", but ok with that
-        if ($format == 'yaml') {
-            $format = 'yml';
-        }
+            if (false === $result) {
+                throw new \InvalidArgumentException(sprintf('Invalid length "%s".', $length));
+            }
 
-        if (!in_array($format, array('php', 'xml', 'yml', 'annotation'))) {
-            throw new \RuntimeException(sprintf('Format "%s" is not supported.', $format));
-        }
-
-        return $format;
+            return $length;
+        };
     }
 
-    /**
-     * Performs basic checks in entity name.
-     *
-     * @param string $entity
-     *
-     * @return string
-     *
-     * @throws \InvalidArgumentException
-     */
-    public static function validateEntityName($entity)
+    public static function getBoolValidator(): callable
     {
-        if (!preg_match('{^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*:[a-zA-Z0-9_\x7f-\xff\\\/]+$}', $entity)) {
-            throw new \InvalidArgumentException(sprintf('The entity name isn\'t valid ("%s" given, expecting something like AcmeBlogBundle:Blog/Post)', $entity));
-        }
+        return function ($value) {
+            if (null === $valueAsBool = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)) {
+                throw new \InvalidArgumentException(sprintf('Invalid bool value "%s".', $value));
+            }
 
-        return $entity;
+            return $valueAsBool;
+        };
     }
 
-    public static function getReservedWords()
+    public static function getPrecisionValidator() : callable
     {
-        return array(
-            'abstract',
-            'and',
-            'array',
-            'as',
-            'break',
-            'callable',
-            'case',
-            'catch',
-            'class',
-            'clone',
-            'const',
-            'continue',
-            'declare',
-            'default',
-            'do',
-            'else',
-            'elseif',
-            'enddeclare',
-            'endfor',
-            'endforeach',
-            'endif',
-            'endswitch',
-            'endwhile',
-            'extends',
-            'final',
-            'finally',
-            'for',
-            'foreach',
-            'function',
-            'global',
-            'goto',
-            'if',
-            'implements',
-            'interface',
-            'instanceof',
-            'insteadof',
-            'namespace',
-            'new',
-            'or',
-            'private',
-            'protected',
-            'public',
-            'static',
-            'switch',
-            'throw',
-            'trait',
-            'try',
-            'use',
-            'var',
-            'while',
-            'xor',
-            'yield',
-            '__CLASS__',
-            '__DIR__',
-            '__FILE__',
-            '__LINE__',
-            '__FUNCTION__',
-            '__METHOD__',
-            '__NAMESPACE__',
-            '__TRAIT__',
-            '__halt_compiler',
-            'die',
-            'echo',
-            'empty',
-            'exit',
-            'eval',
-            'include',
-            'include_once',
-            'isset',
-            'list',
-            'require',
-            'require_once',
-            'return',
-            'print',
-            'unset',
-        );
+        return function ($precision) {
+            if (!$precision) {
+                return $precision;
+            }
+
+            $result = filter_var($precision, FILTER_VALIDATE_INT, array(
+                'options' => array('min_range' => 1, 'max_range' => 65),
+            ));
+
+            if (false === $result) {
+                throw new \InvalidArgumentException(sprintf('Invalid precision "%s".', $precision));
+            }
+
+            return $precision;
+        };
+    }
+
+    public static function getScaleValidator(): callable
+    {
+        return function ($scale) {
+            if (!$scale) {
+                return $scale;
+            }
+
+            $result = filter_var($scale, FILTER_VALIDATE_INT, array(
+                'options' => array('min_range' => 0, 'max_range' => 30),
+            ));
+
+            if (false === $result) {
+                throw new \InvalidArgumentException(sprintf('Invalid scale "%s".', $scale));
+            }
+
+            return $scale;
+        };
+    }
+
+    //TODO: this isn't actually a validator: should we a different class instead?
+    public static function getEntityNormalizer($bundle, $existingEntityOptions): callable
+    {
+        return function ($entity) use ($bundle, $existingEntityOptions) {
+            if (ctype_digit($entity) && isset($existingEntityOptions[$entity])) {
+                return $existingEntityOptions[$entity];
+            }
+            if (strpos($entity, ':') === false) {
+                $entity = $bundle . ':' . $entity;
+            }
+            return $entity;
+        };
+    }
+
+    public static function getEnumTypeValidator($enumOptionsList): callable
+    {
+        return function ($type) use ($enumOptionsList) {
+            if (!$type) {
+                return null;
+            }
+            if (is_int($type) || ctype_digit($type)) {
+                if (!in_array($type, $enumOptionsList)) {
+                    throw new \InvalidArgumentException(sprintf('%d is not a valid option', $type));
+                }
+                if ($type == 0) {
+                    return null;
+                }
+                return array_search($type, $enumOptionsList);
+            }
+            if (!array_key_exists($type, $enumOptionsList)) {
+                throw new \InvalidArgumentException(sprintf("'%s' is not a valid option", $type));
+            }
+            return $type;
+        };
+    }
+
+    public static function getConstraintValidator($constraintOptions): callable
+    {
+        return function ($constraint) use ($constraintOptions) {
+            if (!$constraint) {
+                return null;
+            }
+            if (ctype_digit($constraint) && isset($constraintOptions[$constraint])) {
+                $constraint = $constraintOptions[$constraint];
+            } elseif (!in_array($constraint, $constraintOptions)) {
+                throw new \InvalidArgumentException(sprintf(
+                    "Unknown validation constraint '%s'! Available options: [%s]",
+                    $constraint,
+                    implode(', ', $constraintOptions)
+                ));
+            }
+            return $constraint;
+        };
+    }
+
+    public static function getConstraintsNormalizer(): callable
+    {
+        return function ($value) {
+            if (is_int($value) || ctype_digit($value)) {
+                return (int) $value;
+            }
+            if (is_array($value)) {
+                return $value;
+            }
+            if ($value === 'yes') {
+                return true;
+            }
+            if ($value === 'no') {
+                return false;
+            }
+            try {
+                $decodeValue = @json_decode($value, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new \RuntimeException('Could not decode value as json');
+                }
+                return $decodeValue;
+            } catch (\Exception $e) {
+                return $value;
+            }
+        };
+    }
+
+    public static function getDisplayFieldValidator($displayFieldOptions): callable
+    {
+        return function ($field) use ($displayFieldOptions) {
+            if (!$field) {
+                return null;
+            }
+            if (ctype_digit($field) && isset($displayFieldOptions[$field])) {
+                return $displayFieldOptions[$field];
+            }
+            if (!in_array($field, $displayFieldOptions, true)) {
+                throw new \InvalidArgumentException(sprintf('Invalid field "%s".', $field));
+            }
+
+            return $field;
+        };
     }
 }

@@ -9,13 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Tests\Manipulator;
+namespace Wame\SensioGeneratorBundle\Tests\Manipulator;
 
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 use Symfony\Component\Process\PhpExecutableFinder;
-use Sensio\Bundle\GeneratorBundle\Tests\Generator\GeneratorTest;
-use Sensio\Bundle\GeneratorBundle\Manipulator\KernelManipulator;
+use Wame\SensioGeneratorBundle\Tests\Generator\GeneratorTest;
+use Wame\SensioGeneratorBundle\Manipulator\KernelManipulator;
 
 class KernelManipulatorTest extends GeneratorTest
 {
@@ -81,19 +81,19 @@ class KernelManipulatorTest extends GeneratorTest
     public function kernelStubFilenamesProvider()
     {
         $stubs = array(
-            'With empty bundles array' => array(__DIR__.'/Stubs/EmptyBundlesKernelStub.php'),
-            'With empty multiline bundles array' => array(__DIR__.'/Stubs/EmptyBundlesMultilineKernelStub.php'),
-            'With bundles array contains comma' => array(__DIR__.'/Stubs/ContainsCommaKernelStub.php'),
-            'With bundles added w/o trailing comma' => array(__DIR__.'/Stubs/ContainsBundlesKernelStub.php'),
-            'With some extra code and bad formatted' => array(__DIR__.'/Stubs/ContainsExtraCodeKernelStub.php'),
+            'With empty bundles array' => array(__DIR__ . '/Stubs/EmptyBundlesKernelStub.php'),
+            'With empty multiline bundles array' => array(__DIR__ . '/Stubs/EmptyBundlesMultilineKernelStub.php'),
+            'With bundles array contains comma' => array(__DIR__ . '/Stubs/ContainsCommaKernelStub.php'),
+            'With bundles added w/o trailing comma' => array(__DIR__ . '/Stubs/ContainsBundlesKernelStub.php'),
+            'With some extra code and bad formatted' => array(__DIR__ . '/Stubs/ContainsExtraCodeKernelStub.php'),
         );
 
         if (PHP_VERSION_ID >= 50400) {
             $stubs = array_merge($stubs, array(
-                'With empty bundles array, short array syntax' => array(__DIR__.'/Stubs/EmptyBundlesShortArraySyntaxKernelStub.php'),
-                'With empty multiline bundles array, short array syntax' => array(__DIR__.'/Stubs/EmptyBundlesMultilineShortArraySyntaxKernelStub.php'),
-                'With bundles array contains comma, short array syntax' => array(__DIR__.'/Stubs/ContainsCommaShortArraySyntaxKernelStub.php'),
-                'With bundles added w/o trailing comma, short array syntax' => array(__DIR__.'/Stubs/ContainsBundlesShortArraySyntaxKernelStub.php'),
+                'With empty bundles array, short array syntax' => array(__DIR__ . '/Stubs/EmptyBundlesShortArraySyntaxKernelStub.php'),
+                'With empty multiline bundles array, short array syntax' => array(__DIR__ . '/Stubs/EmptyBundlesMultilineShortArraySyntaxKernelStub.php'),
+                'With bundles array contains comma, short array syntax' => array(__DIR__ . '/Stubs/ContainsCommaShortArraySyntaxKernelStub.php'),
+                'With bundles added w/o trailing comma, short array syntax' => array(__DIR__ . '/Stubs/ContainsBundlesShortArraySyntaxKernelStub.php'),
             ));
         }
 

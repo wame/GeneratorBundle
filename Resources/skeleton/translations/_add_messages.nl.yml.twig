@@ -1,0 +1,19 @@
+
+{# @var meta_entity \Wame\SensioGeneratorBundle\MetaData\MetaEntity #}
+{% set entity_humanized =  meta_entity.entityName | humanize %}
+{% set entity_humanized_lowered =  entity_humanized | lower %}
+{{ meta_entity.entityName | pluralize | tabalize | capitalize }}: {{ meta_entity.entityName | pluralize | humanize | capitalize }}
+{{ meta_entity.entityName | tabalize | capitalize }}: {{ meta_entity.entityName | humanize | capitalize }}
+{{ meta_entity.entityName | tabalize }}:
+    index_title: '{{ entity_humanized }} overzicht'
+    new_title: 'Nieuwe {{ entity_humanized_lowered }} aanmaken'
+    show_title: '{{ entity_humanized }} bekijken'
+    edit_title: '{{ entity_humanized }} bewerken'
+    new_button: 'Nieuwe {{ entity_humanized_lowered }}'
+    create_success: '{{ entity_humanized }} is succesvol aangemaakt.'
+    edit_success: '{{ entity_humanized }} is succesvol bijgewerkt.'
+    delete_success: '{{ entity_humanized }} is succesvol verwijderd.'
+    no_records_found: 'Er zijn geen resultaten gevonden voor {{ entity_humanized_lowered }}.'
+{% for property in meta_entity.properties %}
+    {{ property.name|tabalize }}: {{ property.name|humanize }}
+{% endfor %}

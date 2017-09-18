@@ -1,16 +1,9 @@
 <?php
+declare(strict_types=1);
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+namespace Wame\SensioGeneratorBundle\Command;
 
-namespace Sensio\Bundle\GeneratorBundle\Command;
-
+use Sensio\Bundle\GeneratorBundle\Command\GenerateDoctrineCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,8 +14,8 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Sensio\Bundle\GeneratorBundle\Command\AutoComplete\EntitiesAutoCompleter;
 use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
-use Sensio\Bundle\GeneratorBundle\Generator\DoctrineCrudGenerator;
-use Sensio\Bundle\GeneratorBundle\Generator\DoctrineFormGenerator;
+use Wame\SensioGeneratorBundle\Generator\DoctrineCrudGenerator;
+use Wame\SensioGeneratorBundle\Generator\WameFormGenerator;
 use Sensio\Bundle\GeneratorBundle\Manipulator\RoutingManipulator;
 
 /**
@@ -40,8 +33,7 @@ class GenerateDoctrineCrudCommand extends GenerateDoctrineCommand
     protected function configure()
     {
         $this
-            ->setName('doctrine:generate:crud')
-            ->setAliases(array('generate:doctrine:crud'))
+            ->setName('wame:doctrine:generate:crud')
             ->setDescription('Generates a CRUD based on a Doctrine entity')
             ->addArgument('entity', InputArgument::OPTIONAL, 'The entity class name to initialize (shortcut notation)')
             ->addOption('entity', null, InputOption::VALUE_OPTIONAL, 'The entity class name to initialize (shortcut notation)')
@@ -107,6 +99,8 @@ EOT
         $prefix = $this->getRoutePrefix($input, $entity);
         $withWrite = $input->getOption('with-write');
         $forceOverwrite = $input->getOption('overwrite');
+        $withDatatable = $input->hasOption('with-datatable') ? $input->getOption('with-datatable') : false;
+        $withVoter = $input->hasOption('with-voter') ? $input->getOption('with-voter') : false;
 
         $questionHelper->writeSection($output, 'CRUD generation');
 
@@ -120,7 +114,7 @@ EOT
         $bundle = $this->getContainer()->get('kernel')->getBundle($bundle);
 
         $generator = $this->getGenerator($bundle);
-        $generator->generate($bundle, $entity, $metadata[0], $format, $prefix, $withWrite, $forceOverwrite);
+        $generator->generate($bundle, $entity, $metadata[0], $format, $prefix, $withWrite, $forceOverwrite, $withDatatable, $withVoter);
 
         $output->writeln('Generating the CRUD code: <info>OK</info>');
 
@@ -135,7 +129,7 @@ EOT
 
         // routing
         $output->write('Updating the routing: ');
-        if ('annotation' != $format) {
+        if ('annotation' !== $format) {
             $runner($this->updateRouting($questionHelper, $input, $output, $bundle, $format, $entity, $prefix));
         } else {
             $runner($this->updateAnnotationRouting($bundle, $entity, $prefix));
@@ -166,7 +160,7 @@ EOT
         }
 
         $question = new Question($questionHelper->getQuestion('The Entity shortcut name', $input->getArgument('entity')), $input->getArgument('entity'));
-        $question->setValidator(array('Sensio\Bundle\GeneratorBundle\Command\Validators', 'validateEntityName'));
+        $question->setValidator(array('Wame\SensioGeneratorBundle\Command\Validators', 'validateEntityName'));
 
         $autocompleter = new EntitiesAutoCompleter($this->getContainer()->get('doctrine')->getManager());
         $autocompleteEntities = $autocompleter->getSuggestions();
@@ -184,11 +178,11 @@ EOT
         }
 
         // write?
-        $withWrite = $input->getOption('with-write') ?: false;
+        $withWrite = $input->getOption('with-write') ?: true;
         $output->writeln(array(
             '',
-            'By default, the generator creates two actions: list and show.',
-            'You can also ask it to generate "write" actions: new, update, and delete.',
+            'By default, the generator creates all actions.',
+            'You can also ask it to generate only index and show.',
             '',
         ));
         $question = new ConfirmationQuestion($questionHelper->getQuestion('Do you want to generate the "write" actions', $withWrite ? 'yes' : 'no', '?', $withWrite), $withWrite);
@@ -204,7 +198,7 @@ EOT
             '',
         ));
         $question = new Question($questionHelper->getQuestion('Configuration format (yml, xml, php, or annotation)', $format), $format);
-        $question->setValidator(array('Sensio\Bundle\GeneratorBundle\Command\Validators', 'validateFormat'));
+        $question->setValidator(array('Wame\SensioGeneratorBundle\Command\Validators', 'validateFormat'));
         $format = $questionHelper->ask($input, $output, $question);
         $input->setOption('format', $format);
 
@@ -235,7 +229,10 @@ EOT
      */
     protected function generateForm($bundle, $entity, $metadata, $forceOverwrite = false)
     {
-        $this->getFormGenerator($bundle)->generate($bundle, $entity, $metadata[0], $forceOverwrite);
+        /** @var WameFormGenerator $formGenerator */
+        $formGenerator = $this->getContainer()->get(WameFormGenerator::class);
+        $formGenerator->generateByBundleAndEntityName($bundle, $entity);
+//        $this->getFormGenerator($bundle)->generate($bundle, $entity, $metadata[0], $forceOverwrite);
     }
 
     protected function updateRouting(QuestionHelper $questionHelper, InputInterface $input, OutputInterface $output, BundleInterface $bundle, $format, $entity, $prefix)

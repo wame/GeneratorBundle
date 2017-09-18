@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Tests\Generator;
+namespace Wame\SensioGeneratorBundle\Tests\Generator;
 
-use Sensio\Bundle\GeneratorBundle\Generator\CommandGenerator;
+use Wame\SensioGeneratorBundle\Generator\CommandGenerator;
 
 class CommandGeneratorTest extends GeneratorTest
 {
@@ -62,7 +62,7 @@ class CommandGeneratorTest extends GeneratorTest
     protected function getGenerator()
     {
         $generator = new CommandGenerator($this->filesystem);
-        $generator->setSkeletonDirs(__DIR__.'/../../Resources/skeleton');
+        $generator->setSkeletonDirs(__DIR__ . '/../../Resources/skeleton');
 
         return $generator;
     }

@@ -1,28 +1,26 @@
 <?php
+declare(strict_types=1);
 
 /*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * This file is a modified copy of the DoctrineCrudGenerator that is part of the Symfony package.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Generator;
+namespace Wame\SensioGeneratorBundle\Generator;
 
+use Sensio\Bundle\GeneratorBundle\Generator\Generator;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Common\Inflector\Inflector;
 
 /**
- * Generates a CRUD controller.
- *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Kevin Driessen <kevin@wame.nl>
  */
 class DoctrineCrudGenerator extends Generator
 {
+    use WameGeneratorTrait;
+
     protected $filesystem;
     protected $rootDir;
     protected $routePrefix;
@@ -34,6 +32,9 @@ class DoctrineCrudGenerator extends Generator
     protected $metadata;
     protected $format;
     protected $actions;
+    protected $useDatatable;
+    protected $useVoter;
+
 
     /**
      * @param Filesystem $filesystem
@@ -58,8 +59,10 @@ class DoctrineCrudGenerator extends Generator
      *
      * @throws \RuntimeException
      */
-    public function generate(BundleInterface $bundle, $entity, ClassMetadataInfo $metadata, $format, $routePrefix, $needWriteActions, $forceOverwrite)
+    public function generate(BundleInterface $bundle, $entity, ClassMetadataInfo $metadata, $format, $routePrefix, $needWriteActions, $forceOverwrite, $useDatatable, $useVoter)
     {
+        $this->useDatatable = $useDatatable;
+        $this->useVoter = $useVoter;
         $this->routePrefix = $routePrefix;
         $this->routeNamePrefix = self::getRouteNamePrefix($routePrefix);
         $this->actions = $needWriteActions ? array('index', 'show', 'new', 'edit', 'delete') : array('index', 'show');
@@ -80,7 +83,7 @@ class DoctrineCrudGenerator extends Generator
 
         $this->generateControllerClass($forceOverwrite);
 
-        $dir = sprintf('%s/Resources/views/%s', $this->rootDir, strtolower($entity));
+        $dir = sprintf('%s/Resources/views/%s', $this->rootDir, Inflector::tableize($entity));
 
         if (!file_exists($dir)) {
             self::mkdir($dir);
@@ -100,7 +103,8 @@ class DoctrineCrudGenerator extends Generator
             $this->generateEditView($dir);
         }
 
-        $this->generateTestClass();
+        //TODO: shall we generate tests? If so, how should we generate them (the original generated tests aren't quite useful)
+//        $this->generateTestClass();
         $this->generateConfiguration();
     }
 
@@ -187,6 +191,8 @@ class DoctrineCrudGenerator extends Generator
             'format' => $this->format,
             // BC with Symfony 2.7
             'use_form_type_instance' => !method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix'),
+            'use_datatable' => $this->useDatatable,
+            'use_voter' => $this->useVoter,
         ));
     }
 
@@ -222,7 +228,8 @@ class DoctrineCrudGenerator extends Generator
      */
     protected function generateIndexView($dir)
     {
-        $this->renderFile('crud/views/index.html.twig.twig', $dir.'/index.html.twig', array(
+        $templateFile = $this->useDatatable ? 'crud/views/index-with-datatable.html.twig.twig' : 'crud/views/index.html.twig.twig';
+        $this->renderFile($templateFile, $dir.'/index.html.twig', array(
             'bundle' => $this->bundle->getName(),
             'entity' => $this->entity,
             'entity_pluralized' => $this->entityPluralized,
@@ -252,6 +259,7 @@ class DoctrineCrudGenerator extends Generator
             'actions' => $this->actions,
             'route_prefix' => $this->routePrefix,
             'route_name_prefix' => $this->routeNamePrefix,
+            'use_voter' => $this->useVoter,
         ));
     }
 
@@ -270,6 +278,7 @@ class DoctrineCrudGenerator extends Generator
             'route_name_prefix' => $this->routeNamePrefix,
             'actions' => $this->actions,
             'fields' => $this->metadata->fieldMappings,
+            'use_voter' => $this->useVoter,
         ));
     }
 
@@ -289,6 +298,7 @@ class DoctrineCrudGenerator extends Generator
             'fields' => $this->metadata->fieldMappings,
             'bundle' => $this->bundle->getName(),
             'actions' => $this->actions,
+            'use_voter' => $this->useVoter,
         ));
     }
 

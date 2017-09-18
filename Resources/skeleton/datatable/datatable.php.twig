@@ -1,0 +1,39 @@
+{# @var meta_entity \Wame\SensioGeneratorBundle\MetaData\MetaEntity #}
+<?php
+declare(strict_types=1);
+
+namespace {{ meta_entity.bundleNamespace }}\Datatable;
+
+use Sg\DatatablesBundle\Datatable\Column\Column;
+{%- set break = false -%}
+{%- for property in meta_entity.properties if not break %}
+    {%- if property.returnType == '\DateTime' -%}
+        {{- '\n' -}}
+        use Sg\DatatablesBundle\Datatable\Column\DateTimeColumn;
+        {{- '\n' -}}
+        {%- set break = true -%}
+    {%- endif -%}
+{%- endfor -%}
+{{- '\n\n' -}}
+class {{ meta_entity.entityName }}Datatable extends AppDatatable
+{
+    protected function addColumns(?array $options = []): void
+    {
+        $this->columnBuilder
+        {%- for property in meta_entity.properties -%}
+            {%- if property.returnType == '\DateTime' -%}
+                {{- '\n            ' -}}
+            ->add('{{ property.name }}', DateTimeColumn::class, [
+                'title' => $this->translator->trans({{ meta_entity.entityName | tabalize }}.{{ property.columnName }}'),
+            ])
+            {%- elseif property.relationType == false -%}
+                {{- '\n            ' -}}
+            ->add('{{ property.name }}', Column::class, [
+                'title' => $this->translator->trans('{{ meta_entity.entityName | tabalize }}.{{ property.columnName }}'),
+            ])
+            {%- endif -%}
+        {%- endfor -%}
+        {{-''}}
+        ;
+    }
+}

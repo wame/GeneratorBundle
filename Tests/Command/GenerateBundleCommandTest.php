@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Tests\Command;
+namespace Wame\SensioGeneratorBundle\Tests\Command;
 
-use Sensio\Bundle\GeneratorBundle\Model\Bundle;
+use Wame\SensioGeneratorBundle\Model\Bundle;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class GenerateBundleCommandTest extends GenerateCommandTest
@@ -124,7 +124,7 @@ class GenerateBundleCommandTest extends GenerateCommandTest
     protected function getCommand($generator, $container)
     {
         $command = $this
-            ->getMockBuilder('Sensio\Bundle\GeneratorBundle\Command\GenerateBundleCommand')
+            ->getMockBuilder('Wame\SensioGeneratorBundle\Command\GenerateBundleCommand')
             ->setMethods(array('checkAutoloader', 'updateKernel', 'updateRouting'))
             ->getMock()
         ;
@@ -140,7 +140,7 @@ class GenerateBundleCommandTest extends GenerateCommandTest
     {
         // get a noop generator
         return $this
-            ->getMockBuilder('Sensio\Bundle\GeneratorBundle\Generator\BundleGenerator')
+            ->getMockBuilder('Wame\SensioGeneratorBundle\Generator\BundleGenerator')
             ->disableOriginalConstructor()
             ->setMethods(array('generateBundle'))
             ->getMock()

@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Tests\Command;
+namespace Wame\SensioGeneratorBundle\Tests\Command;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
-use Sensio\Bundle\GeneratorBundle\Command\GenerateCommandCommand;
+use Wame\SensioGeneratorBundle\Command\GenerateCommandCommand;
 
 class GenerateCommandCommandTest extends GenerateCommandTest
 {
@@ -133,7 +133,7 @@ class GenerateCommandCommandTest extends GenerateCommandTest
     {
         // get a noop generator
         $this->generator = $this
-            ->getMockBuilder('Sensio\Bundle\GeneratorBundle\Generator\CommandGenerator')
+            ->getMockBuilder('Wame\SensioGeneratorBundle\Generator\CommandGenerator')
             ->disableOriginalConstructor()
             ->setMethods(array('generate'))
             ->getMock()

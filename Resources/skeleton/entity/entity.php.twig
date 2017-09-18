@@ -1,0 +1,89 @@
+{# @var meta_entity \Wame\SensioGeneratorBundle\MetaData\MetaEntity #}
+{% use 'entity/property.php.twig' %}
+<?php
+declare(strict_types=1);
+
+namespace {{ meta_entity.bundleNamespace }}\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+{% if meta_entity.hasTrait('SoftDeleteable') %}
+use Gedmo\Mapping\Annotation as Gedmo;
+{% endif -%}
+{% if meta_entity.hasCollectionProperties  -%}
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+{% endif -%}
+{% if meta_entity.hasValidation  -%}
+use Symfony\Component\Validator\Constraints as Assert;
+{% endif %}
+{% if meta_entity.hasEnumProperty  -%}
+use Fresh\DoctrineEnumBundle\Validator\Constraints as EnumAssert;
+{% endif %}
+{% for trait in meta_entity.traits -%}
+    use {{ trait.namespace }} as {{ trait.name | classify }};
+{% endfor %}
+{% for interface in meta_entity.interfaces -%}
+    use {{ interface.namespace }} as {{ interface.name }};
+{% endfor %}
+
+/**
+ * @ORM\Table(name="{{ meta_entity.tableName }}")
+ * @ORM\Entity(repositoryClass="{{ meta_entity.bundleNamespace }}\Repository\{{ meta_entity.entityName }}Repository")
+{% if meta_entity.hasTrait('SoftDeleteable') %}
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
+{% endif %}
+ */
+class {{ meta_entity.entityName }}
+{%- if meta_entity.interfaces.empty == false -%}
+    implements
+    {%- for interface in meta_entity.interfaces -%}
+        {{- loop.first ? ' ' : ', '  -}}
+        {{- interface.name -}}
+    {%- endfor -%}
+{%- endif -%}
+{{-''}}
+{
+    {%- for trait in meta_entity.traits -%}
+        {{- '\n    ' -}}
+        use {{ trait.name | classify }};
+        {%- if loop.last -%}
+            {{- '\n' -}}
+        {%- endif -%}
+    {%- endfor -%}
+
+    {%- for property in meta_entity.properties -%}
+        {{- block('property') ~ '\n' -}}
+    {%- endfor -%}
+
+    {%- if meta_entity.hasCollectionProperties -%}
+    {{-''}}
+    public function __construct()
+    {
+        {%- for property in meta_entity.collectionProperties -%}
+        {{-''}}
+        $this->{{ property.name }} = new ArrayCollection();
+        {%- endfor -%}
+        {{-''}}
+    }
+    {{- '\n' -}}
+    {%- endif -%}
+
+    {%- for property in meta_entity.properties -%}
+        {{- block('property_methods')  ~ '\n' -}}
+    {%- endfor -%}
+
+    {%- set displayFieldProperty =  meta_entity.getDisplayFieldProperty -%}
+    {%- if displayFieldProperty is not null -%}
+    {{-''}}
+    public function __toString(): string
+    {
+        return {{ displayFieldProperty.type == 'string' ? '' : '(string) ' -}}
+        $this->get{{ displayFieldProperty.name | classify }}() ?:
+        {%- if displayFieldProperty.id == false and meta_entity.idProperty is not null -%}
+            ('#'.$this->get{{ meta_entity.idProperty.name | classify }}()) ?: ''
+        {%- endif -%}
+        ;
+    }
+    {{- '\n' -}}
+    {%- endif -%}
+}

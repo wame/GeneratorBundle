@@ -32,7 +32,7 @@ Then, enable the bundle by adding it to the list of registered bundles for the
         public function registerBundles()
         {
             if (in_array($this->getEnvironment(), array('dev', 'test'))) {
-                $bundles[] = new Sensio\Bundle\GeneratorBundle\SensioGeneratorBundle();
+                $bundles[] = new Wame\SensioGeneratorBundle\SensioGeneratorBundle();
                 // ...
             }
 

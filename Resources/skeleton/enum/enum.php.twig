@@ -1,0 +1,20 @@
+{# @var meta_enum \Wame\SensioGeneratorBundle\MetaData\MetaEnumType #}
+<?php
+declare(strict_types=1);
+
+namespace {{ meta_enum.bundle.namespace }}\DBAL\Types;
+
+use Fresh\DoctrineEnumBundle\DBAL\Types\AbstractEnumType;
+
+final class {{ meta_enum.className }} extends AbstractEnumType
+{
+    {% for option in meta_enum.options -%}
+    const {{ option.const | upper }} = '{{ option.value }}';
+    {% endfor %}
+
+    protected static $choices = [
+        {% for option in meta_enum.options -%}
+        self::{{ option.const | upper }} => '{{ option.label }}',
+        {% endfor %}
+    ];
+}

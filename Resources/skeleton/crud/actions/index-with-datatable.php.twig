@@ -1,0 +1,26 @@
+    /**
+{% block phpdoc_method_annotations %}
+{% if 'annotation' == format %}
+     * @Route("/", name="{{ route_name_prefix }}_index")
+     * @Method("GET")
+{% endif %}
+{% endblock phpdoc_method_annotations %}
+     */
+{% block method_definition %}
+    public function indexAction({{ entity }}Datatable $datatable): Response
+{% endblock method_definition %}
+    {
+{% block method_body %}
+    {%- if use_voter is defined and use_voter %}
+        $this->denyAccessUnlessGranted({{ entity }}Voter::INDEX);
+        {{- '\n\n' -}}
+    {%- endif %}
+        $datatable->buildDatatable();
+{% endblock method_body %}
+
+{% block method_return %}
+        return $this->render('{{ entity|tabalize|replace({'\\': '/'}) }}/index.html.twig', [
+            'datatable' => $datatable,
+        ]);
+{% endblock method_return %}
+    }

@@ -8,10 +8,10 @@
 
     <table>
         <tbody>
-        {%- for field, metadata in fields %}
+        {%- for field, metadata in fields if field not in 'deletedAt,createdAt,updatedAt,updatedBy,deletedBy,createdBy' %}
 
             <tr>
-                <th>{{ field|capitalize }}</th>
+                <th>{{ '{{ \'' ~ entity_singularized | tabalize ~ '.' ~field|tabalize ~ '\' | trans }}' }}</th>
 
             {%- if metadata.type in ['datetime'] %}
 

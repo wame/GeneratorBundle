@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Tests\Generator;
+namespace Wame\SensioGeneratorBundle\Tests\Generator;
 
-use Sensio\Bundle\GeneratorBundle\Generator\DoctrineEntityGenerator;
+use Wame\SensioGeneratorBundle\Generator\DoctrineEntityGenerator;
 
 class DoctrineEntityGeneratorTest extends GeneratorTest
 {
@@ -154,7 +154,7 @@ class DoctrineEntityGeneratorTest extends GeneratorTest
     protected function getGenerator()
     {
         $generator = new DoctrineEntityGenerator($this->filesystem, $this->getRegistry());
-        $generator->setSkeletonDirs(__DIR__.'/../../Resources/skeleton');
+        $generator->setSkeletonDirs(__DIR__ . '/../../Resources/skeleton');
 
         return $generator;
     }

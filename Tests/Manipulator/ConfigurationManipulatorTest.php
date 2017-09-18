@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Sensio\Bundle\GeneratorBundle\Tests\Generator;
+namespace Wame\SensioGeneratorBundle\Tests\Generator;
 
-use Sensio\Bundle\GeneratorBundle\Manipulator\ConfigurationManipulator;
-use Sensio\Bundle\GeneratorBundle\Model\Bundle;
+use Wame\SensioGeneratorBundle\Manipulator\ConfigurationManipulator;
+use Wame\SensioGeneratorBundle\Model\Bundle;
 use Symfony\Component\Filesystem\Filesystem;
 
 class ConfigurationManipulatorTest extends \PHPUnit_Framework_TestCase

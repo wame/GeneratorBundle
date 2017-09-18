@@ -1,0 +1,46 @@
+{# @var meta_entity \Wame\SensioGeneratorBundle\MetaData\MetaEntity #}
+{% set attributePrefix = meta_entity.entityName | tabalize | upper  %}
+<?php
+declare(strict_types=1);
+
+namespace {{ meta_entity.bundleNamespace }}\Security;
+
+use {{ meta_entity.bundleNamespace }}\Entity\{{ meta_entity.entityName }};
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+
+class {{ meta_entity.entityName }}Voter extends AppVoter
+{
+    const INDEX     = '{{ attributePrefix }}_INDEX';
+    const SEARCH    = '{{ attributePrefix }}_SEARCH';
+    const VIEW      = '{{ attributePrefix }}_VIEW';
+    const CREATE    = '{{ attributePrefix }}_CREATE';
+    const EDIT      = '{{ attributePrefix }}_EDIT';
+    const DELETE    = '{{ attributePrefix }}_DELETE';
+
+    static protected $supportedAttributes = [
+        self::INDEX,
+        self::SEARCH,
+        self::VIEW,
+        self::CREATE,
+        self::EDIT,
+        self::DELETE,
+    ];
+
+    static protected $supportedClasses = [
+        {{ meta_entity.entityName }}::class
+    ];
+
+    protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
+    {
+        switch ($attribute) {
+            case self::INDEX:
+            case self::SEARCH:
+            case self::VIEW:
+            case self::CREATE:
+            case self::EDIT:
+            case self::DELETE:
+                return $this->isAdmin($token);
+        }
+        throw new \LogicException('This code should not be reached!');
+    }
+}

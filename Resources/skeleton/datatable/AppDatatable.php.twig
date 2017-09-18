@@ -1,0 +1,153 @@
+<?php
+declare(strict_types=1);
+
+namespace {{ bundle_namespace }}\Datatable;
+
+use Sg\DatatablesBundle\Datatable\AbstractDatatable as SgDatatable;
+use Sg\DatatablesBundle\Datatable\Column\ActionColumn;
+use Doctrine\ORM\QueryBuilder;
+
+abstract class AppDatatable extends SgDatatable
+{
+    /** @var callable */
+    protected $modifyQueryCallback;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildDatatable(?array $options = []): void
+    {
+        $this->language->set([]);
+
+        $this->ajax->set($this->getAjaxOptions($options));
+
+        $this->options->set(array_merge(
+            ['classes' => 'table table-condensed'],
+            $options
+        ));
+
+        $this->features->set([]);
+
+        $this->addColumns($options);
+
+        $this->addActions($options);
+    }
+
+    protected function getAjaxOptions($options = []): array
+    {
+        return [
+            'type' => 'POST',
+            'url' => $this->getAjaxUrl($options),
+        ];
+    }
+
+    protected function getAjaxUrl($options = []): string
+    {
+        return $this->router->generate($this->getRoute('result'));
+    }
+
+    public function setModifyQueryCallback(callable $callback): void
+    {
+        $this->modifyQueryCallback = $callback;
+    }
+
+    public function getModifyQueryCallback(): ?callable
+    {
+        return $this->modifyQueryCallback;
+    }
+
+    public function modifyQuery(QueryBuilder $qb): void
+    {
+        $callback = $this->getModifyQueryCallback();
+        if ($callback) {
+            $callback($qb);
+        }
+    }
+
+    abstract protected function addColumns(array $options = []): void;
+
+    protected function addActions(array $options = []): void
+    {
+        $actions = $this->getActions();
+        $this->columnBuilder
+            ->add(null, ActionColumn::class, [
+                'title' => $this->translator->trans('sg.datatables.actions.title'),
+                'actions' => $actions,
+                'class_name' => 'action-column',
+            ])
+        ;
+    }
+
+    protected function getActions(): array
+    {
+        return [
+            [
+                'route' => $this->getRoute('show'),
+                'route_parameters' => ['id' => 'id'],
+                'label' => null,
+                'icon' => 'glyphicon glyphicon-eye-open',
+                'attributes' => [
+                    'rel' => 'tooltip',
+                    'title' => $this->translator->trans('sg.datatables.actions.show'),
+                    'class' => 'btn btn-default btn-sm',
+                    'role' => 'button'
+                ],
+                'render_if' => function ($row) {
+                    return $this->checkIsGranted('VIEW', $row['id']);
+                },
+            ],
+            [
+                'route' => $this->getRoute('edit'),
+                'route_parameters' => ['id' => 'id'],
+                'label' => null,
+                'icon' => 'glyphicon glyphicon-edit',
+                'attributes' => [
+                    'rel' => 'tooltip',
+                    'title' => $this->translator->trans('sg.datatables.actions.edit'),
+                    'class' => 'btn btn-warning btn-sm',
+                    'role' => 'button'
+                ],
+                'render_if' => function ($row) {
+                    return $this->checkIsGranted('EDIT', $row['id']);
+                },
+            ]
+        ];
+    }
+
+    protected function checkIsGranted($voterSuffix, $entryId): bool
+    {
+        return $this->authorizationChecker->isGranted(
+            strtoupper($this->getEntityName().'_'.$voterSuffix),
+            $this->getEntityManager()->getReference($this->getEntity(), $entryId)
+        );
+    }
+
+    protected function getRoute($suffix): string
+    {
+        return str_replace('datatable', '', $this->getName()).$suffix;
+    }
+
+    protected function getEntityName(): string
+    {
+        return str_replace(['AppBundle\Datatable', 'Datatable', '\\'], '', get_class($this));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEntity(): string
+    {
+        return str_replace(['AppBundle\Datatable', 'Datatable'], ['AppBundle\Entity', ''], get_class($this));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName(): string
+    {
+        $className = get_class($this);
+        $name = str_replace('{{ bundle_namespace }}\Datatable\\', '', $className);
+        //SomeDatatable becomes some_datatable
+        return strtolower(preg_replace('/\B([A-Z])/', '_$1', $name));
+    }
+}

@@ -6,12 +6,12 @@
 {{ "{% block body %}" }}
     <h1>{{ entity_pluralized|capitalize }} list</h1>
 
-    <table>
+    <table class="table table-striped">
         <thead>
             <tr>
-            {%- for field, metadata in fields %}
+            {%- for field, metadata in fields if field not in 'deletedAt,createdAt,updatedAt,updatedBy,deletedBy,createdBy'  %}
 
-                <th>{{ field|capitalize }}</th>
+                <th>{{ '{{ \'' ~ entity_singularized | tabalize ~ '.' ~field|tabalize ~ '\' | trans }}' }}</th>
 
             {%- endfor %}
 
@@ -23,18 +23,19 @@
             <tr>
 
         {%- for field, metadata in fields %}
+            {% if field not in 'deletedAt,createdAt,updatedAt,updatedBy,deletedBy,createdBy' %}
             {%- if loop.first and ('show' in actions) %}
 
-                <td><a href="{{ "{{ path('" ~ route_name_prefix ~ "_show', { '"~ identifier ~"': " ~ entity_singularized ~ "."~ identifier ~" }) }}" }}">{{ '{{ ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ ' }}' }}</a></td>
+                <td>{{ '{{ ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ ' }}' }}</td>
 
             {%- elseif metadata.type in ['datetime'] %}
 
                 <td>{{ '{% if ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ ' %}{{ ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ '|date(\'Y-m-d H:i:s\') }}{% endif %}' }}</td>
-            
+
             {%- elseif metadata.type in ['date'] %}
 
                 <td>{{ '{% if ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ ' %}{{ ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ '|date(\'Y-m-d\') }}{% endif %}' }}</td>
-          
+
             {%- elseif metadata.type in ['time'] %}
 
                 <td>{{ '{% if ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ ' %}{{ ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ '|date(\'H:i:s\') }}{% endif %}' }}</td>
@@ -53,20 +54,21 @@
 
             {%- endif %}
 
+            {%- endif %}
+
             {%- if loop.last %}
 
-                <td>
-                    <ul>
-
-                    {%- for action in record_actions %}
-
-                        <li>
-                            <a href="{{ "{{ path('" ~ route_name_prefix ~ "_" ~ action ~ "', { '"~ identifier ~"': " ~ entity_singularized ~ "."~ identifier ~" }) }}" }}">{{ action }}</a>
-                        </li>
-
-                    {%- endfor %}
-
-                    </ul>
+                <td class="action-column">
+                    {%- for action in record_actions -%}
+                        {%- set btn_type = (action == 'edit' ? 'warning' : (action == 'delete' ? 'danger' : 'default')) -%}
+                        {{- '\n                    ' -}}
+                        <a href="{{ "{{ path('" ~ route_name_prefix ~ "_" ~ action ~ "', { '"~ identifier ~"': " ~ entity_singularized ~ "."~ identifier ~" }) }}" }}" class="btn btn-{{ btn_type }}">
+                            {{- '\n                        ' -}}
+                            {{- '{{ \'action.' ~action~ '\' | trans }}' -}}
+                        {{- '\n                    ' -}}
+                        </a>
+                    {%- endfor -%}
+                    {{- '\n                ' -}}
                 </td>
 
             {%- endif %}

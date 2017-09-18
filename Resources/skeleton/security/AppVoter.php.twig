@@ -1,0 +1,67 @@
+<?php
+declare(strict_types=1);
+
+namespace {{ bundle_namespace }}\Security;
+
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\Security\Core\User\UserInterface;
+
+abstract class AppVoter extends Voter
+{
+    protected static $supportedAttributes = [];
+    protected static $supportedClasses = [];
+
+    /** @var AccessDecisionManagerInterface */
+    private $decisionManager;
+
+    public function __construct(AccessDecisionManagerInterface $decisionManager)
+    {
+        $this->decisionManager = $decisionManager;
+    }
+
+    protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
+    {
+        return false;
+    }
+
+    protected function objectIsSupported($subject) : bool
+    {
+        if ($subject === null) {
+            return true;
+        }
+        foreach (static::$supportedClasses as $supportedClass) {
+            if (is_a($subject, $supportedClass, true)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected function supports($attribute, $subject)
+    {
+        return in_array($attribute, static::$supportedAttributes, true)
+            && $this->objectIsSupported($subject);
+    }
+
+    protected function isSuperAdmin(TokenInterface $token)
+    {
+        return $this->isLoggedIn($token) && $this->decisionManager->decide($token, ['ROLE_SUPER_ADMIN']);
+    }
+
+    protected function isAdmin(TokenInterface $token)
+    {
+        return $this->isLoggedIn($token) && $this->decisionManager->decide($token, ['ROLE_ADMIN']);
+    }
+
+    protected function isUser(TokenInterface $token)
+    {
+        return $this->isLoggedIn($token) && $this->decisionManager->decide($token, ['ROLE_USER']);
+    }
+
+    protected function isLoggedIn(TokenInterface $token)
+    {
+        return $token->getUser() instanceof UserInterface;
+    }
+}
