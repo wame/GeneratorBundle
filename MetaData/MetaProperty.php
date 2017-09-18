@@ -323,8 +323,6 @@ class MetaProperty
             case 'date':
             case 'time':
                 return '\DateTime';
-            case 'decimal':
-                return 'float';
             case 'one2many':
             case 'many2many':
                 return 'Collection'. ($annotation ? '|'.$this->getTargetEntity().'[]' : '');
@@ -334,6 +332,7 @@ class MetaProperty
             case 'enum':
             case 'text':
             case 'blob':
+            case 'decimal':
                 return 'string';
             case 'integer':
             case 'smallint':

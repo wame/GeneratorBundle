@@ -32,7 +32,7 @@
         "doctrine/orm": "~2.4"
     },
     "autoload": {
-        "psr-4": { "Sensio\\Bundle\\GeneratorBundle\\": "" },
+        "psr-4": { "Wame\\SensioGeneratorBundle\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]

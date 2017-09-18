@@ -20,6 +20,7 @@ class {{ meta_entity.entityName }}Type extends AbstractType
     {
         $builder
             {% for property in meta_entity.properties if property.id == false -%}
+            {{- '\n            ' -}}
             ->add('{{ property.name }}', null, [
                 'label' => '{{ meta_entity.entityName | tabalize ~ '.' ~ property.name | tabalize }}'
             ])

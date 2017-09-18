@@ -28,6 +28,8 @@ use Wame\SensioGeneratorBundle\Generator\WameEntityGenerator;
  */
 class WameEntityCommand extends GenerateDoctrineEntityCommand
 {
+    use WameCommandTrait;
+
     protected function configure(): void
     {
         parent::configure();

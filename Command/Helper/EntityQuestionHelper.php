@@ -171,7 +171,7 @@ class EntityQuestionHelper extends QuestionHelper
         // 10 is the default value given in \Doctrine\DBAL\Schema\Column::$_precision
         $question = new Question($this->getQuestion('Precision', 10), 10);
         $question->setValidator(Validators::getPrecisionValidator());
-        return $this->ask($input, $output, $question);
+        return (int) $this->ask($input, $output, $question);
     }
 
     public function askFieldScale(InputInterface $input, OutputInterface $output): ?int
@@ -179,7 +179,7 @@ class EntityQuestionHelper extends QuestionHelper
         // 0 is the default value given in \Doctrine\DBAL\Schema\Column::$_scale
         $question = new Question($this->getQuestion('Scale', 0), 0);
         $question->setValidator(Validators::getScaleValidator());
-        return $this->ask($input, $output, $question);
+        return (int) $this->ask($input, $output, $question);
     }
 
     public function askFieldNullable(InputInterface $input, OutputInterface $output): ?bool

@@ -19,6 +19,8 @@ use Wame\SensioGeneratorBundle\MetaData\MetaEntityFactory;
  */
 class WameCrudCommand extends GenerateDoctrineCrudCommand
 {
+    use WameCommandTrait;
+
     /** @var  WameDatatableGenerator */
     protected $datatableGenerator;
     /** @var  WameVoterGenerator */
