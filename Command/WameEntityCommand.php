@@ -161,7 +161,7 @@ class WameEntityCommand extends GenerateDoctrineEntityCommand
                 $data['targetEntity'] = $entityQuestionHelper->askTargetEntity($input, $output, $bundle);
                 $data['referencedColumnName'] = $entityQuestionHelper->askReferenceColumnName($input, $output, $data['targetEntity']);
             } elseif ('enum' === $type) {
-                list ($enumType, $enumTypeClass) = $entityQuestionHelper->askTargetEntity($input, $output, $bundle);
+                list ($enumType, $enumTypeClass) = $entityQuestionHelper->askFieldEnumType($input, $output, $bundle);
                 $data['enumType'] = $enumType;
                 $data['enumTypeClass'] = $enumTypeClass;
             }
