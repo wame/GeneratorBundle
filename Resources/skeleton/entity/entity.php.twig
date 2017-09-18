@@ -80,7 +80,7 @@ class {{ meta_entity.entityName }}
         return {{ displayFieldProperty.type == 'string' ? '' : '(string) ' -}}
         $this->get{{ displayFieldProperty.name | classify }}() ?:
         {%- if displayFieldProperty.id == false and meta_entity.idProperty is not null -%}
-            (string) '#'.$this->get{{ meta_entity.idProperty.name | classify }}() ?: ''
+            ('#'.$this->get{{ meta_entity.idProperty.name | classify }}()) ?: ''
         {%- endif -%}
         ;
     }

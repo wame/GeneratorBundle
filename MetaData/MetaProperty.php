@@ -194,7 +194,20 @@ class MetaProperty
 
     public function getTargetEntity(): ?string
     {
+        if (strpos($this->targetEntity, ':') !== false) {
+            $targetEntityParts = explode(':', $this->targetEntity);
+            return $targetEntityParts[1];
+        }
         return $this->targetEntity;
+    }
+
+    public function getTargetEntityNamespace(): ?string
+    {
+        if (strpos($this->targetEntity, ':') !== false) {
+            $targetEntityParts = explode(':', $this->targetEntity);
+            return $targetEntityParts[0].'\\Entity\\'.$targetEntityParts[1];
+        }
+        return $this->getEntity()->getBundleNamespace().'\\Entity\\'.$this->targetEntity;
     }
 
     public function setTargetEntity(?string $targetEntity): MetaProperty

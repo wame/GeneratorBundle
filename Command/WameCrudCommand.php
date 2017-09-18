@@ -89,7 +89,7 @@ class WameCrudCommand extends GenerateDoctrineCrudCommand
     protected function getDatatableGenerator()
     {
         if (null === $this->datatableGenerator) {
-            $this->datatableGenerator = new WameDatatableGenerator();
+            $this->datatableGenerator = $this->getContainer()->get(WameDatatableGenerator::class);
         }
 
         return $this->datatableGenerator;
@@ -98,7 +98,7 @@ class WameCrudCommand extends GenerateDoctrineCrudCommand
     protected function getVoterGenerator()
     {
         if (null === $this->voterGenerator) {
-            $this->voterGenerator = new WameVoterGenerator();
+            $this->voterGenerator = $this->getContainer()->get(WameVoterGenerator::class);
         }
 
         return $this->voterGenerator;

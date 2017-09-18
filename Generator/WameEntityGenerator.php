@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Wame\SensioGeneratorBundle\Generator;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Sensio\Bundle\GeneratorBundle\Generator\DoctrineEntityGenerator;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
@@ -12,7 +13,6 @@ use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
 use Wame\SensioGeneratorBundle\MetaData\MetaProperty;
 use Wame\SensioGeneratorBundle\MetaData\MetaTrait;
 use Wame\SensioGeneratorBundle\MetaData\MetaValidation;
-use Wame\SensioGeneratorBundle\Model\EntityGeneratorResult;
 
 class WameEntityGenerator extends DoctrineEntityGenerator
 {
@@ -28,40 +28,39 @@ class WameEntityGenerator extends DoctrineEntityGenerator
         Filesystem $filesystem,
         RegistryInterface $registry,
         WameTranslationGenerator $translationGenerator,
-        WameRepositoryGenerator $repositoryGenerator
+        WameRepositoryGenerator $repositoryGenerator,
+        $rootDir
     ) {
         parent::__construct($filesystem, $registry);
 
         $this->translationGenerator = $translationGenerator;
         $this->repositoryGenerator = $repositoryGenerator;
+
+        $this->rootDir = $rootDir;
     }
 
-    protected $behaviourTraits = [
+    protected static $behaviourTraits = [
         'softdeleteable' => 'Gedmo\\SoftDeleteable\\Traits\\SoftDeleteableEntity',
         'timestampable'  => 'Gedmo\\Timestampable\\Traits\\TimestampableEntity',
         'blameable'      => 'Gedmo\\Blameable\\Traits\\BlameableEntity',
     ];
 
-    public function generateFromCommand(BundleInterface $bundle, $entity, array $fields, array $behaviours = [])
+    public function generateFromCommand(BundleInterface $bundle, $entity, array $fields, array $behaviours = []): void
     {
-        $metaEntity = (new MetaEntity())
-            ->setEntityName($entity)
-            ->setBundle($bundle)
-            ->setTableName(Inflector::pluralTableize($entity))
-        ;
+        $metaEntity = new MetaEntity($bundle, $entity);
         foreach ($behaviours as $behaviour) {
-            if (array_key_exists($behaviour, $this->behaviourTraits)) {
+            if (array_key_exists($behaviour, static::$behaviourTraits)) {
                 $metaEntity->addTrait(
                     (new MetaTrait())
                         ->setName($behaviour)
-                        ->setNamespace($this->behaviourTraits[$behaviour])
+                        ->setNamespace(static::$behaviourTraits[$behaviour])
                 );
             }
         }
         foreach ($fields as $field) {
             $metaProperty = (new MetaProperty())
-                ->setName(isset($field['fieldName']) ? $field['fieldName'] : $field['columnName'])
-                ->setColumnName(isset($field['columnName']) ? $field['columnName'] : $field['columnName'])
+                ->setName($field['fieldName'])
+                ->setColumnName($field['columnName'])
                 ->setType($field['type'] ?? 'string')
                 ->setLength($field['length'] ?? null)
                 ->setUnique($field['unique'] ?? false)
@@ -87,10 +86,10 @@ class WameEntityGenerator extends DoctrineEntityGenerator
             $metaEntity->addProperty($metaProperty);
         }
 
-        return $this->generateByMetaEntity($metaEntity);
+        $this->generateByMetaEntity($metaEntity);
     }
 
-    public function generateByMetaEntity(MetaEntity $metaEntity, $includeRepo = true)
+    public function generateByMetaEntity(MetaEntity $metaEntity, $includeRepo = true): void
     {
         $this->addIdFieldIfMissing($metaEntity);
         $fs = new Filesystem();
@@ -100,14 +99,12 @@ class WameEntityGenerator extends DoctrineEntityGenerator
         $entityPath = $metaEntity->getBundle()->getPath().'/Entity/'.$metaEntity->getEntityName().'.php';
         $fs->dumpFile($entityPath, $entityContent);
 
-        $repositoryPath = $includeRepo ? $this->repositoryGenerator->generateByMetaEntity($metaEntity) : null;
+        $includeRepo ? $this->repositoryGenerator->generateByMetaEntity($metaEntity) : null;
 
         $this->translationGenerator->updateByMetaEntity($metaEntity);
-
-        return new EntityGeneratorResult($entityPath, $repositoryPath, null);
     }
 
-    protected function addIdFieldIfMissing(MetaEntity $metaEntity)
+    protected function addIdFieldIfMissing(MetaEntity $metaEntity): void
     {
         foreach ($metaEntity->getProperties() as $property) {
             if ($property->isId()) {

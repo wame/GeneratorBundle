@@ -1,25 +1,21 @@
 <?php
+declare(strict_types=1);
 
 /*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * This file is a modified copy of the DoctrineCrudGenerator that is part of the Symfony package.
  */
 
 namespace Wame\SensioGeneratorBundle\Generator;
 
+use Sensio\Bundle\GeneratorBundle\Generator\Generator;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Common\Inflector\Inflector;
 
 /**
- * Generates a CRUD controller.
- *
  * @author Fabien Potencier <fabien@symfony.com>
+ * @author Kevin Driessen <kevin@wame.nl>
  */
 class DoctrineCrudGenerator extends Generator
 {
@@ -107,7 +103,8 @@ class DoctrineCrudGenerator extends Generator
             $this->generateEditView($dir);
         }
 
-        $this->generateTestClass();
+        //TODO: shall we generate tests? If so, how should we generate them (the original generated tests aren't quite useful)
+//        $this->generateTestClass();
         $this->generateConfiguration();
     }
 

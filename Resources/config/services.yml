@@ -3,11 +3,6 @@ parameters:
         default_bundle: 'AppBundle'
 
 services:
-#    wame_generator.example:
-#        class: Wame\GeneratorBundle\Example
-#        arguments: [@service_id, "plain_value", %parameter%]
-
-services:
     Wame\SensioGeneratorBundle\Form\EntityType:
         arguments: ['@service_container']
         tags: [form.type]
@@ -15,13 +10,37 @@ services:
         arguments: ['@service_container']
         tags: [form.type]
     Wame\SensioGeneratorBundle\Generator\WameDatatableGenerator:
-    Wame\SensioGeneratorBundle\Generator\WameEntityGenerator:
+        public: true
+        arguments:
+            - '%kernel.root_dir%'
     Wame\SensioGeneratorBundle\Generator\WameEnumGenerator:
-    Wame\SensioGeneratorBundle\Generator\WameRepositoryGenerator:
+        public: true
+        arguments:
+            - '%kernel.root_dir%'
     Wame\SensioGeneratorBundle\Generator\WameFormGenerator:
         public: true
-    Wame\SensioGeneratorBundle\Generator\WameTranslationGenerator:
+        arguments:
+            - '%kernel.root_dir%'
+    Wame\SensioGeneratorBundle\Generator\WameVoterGenerator:
         public: true
+        arguments:
+            - '%kernel.root_dir%'
+    wame_repository_generator:
+        public: true
+        class: Wame\SensioGeneratorBundle\Generator\WameRepositoryGenerator
+        arguments:
+            - '%kernel.root_dir%'
+    wame_translation_generator:
+        public: true
+        class:  Wame\SensioGeneratorBundle\Generator\WameTranslationGenerator
         arguments:
             - '%kernel.root_dir%/Resources/translations'
             - '%locale%'
+    Wame\SensioGeneratorBundle\Generator\WameEntityGenerator:
+        public: true
+        arguments:
+            - '@filesystem'
+            - '@doctrine'
+            - '@wame_translation_generator'
+            - '@wame_repository_generator'
+            - '%kernel.root_dir%'

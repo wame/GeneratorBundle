@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Wame\SensioGeneratorBundle\Generator;
 
+use Sensio\Bundle\GeneratorBundle\Generator\Generator;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 use Wame\SensioGeneratorBundle\Inflector\Inflector;

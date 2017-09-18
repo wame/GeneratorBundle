@@ -1,20 +1,18 @@
 <?php
+declare(strict_types=1);
 
 namespace Wame\SensioGeneratorBundle\Command;
 
 use Sensio\Bundle\GeneratorBundle\Command\Validators as SensioValidators;
 use Wame\SensioGeneratorBundle\Inflector\Inflector;
 
-/**
- * Validator functions.
- */
 class Validators extends SensioValidators
 {
-    static function getFieldNameValidator(array $fields = []): callable
+    public static function getFieldNameValidator(array $fields = []): callable
     {
         return function ($name) use ($fields) {
             $name = Inflector::tableize($name);
-            if (isset($fields[$name]) || 'id' == $name) {
+            if ('id' === $name || isset($fields[$name])) {
                 throw new \InvalidArgumentException(sprintf('Field "%s" is already defined.', $name));
             }
 
@@ -27,17 +25,17 @@ class Validators extends SensioValidators
         };
     }
 
-    static function getTypeValidator(array $types): callable
+    public static function getTypeValidator(array $types): callable
     {
         return function ($type) use ($types) {
-            if (!in_array($type, $types)) {
-               throw new \InvalidArgumentException(sprintf('Invalid type "%s".', $type));
+            if (!in_array($type, $types, true)) {
+                throw new \InvalidArgumentException(sprintf('Invalid type "%s".', $type));
             }
             return $type;
         };
     }
 
-    static function getTypeNormalizer(array $types): callable
+    public static function getTypeNormalizer(array $types): callable
     {
         return function ($type) use ($types) {
             if (in_array($type, $types, true)) {
@@ -47,7 +45,7 @@ class Validators extends SensioValidators
         };
     }
 
-    static function getLengthValidator(): callable
+    public static function getLengthValidator(): callable
     {
         return function ($length) {
             if (!$length) {
@@ -66,7 +64,7 @@ class Validators extends SensioValidators
         };
     }
 
-    static function getBoolValidator(): callable
+    public static function getBoolValidator(): callable
     {
         return function ($value) {
             if (null === $valueAsBool = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)) {
@@ -77,7 +75,7 @@ class Validators extends SensioValidators
         };
     }
 
-    static function getPrecisionValidator() : callable
+    public static function getPrecisionValidator() : callable
     {
         return function ($precision) {
             if (!$precision) {
@@ -96,7 +94,7 @@ class Validators extends SensioValidators
         };
     }
 
-    static function getScaleValidator(): callable
+    public static function getScaleValidator(): callable
     {
         return function ($scale) {
             if (!$scale) {
@@ -116,7 +114,7 @@ class Validators extends SensioValidators
     }
 
     //TODO: this isn't actually a validator: should we a different class instead?
-    static function getEntityNormalizer($bundle, $existingEntityOptions): callable
+    public static function getEntityNormalizer($bundle, $existingEntityOptions): callable
     {
         return function ($entity) use ($bundle, $existingEntityOptions) {
             if (ctype_digit($entity) && isset($existingEntityOptions[$entity])) {
@@ -129,15 +127,15 @@ class Validators extends SensioValidators
         };
     }
 
-    static function getEnumTypeValidator($enumOptionsList): callable
+    public static function getEnumTypeValidator($enumOptionsList): callable
     {
-        function ($type) use ($enumOptionsList) {
+        return function ($type) use ($enumOptionsList) {
             if (!$type) {
                 return null;
             }
             if (is_int($type) || ctype_digit($type)) {
                 if (!in_array($type, $enumOptionsList)) {
-                    throw new \InvalidArgumentException(sprintf("%d is not a valid option", $type));
+                    throw new \InvalidArgumentException(sprintf('%d is not a valid option', $type));
                 }
                 if ($type == 0) {
                     return null;
@@ -151,7 +149,7 @@ class Validators extends SensioValidators
         };
     }
 
-    static function getConstraintValidator($constraintOptions): callable
+    public static function getConstraintValidator($constraintOptions): callable
     {
         return function ($constraint) use ($constraintOptions) {
             if (!$constraint) {
@@ -170,7 +168,7 @@ class Validators extends SensioValidators
         };
     }
 
-    static function getConstraintsNormalizer(): callable
+    public static function getConstraintsNormalizer(): callable
     {
         return function ($value) {
             if (is_int($value) || ctype_digit($value)) {
@@ -197,7 +195,7 @@ class Validators extends SensioValidators
         };
     }
 
-    static function getDisplayFieldValidator($displayFieldOptions): callable
+    public static function getDisplayFieldValidator($displayFieldOptions): callable
     {
         return function ($field) use ($displayFieldOptions) {
             if (!$field) {
@@ -206,7 +204,7 @@ class Validators extends SensioValidators
             if (ctype_digit($field) && isset($displayFieldOptions[$field])) {
                 return $displayFieldOptions[$field];
             }
-            if (!in_array($field, $displayFieldOptions)) {
+            if (!in_array($field, $displayFieldOptions, true)) {
                 throw new \InvalidArgumentException(sprintf('Invalid field "%s".', $field));
             }
 

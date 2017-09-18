@@ -6,6 +6,7 @@ namespace Wame\SensioGeneratorBundle\MetaData;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Wame\SensioGeneratorBundle\Inflector\Inflector;
 
 class MetaEntity
 {
@@ -30,8 +31,11 @@ class MetaEntity
     /** @var MetaProperty[]|ArrayCollection */
     protected $properties;
 
-    public function __construct()
+    public function __construct(BundleInterface $bundle, string $entityName)
     {
+        $this->bundle = $bundle;
+        $this->setEntityName($entityName);
+        $this->setTableName($entityName);
         $this->properties = new ArrayCollection();
         $this->interfaces = new ArrayCollection();
         $this->traits = new ArrayCollection();
@@ -44,7 +48,7 @@ class MetaEntity
 
     public function setEntityName(string $entityName): self
     {
-        $this->entityName = $entityName;
+        $this->entityName = Inflector::classify($entityName);
         return $this;
     }
 
@@ -55,11 +59,11 @@ class MetaEntity
 
     public function setTableName(string $tableName): self
     {
-        $this->tableName = $tableName;
+        $this->tableName = Inflector::pluralTableize($tableName);
         return $this;
     }
 
-    public function getBundle(): ?BundleInterface
+    public function getBundle(): BundleInterface
     {
         return $this->bundle;
     }

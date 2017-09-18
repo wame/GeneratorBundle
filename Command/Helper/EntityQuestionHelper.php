@@ -1,15 +1,16 @@
 <?php
+declare(strict_types=1);
 
 namespace Wame\SensioGeneratorBundle\Command\Helper;
 
 use Doctrine\DBAL\Types\Type;
 use Fresh\DoctrineEnumBundle\DBAL\Types\AbstractEnumType;
+use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Validator\Constraint;
 use Wame\SensioGeneratorBundle\Command\Validators;
 
@@ -20,6 +21,8 @@ use Wame\SensioGeneratorBundle\Command\Validators;
  */
 class EntityQuestionHelper extends QuestionHelper
 {
+    const MAX_OUTPUT_WIDTH = 70;
+
     /** @var RegistryInterface */
     protected $registry;
 
@@ -35,10 +38,9 @@ class EntityQuestionHelper extends QuestionHelper
         'softdeleteable' => true,
     ];
 
-
     protected $constraints;
 
-    protected $typeAliases = [
+    protected static $typeAliases = [
         Type::TARRAY => 'a',
         Type::JSON_ARRAY => 'json',
         Type::BOOLEAN => 'b',
@@ -73,8 +75,8 @@ class EntityQuestionHelper extends QuestionHelper
         // ask about timestampable/blameable/softdeletable behaviours
         $behavioursStr = '<comment>'.implode(', ', array_keys($this->behaviours)).'</comment>';
         $allBehaviours = (!$input->getOption('no-blameable') && !$input->getOption('no-timestampable') && !$input->getOption('no-softdeleteable'));
-        $question = new ConfirmationQuestion($this->getQuestion('Add default behaviours ('.$behavioursStr.')', $allBehaviours ? 'yes' : 'no'), $allBehaviours);
-        if ($this->ask($input, $output, $question)) {
+        $questionAll = new ConfirmationQuestion($this->getQuestion('Add default behaviours ('.$behavioursStr.')', $allBehaviours ? 'yes' : 'no'), $allBehaviours);
+        if ($this->ask($input, $output, $questionAll)) {
             $behaviours = array_keys($this->behaviours);
         } else {
             $behaviours = [];
@@ -153,7 +155,7 @@ class EntityQuestionHelper extends QuestionHelper
         $question = new Question($this->getQuestion('Field type', $defaultType), $defaultType);
         $question->setNormalizer(Validators::getTypeNormalizer($types));
         $question->setValidator(Validators::getTypeValidator($typeOptions));
-        $question->setAutocompleterValues(array_merge($typeOptions, $this->typeAliases));
+        $question->setAutocompleterValues(array_merge($typeOptions, static::$typeAliases));
         return $this->ask($input, $output, $question);
     }
 
@@ -276,7 +278,7 @@ class EntityQuestionHelper extends QuestionHelper
 
         while (true) {
             $output->writeln('');
-            $question = new Question($this->getQuestion('Add validation (press <return> to stop adding)', null, ':'));
+            $question = new Question($this->getQuestion('Add validation (press <return> to stop adding)', null));
             $question->setValidator(Validators::getConstraintValidator($constraintOptions));
             $type = $this->ask($input, $output, $question);
 
@@ -289,7 +291,9 @@ class EntityQuestionHelper extends QuestionHelper
                 'options' => [],
             ];
 
-            $currentConstraints = array_map(function($fieldConstraint) { return $fieldConstraint['type']; }, $fieldConstraints);
+            $currentConstraints = array_map(function ($fieldConstraint) {
+                return $fieldConstraint['type'];
+            }, $fieldConstraints);
             $output->writeln('Current validations: '. implode(', ', $currentConstraints));
         }
 
@@ -312,10 +316,10 @@ class EntityQuestionHelper extends QuestionHelper
 
         // Try to get all default constraints by scanning the Component's Constraints folder
         $dir = dirname((new \ReflectionClass($componentNamespace.'\Valid'))->getFileName());
-        foreach (scandir($dir, SCANDIR_SORT_ASCENDING ) as $file) {
+        foreach (scandir($dir, SCANDIR_SORT_ASCENDING) as $file) {
             if (preg_match('/^(.+)(?!(Validator|Provider))\.php$/', $file, $matches)) {
                 $constraintClass = $componentNamespace . '\\' . $matches[1];
-                if (!is_subclass_of($constraintClass, '\Symfony\Component\Validator\Constraint')) {
+                if (!is_subclass_of($constraintClass, Constraint::class)) {
                     continue;
                 }
                 $ref = new \ReflectionClass($constraintClass);
@@ -329,7 +333,7 @@ class EntityQuestionHelper extends QuestionHelper
                 } catch (\Exception $e) {
                     continue;
                 }
-                if (!in_array(Constraint::PROPERTY_CONSTRAINT, (array)$constraint->getTargets())) {
+                if (!in_array(Constraint::PROPERTY_CONSTRAINT, (array)$constraint->getTargets(), true)) {
                     continue;
                 }
                 $constraints[ltrim($constraintClass, '\\')] = $constraint;
@@ -346,7 +350,7 @@ class EntityQuestionHelper extends QuestionHelper
         $types = array_merge(Type::getTypesMap(), $this->configuredTypes);
         $types = array_keys($types);
         $types = array_combine($types, array_fill(0, count($types), null));
-        $aliases = $this->typeAliases;
+        $aliases = static::$typeAliases;
         $types = array_merge($types, $aliases);
         return $types;
     }
@@ -354,7 +358,7 @@ class EntityQuestionHelper extends QuestionHelper
     protected function getEnumTypes()
     {
         $enumTypes = [];
-        foreach ($this->configuredTypes  as $type => $typeClass) {
+        foreach ($this->configuredTypes as $type => $typeClass) {
             if (strpos(ltrim($typeClass, '\\'), 'Doctrine\DBAL\Types') === 0) {
                 continue;
             }
@@ -396,12 +400,12 @@ class EntityQuestionHelper extends QuestionHelper
         $output->writeln('');
     }
 
-    protected function outputCompactOptionsList(OutputInterface $output, array $options, $offset = 0, $maxWidth = 70)
+    protected function outputCompactOptionsList(OutputInterface $output, array $options, $offset = 0)
     {
         $count = $offset;
         $i = 0;
         foreach ($options as $option => $alias) {
-            if ($count > $maxWidth) {
+            if ($count > static::MAX_OUTPUT_WIDTH) {
                 $count = 0;
                 $output->writeln('');
             }
@@ -410,7 +414,7 @@ class EntityQuestionHelper extends QuestionHelper
                 $output->write(sprintf('<info>%s</info>: ', $alias));
             }
             $output->write(sprintf('<comment>%s</comment>', $option));
-            if (count($options) != $i + 1) {
+            if (count($options) !== $i + 1) {
                 $output->write(', ');
             } else {
                 $output->write('.');
@@ -422,19 +426,22 @@ class EntityQuestionHelper extends QuestionHelper
 
     protected function guessFieldType(string $columnName): string
     {
-        if (substr($columnName, -3) === '_at' || substr($columnName, -3) === '_on') {
+        $lastThreeChars = substr($columnName, -3);
+        $lastFourChars = substr($columnName, -4);
+        $lastFiveChars = substr($columnName, -5);
+        if ($lastThreeChars === '_at' || $lastThreeChars === '_on') {
             return 'datetime';
-        } if (substr($columnName, -3) === '_id' || substr($columnName, -5) === 'count') {
+        } if ($lastThreeChars === '_id' || $lastFiveChars === 'count') {
             return 'integer';
-        } if (substr($columnName, 0, 3) === 'is_' || substr($columnName, 0, 4) === 'has_') {
+        } if (0 === strpos($columnName, 'is_') || 0 === strpos($columnName, 'has_')) {
             return 'boolean';
-        } if (substr($columnName, -4) === 'date') {
+        } if ($lastFourChars === 'date') {
             return 'date';
-        } if (substr($columnName, -3) === '_id') {
+        } if ($lastThreeChars === '_id') {
             return 'many2one';
-        } if (in_array($columnName, ['summary', 'description', 'text'])) {
+        } if (in_array($columnName, ['summary', 'description', 'text'], true)) {
             return 'text';
-        } if (substr($columnName, -5) === 'price') {
+        } if ($lastFiveChars === 'price') {
             return 'decimal';
         }
         return 'string';

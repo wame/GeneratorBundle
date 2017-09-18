@@ -1,16 +1,9 @@
 <?php
-
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types=1);
 
 namespace Wame\SensioGeneratorBundle\Command;
 
+use Sensio\Bundle\GeneratorBundle\Command\GenerateDoctrineCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,12 +12,11 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Wame\SensioGeneratorBundle\Command\AutoComplete\EntitiesAutoCompleter;
-use Wame\SensioGeneratorBundle\Command\Helper\QuestionHelper;
+use Sensio\Bundle\GeneratorBundle\Command\AutoComplete\EntitiesAutoCompleter;
+use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
 use Wame\SensioGeneratorBundle\Generator\DoctrineCrudGenerator;
-use Wame\SensioGeneratorBundle\Generator\DoctrineFormGenerator;
 use Wame\SensioGeneratorBundle\Generator\WameFormGenerator;
-use Wame\SensioGeneratorBundle\Manipulator\RoutingManipulator;
+use Sensio\Bundle\GeneratorBundle\Manipulator\RoutingManipulator;
 
 /**
  * Generates a CRUD for a Doctrine entity.
@@ -137,7 +129,7 @@ EOT
 
         // routing
         $output->write('Updating the routing: ');
-        if ('annotation' != $format) {
+        if ('annotation' !== $format) {
             $runner($this->updateRouting($questionHelper, $input, $output, $bundle, $format, $entity, $prefix));
         } else {
             $runner($this->updateAnnotationRouting($bundle, $entity, $prefix));

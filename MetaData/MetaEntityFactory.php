@@ -25,9 +25,7 @@ class MetaEntityFactory
         $reflectionClass = $classMetadata->getReflectionClass();
         $reflectionClass = $reflectionClass ?: new \ReflectionClass($classMetadata->name);
 
-        $entityMetadata = (new MetaEntity())
-            ->setBundle($bundle)
-            ->setEntityName($reflectionClass->getShortName())
+        $entityMetadata = (new MetaEntity($bundle, $reflectionClass->getShortName()))
             ->setTableName($classMetadata->getTableName())
         ;
         static::setInterfaces($entityMetadata, $reflectionClass);

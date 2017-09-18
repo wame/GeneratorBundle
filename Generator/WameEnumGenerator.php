@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Wame\SensioGeneratorBundle\Generator;
 
+use Sensio\Bundle\GeneratorBundle\Generator\Generator;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Wame\SensioGeneratorBundle\MetaData\MetaEnumType;
@@ -10,6 +11,11 @@ use Wame\SensioGeneratorBundle\MetaData\MetaEnumType;
 class WameEnumGenerator extends Generator
 {
     use WameGeneratorTrait;
+
+    public function __construct(string $rootDir)
+    {
+        $this->rootDir = $rootDir;
+    }
 
     public function generate(BundleInterface $bundle, string $className, array $enumOptions): string
     {

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the Symfony package.
@@ -11,51 +12,42 @@
 
 namespace Wame\SensioGeneratorBundle\Command;
 
+use Sensio\Bundle\GeneratorBundle\Command\GenerateDoctrineEntityCommand;
 use Wame\SensioGeneratorBundle\Command\Helper\EntityQuestionHelper;
-use Wame\SensioGeneratorBundle\Generator\DoctrineEntityGenerator;
-use Wame\SensioGeneratorBundle\Command\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\Console\Question\Question;
 use Wame\SensioGeneratorBundle\Generator\WameEntityGenerator;
-use Wame\SensioGeneratorBundle\Generator\WameRepositoryGenerator;
-use Wame\SensioGeneratorBundle\Generator\WameTranslationGenerator;
-use Wame\SensioGeneratorBundle\Inflector\Inflector;
 
 /**
  * Initializes a Doctrine entity inside a bundle.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class WameEntityCommand extends \Sensio\Bundle\GeneratorBundle\Command\GenerateDoctrineEntityCommand
+class WameEntityCommand extends GenerateDoctrineEntityCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
-        $this->setName('test:generate:entity')
+        $this->setName('wame:generate:entity')
             ->addArgument('entity', InputArgument::OPTIONAL, 'The entity class name to initialize (shortcut notation)')
             ->addOption('bundle', null, InputOption::VALUE_REQUIRED, 'Name of the Bundle in which the entity must be generated')            ->addOption('no-blameable', null, InputOption::VALUE_OPTIONAL, 'Do not add `blameable` fields/behaviour on the new entity')
+            ->addOption('no-blameable', null, InputOption::VALUE_OPTIONAL, 'Do not add `blameable` fields/behaviour on the new entity')
             ->addOption('no-timestampable', null, InputOption::VALUE_OPTIONAL, 'Do not add `timestampable` fields/behaviour on the new entity')
             ->addOption('no-softdeleteable', null, InputOption::VALUE_OPTIONAL, 'Do not soft-delete the new entity')
             ->addOption('behaviours', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Adds behavior (options are `blameable`,`timestampable`,`softdeleteable`)')
             ->addOption('display-field', null, InputOption::VALUE_REQUIRED, 'The field that can represent the entity as a string')
             ->addOption('no-validation', null, InputOption::VALUE_NONE, 'Do not ask to about adding field validation')
         ;
-        ;
-
 
         //TODO: remove option entity as this will be removed in 4.0
         //TODO: remove format option, since we'll always use annotation
         //TODO: make entity-argument required to save a lot of hassle.
     }
 
-    /**
-     * @throws \InvalidArgumentException When the bundle doesn't end with Bundle (Example: "Bundle/MySampleBundle")
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $questionHelper = $this->getQuestionHelper();
 
@@ -63,8 +55,6 @@ class WameEntityCommand extends \Sensio\Bundle\GeneratorBundle\Command\GenerateD
         list($bundle, $entity) = $this->parseShortcutNotation($entity);
 
         $fields = $this->parseFields($input->getOption('fields'));
-
-        dump($fields);
 
         $questionHelper->writeSection($output, 'Entity generation');
 
@@ -74,9 +64,9 @@ class WameEntityCommand extends \Sensio\Bundle\GeneratorBundle\Command\GenerateD
 
         /** @var WameEntityGenerator $generator */
         $generator = $this->getGenerator();
-        $generatorResult = $generator->generateFromCommand($bundle, $entity, $fields, $behaviours);
+        $generator->generateFromCommand($bundle, $entity, $fields, $behaviours);
 
-        $output->writeln(sprintf('> Generating entity <info>%s</info>: <comment>OK!</comment>',$entity));
+        $output->writeln(sprintf('> Generating entity <info>%s</info>: <comment>OK!</comment>', $entity));
         $output->writeln(sprintf('> Generating repository class <info>%s</info>: <comment>OK!</comment>', $entity.'Repository'));
 
         $questionHelper->writeGeneratorSummary($output, []);
@@ -160,8 +150,8 @@ class WameEntityCommand extends \Sensio\Bundle\GeneratorBundle\Command\GenerateD
 
             $data = ['columnName' => $columnName, 'fieldName' => lcfirst(Container::camelize($columnName)), 'type' => $type];
 
-            list ($bundle, $entity) = $this->parseShortcutNotation($input->getArgument('entity'));
-            if ($type == 'string') {
+            list ($bundle) = $this->parseShortcutNotation($input->getArgument('entity'));
+            if ($type === 'string') {
                 $data['length'] = $entityQuestionHelper->askFieldLength($input, $output);
             } elseif ('decimal' === $type) {
                 $data['precision'] = $entityQuestionHelper->askFieldPrecision($input, $output);
@@ -190,12 +180,6 @@ class WameEntityCommand extends \Sensio\Bundle\GeneratorBundle\Command\GenerateD
 
     protected function createGenerator()
     {
-        //Wame: Use different generator
-        return new WameEntityGenerator(
-            $this->getContainer()->get('filesystem'),
-            $this->getContainer()->get('doctrine'),
-            $this->getContainer()->get(WameTranslationGenerator::class),
-            $this->getContainer()->get(WameRepositoryGenerator::class)
-        );
+        return $this->getContainer()->get(WameEntityGenerator::class);
     }
 }
