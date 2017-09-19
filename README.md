@@ -17,9 +17,6 @@ For more information about the sensioGeneratorBundle, see the official
 ##Entity generation
 
 command `wame:generate:entity`  
-usage: `php bin/console wame:generate:entity AppBundle:EntityName`
-
-* The entity-argument is required, unlike sensio (which will be required in later release)
 
 #### Wame-specific options:
 * --no-blameable  
@@ -51,7 +48,7 @@ If you whish to pass these types as fields without interaction, you'll have to
 specifiy the targetEntity for relations and the enumType for enum.  
 Example:
 
-    `php bin/console wame:generate:entity AppBundle:Product --fields="
+    `php bin/console wame:generate:entity Product --fields="
     bookStore:many2one(targetEntity=BookStore)
     type:enum(enumType=BookType)
     "` -n
@@ -62,7 +59,7 @@ In interactive mode, for each field you'll be asked to add validations.
 
 You can also pass validations to the fields in non-interactive mode, for example:
 
-    `php bin/console wame:generate:entity AppBundle:Customer --fields="
+    `php bin/console wame:generate:entity Customer --fields="
     email:string(validation=Email;NotBlank)
     "` -n
 

@@ -11,19 +11,29 @@ trait WameCommandTrait
 {
     protected $rootDir;
 
+    protected $defaultBundle;
+
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         $container = $this->getContainer();
         parent::initialize($input, $output);
 
+        if ($container->hasParameter('wame_sensio_generator.default_bundle')) {
+            $this->defaultBundle = $container->getParameter('wame_sensio_generator.default_bundle');
+        }
+
+        if (!$input->hasArgument('entity') || !$input->getArgument('entity')) {
+            return;
+        }
+
         $entity = $input->getArgument('entity');
 
-        if (strpos($entity, ':') === false  && $container->hasParameter('wame_generator.default_bundle')) {
-            $input->setArgument('entity', $container->getParameter('wame_generator.default_bundle').':'.$entity);
+        if ($this->defaultBundle !== null && strpos($entity, ':') === false) {
+            $input->setArgument('entity', $this->defaultBundle.':'.$entity);
         }
     }
 
-    protected function validateEntityInput(InputInterface $input)
+    protected function validateEntityInput(InputInterface $input): void
     {
         list($bundle, $entity) = $this->parseShortcutNotation($input->getArgument('entity'));
 
@@ -35,7 +45,7 @@ trait WameCommandTrait
         }
     }
 
-    protected function parseShortcutNotation($shortcut)
+    protected function parseShortcutNotation(string $shortcut): array
     {
         $entity = str_replace('/', '\\', $shortcut);
 
@@ -46,21 +56,17 @@ trait WameCommandTrait
         return array(substr($entity, 0, $pos), substr($entity, $pos + 1));
     }
 
-    protected function getEntityMetadata($entity)
+    protected function getEntityMetadata(string $entityClass): array
     {
         $factory = new DisconnectedMetadataFactory($this->getContainer()->get('doctrine'));
 
-        return $factory->getClassMetadata($entity)->getMetadata();
+        return $factory->getClassMetadata($entityClass)->getMetadata();
     }
 
     /**
      * Tries to make a path relative to the project, which prints nicer.
-     *
-     * @param string $absolutePath
-     *
-     * @return string
      */
-    protected function makePathRelative($absolutePath)
+    protected function makePathRelative(string $absolutePath): string
     {
         $projectRootDir = dirname($this->getContainer()->getParameter('kernel.root_dir'));
 

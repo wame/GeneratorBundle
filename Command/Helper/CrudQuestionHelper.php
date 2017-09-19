@@ -3,14 +3,45 @@ declare(strict_types=1);
 
 namespace Wame\SensioGeneratorBundle\Command\Helper;
 
+use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
+use Wame\SensioGeneratorBundle\Command\WameValidators;
 use Wame\SensioGeneratorBundle\Inflector\Inflector;
 
 class CrudQuestionHelper extends QuestionHelper
 {
+    use HelperTrait;
+
+    const MAX_OUTPUT_WIDTH = 70;
+
+    public function __construct(RegistryInterface $registry, ?array $bundles)
+    {
+        $this->registry = $registry;
+        $this->bundles = $bundles;
+    }
+
+    public function askEntityName(InputInterface $input, OutputInterface $output, string $defaulBundle = null)
+    {
+        $existingEntities = $this->getExistingEntities();
+
+        $existingEntityOptions = !empty($existingEntities)
+            ? array_combine(range(1, count($existingEntities)), array_keys($existingEntities))
+            : [];
+
+
+        $this->outputCompactOptionsList($output, array_flip($existingEntityOptions));
+
+        $question = new Question($this->getQuestion('Entity', null), null);
+        $question->setAutocompleterValues(array_keys($existingEntities));
+        $question->setNormalizer(WameValidators::getEntityNormalizer($defaulBundle, $existingEntityOptions));
+        $entity = $this->ask($input, $output, $question);
+
+        $input->setArgument('entity', $entity);
+    }
+
     public function askRoutePrefix(InputInterface $input, OutputInterface $output, $entity)
     {
         // route prefix

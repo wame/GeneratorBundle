@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Wame\SensioGeneratorBundle\DependencyInjection;
 
@@ -18,13 +19,15 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('wame_generator');
+        $rootNode = $treeBuilder->root('wame_sensio_generator');
         $rootNode
             ->children()
                 ->scalarNode('default_bundle')
                     ->defaultValue('AppBundle')
                     ->validate()
-                    ->ifTrue(function($name) { return !preg_match('/.Bundle$/', $name); })
+                    ->ifTrue(function ($name) {
+                        return !preg_match('/.Bundle$/', $name);
+                    })
                         ->thenInvalid('A bundle name in "default_bundle should" end with "Bundle"')
                     ->end()
                 ->end()
@@ -87,6 +90,5 @@ class Configuration implements ConfigurationInterface
             ->end()
         ;
         return $node;
-
     }
 }

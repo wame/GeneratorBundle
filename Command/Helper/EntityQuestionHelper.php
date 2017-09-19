@@ -16,6 +16,8 @@ use Wame\SensioGeneratorBundle\Inflector\Inflector;
 
 class EntityQuestionHelper extends QuestionHelper
 {
+    use HelperTrait;
+
     const MAX_OUTPUT_WIDTH = 70;
 
     /** @var RegistryInterface */
@@ -63,6 +65,17 @@ class EntityQuestionHelper extends QuestionHelper
         foreach ($configuredTypes as $type => $details) {
             $this->configuredTypes[$type] = $details['class'];
         }
+    }
+
+    public function askEntityName(InputInterface $input, OutputInterface $output, string $defaulBundle = null)
+    {
+        $question = new Question($this->getQuestion('Entity name', ''));
+
+        $question->setValidator(WameValidators::getEntityNameValidator($defaulBundle));
+        $question->setAutocompleterValues($this->bundles);
+        $entity = $this->ask($input, $output, $question);
+
+        $input->setArgument('entity', $entity);
     }
 
     public function askBehaviours(InputInterface $input, OutputInterface $output)
@@ -358,58 +371,10 @@ class EntityQuestionHelper extends QuestionHelper
         return $enumTypes;
     }
 
-    /**
-     * @return \Doctrine\ORM\Mapping\ClassMetadata[]
-     */
-    protected function getExistingEntities(): array
-    {
-        /** @var \Doctrine\ORM\Mapping\ClassMetadata[] $entityMetadata */
-        $entityMetadata = $this->registry->getManager()->getMetadataFactory()->getAllMetadata();
-
-        $entities = [];
-        foreach ($entityMetadata as $meta) {
-            $entityNamespace = $meta->getName();
-            $shortName = $meta->reflClass->getShortName();
-            $bundle = null;
-            foreach ($this->bundles as $bundleName => $bundleNamespace) {
-                if (strpos($entityNamespace, $bundleName) !== false) {
-                    $bundle = $bundleName;
-                }
-            }
-            $entities[$bundle . ':' . $shortName] = $meta;
-        }
-
-        return $entities;
-    }
-
     protected function outputAvailableEntities(OutputInterface $output, array $existingEntityOptions)
     {
         $output->write('<info>Available Entities:</info> ');
         $this->outputCompactOptionsList($output, array_flip($existingEntityOptions));
-        $output->writeln('');
-    }
-
-    protected function outputCompactOptionsList(OutputInterface $output, array $options, $offset = 0)
-    {
-        $count = $offset;
-        $i = 0;
-        foreach ($options as $option => $alias) {
-            if ($count > static::MAX_OUTPUT_WIDTH) {
-                $count = 0;
-                $output->writeln('');
-            }
-            $count += strlen(($alias ? $alias . ': ' : '') . $option);
-            if ($alias !== null) {
-                $output->write(sprintf('<info>%s</info>: ', $alias));
-            }
-            $output->write(sprintf('<comment>%s</comment>', $option));
-            if (count($options) !== $i + 1) {
-                $output->write(', ');
-            } else {
-                $output->write('.');
-            }
-            $i++;
-        }
         $output->writeln('');
     }
 

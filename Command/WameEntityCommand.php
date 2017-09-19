@@ -102,6 +102,10 @@ EOT
         $entityQuestionHelper = $this->getQuestionHelper();
         $entityQuestionHelper->writeSection($output, 'Welcome to the WAME entity generator');
 
+        if (!$input->hasArgument('entity') || !$input->getArgument('entity')) {
+            $entityQuestionHelper->askEntityName($input, $output, $this->defaultBundle);
+        }
+
         //Makes the entity-argument required
         $entity = WameValidators::validateEntityName($input->getArgument('entity'));
         list($bundle, $entity) = $this->parseShortcutNotation($entity);

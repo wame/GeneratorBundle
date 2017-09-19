@@ -14,11 +14,12 @@ use Wame\SensioGeneratorBundle\Generator\WameDatatableGenerator;
 use Wame\SensioGeneratorBundle\Generator\WameFormGenerator;
 use Wame\SensioGeneratorBundle\Generator\WameVoterGenerator;
 use Wame\SensioGeneratorBundle\Inflector\Inflector;
-use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
 use Wame\SensioGeneratorBundle\MetaData\MetaEntityFactory;
 
 /**
- * WAME Additions for CRUD generation
+ * Wame version of GenerateDoctrineCrudCommand
+ *
+ * @author Kevin Driessen <kevin@wame.nl>
  */
 class WameCrudCommand extends ContainerAwareCommand
 {
@@ -72,7 +73,10 @@ EOT
     {
         $question = $this->getHelperSet()->get('question');
         if (!$question || (new \ReflectionClass($question))->getName() !== (new \ReflectionClass(CrudQuestionHelper::class))->getName()) {
-            $this->getHelperSet()->set($question = new CrudQuestionHelper());
+            $this->getHelperSet()->set($question = new CrudQuestionHelper(
+                $this->getContainer()->get('doctrine'),
+                $this->getContainer()->getParameter('kernel.bundles')
+            ));
         }
         return $question;
     }
@@ -117,8 +121,11 @@ EOT
 
     protected function interact(InputInterface $input, OutputInterface $output): void
     {
-        $this->validateEntityInput($input);
         $crudQuestionHelper = $this->getQuestionHelper();
+
+        if (!$input->hasArgument('entity') || !$input->getArgument('entity')) {
+            $crudQuestionHelper->askEntityName($input, $output, $this->defaultBundle);
+        }
 
         $crudQuestionHelper->writeSection($output, 'Welcome to the WAME CRUD generator');
 

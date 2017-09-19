@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Wame\SensioGeneratorBundle\Generator;
 
 use Symfony\Bridge\Doctrine\RegistryInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
 use Wame\SensioGeneratorBundle\MetaData\MetaEntityFactory;
@@ -28,7 +27,6 @@ class WameFormGenerator extends Generator
 
     public function generateByMetaEntity(MetaEntity $metaEntity)
     {
-        $fs = new Filesystem();
         $content = $this->render('form/FormType.php.twig', [
             'meta_entity' => $metaEntity,
         ]);

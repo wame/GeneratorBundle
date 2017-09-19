@@ -7,6 +7,16 @@ use Wame\SensioGeneratorBundle\Inflector\Inflector;
 
 class WameValidators extends Validators
 {
+    public static function getEntityNameValidator($defaulBundle): callable
+    {
+        return function ($name) use ($defaulBundle) {
+            if (strpos($name, ':') === false && $defaulBundle !== null) {
+                $name = $defaulBundle. ':'. $name;
+            }
+            return static::validateEntityName($name);
+        };
+    }
+
     public static function getFieldNameValidator(array $fields = []): callable
     {
         return function ($name) use ($fields) {
