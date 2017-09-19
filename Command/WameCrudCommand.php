@@ -3,19 +3,24 @@ declare(strict_types=1);
 
 namespace Wame\SensioGeneratorBundle\Command;
 
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Wame\SensioGeneratorBundle\Command\Helper\CrudQuestionHelper;
+use Wame\SensioGeneratorBundle\Generator\DoctrineCrudGenerator;
 use Wame\SensioGeneratorBundle\Generator\WameDatatableGenerator;
+use Wame\SensioGeneratorBundle\Generator\WameFormGenerator;
 use Wame\SensioGeneratorBundle\Generator\WameVoterGenerator;
+use Wame\SensioGeneratorBundle\Inflector\Inflector;
 use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
 use Wame\SensioGeneratorBundle\MetaData\MetaEntityFactory;
 
 /**
  * WAME Additions for CRUD generation
  */
-class WameCrudCommand extends GenerateDoctrineCrudCommand
+class WameCrudCommand extends ContainerAwareCommand
 {
     use WameCommandTrait;
 
@@ -26,81 +31,125 @@ class WameCrudCommand extends GenerateDoctrineCrudCommand
 
     protected function configure()
     {
-        parent::configure();
         $this
             ->setName('wame:generate:crud')
+            ->setDescription('Generates a CRUD based on a Doctrine entity')
+            ->addArgument('entity', InputArgument::REQUIRED, 'The entity class name to initialize (shortcut notation)')
+            ->addOption('route-prefix', null, InputOption::VALUE_REQUIRED, 'The route prefix')
+            ->addOption('with-write', null, InputOption::VALUE_NONE, 'Whether or not to generate create, new and delete actions')
             ->addOption('with-datatable', null, InputOption::VALUE_NONE, 'Whether or not to generate a datatable')
             ->addOption('with-voter', null, InputOption::VALUE_NONE, 'Whether or not to generate a voter')
+            ->addOption('overwrite', null, InputOption::VALUE_NONE, 'Overwrite any existing controller or form class when generating the CRUD contents')
+            ->setHelp(<<<EOT
+The <info>%command.name%</info> command generates a CRUD based on a Doctrine entity.
+
+The default command only generates the list and show actions.
+
+<info>php %command.full_name% Post --route-prefix=post_admin</info>
+
+Using the --with-write option allows to generate the new, edit and delete actions.
+
+<info>php %command.full_name% AcmeBlogBundle:Post --route-prefix=post_admin --with-write</info>
+
+Every generated file is based on a template. There are default templates but they can be overridden by placing custom templates in one of the following locations, by order of priority:
+
+<info>BUNDLE_PATH/Resources/WameSensioGeneratorBundle/skeleton/crud
+APP_PATH/Resources/WameSensioGeneratorBundle/skeleton/crud</info>
+
+And
+
+<info>__bundle_path__/Resources/WameSensioGeneratorBundle/skeleton/form
+__project_root__/app/Resources/WameSensioGeneratorBundle/skeleton/form</info>
+
+You can check https://github.com/sensio/SensioGeneratorBundle/tree/master/Resources/skeleton
+in order to know the file structure of the skeleton
+EOT
+            )
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function getQuestionHelper(): CrudQuestionHelper
     {
-        parent::execute($input, $output);
-
-        $metaEntity = $this->getMetaEntity($input);
-
-        if ($input->getOption('with-datatable')) {
-            $this->getDatatableGenerator()->generate($metaEntity);
+        $question = $this->getHelperSet()->get('question');
+        if (!$question || (new \ReflectionClass($question))->getName() !== (new \ReflectionClass(CrudQuestionHelper::class))->getName()) {
+            $this->getHelperSet()->set($question = new CrudQuestionHelper());
         }
-        if ($input->getOption('with-voter')) {
-            $this->getVoterGenerator()->generateByMetaEntity($metaEntity);
-        }
+        return $question;
     }
 
-    protected function getMetaEntity(InputInterface $input) : MetaEntity
+    protected function execute(InputInterface $input, OutputInterface $output): void
     {
-        $entity = $input->getArgument('entity');
+        $crudQuestionHelper = $this->getQuestionHelper();
+
+        $this->validateEntityInput($input);
+        $entity = WameValidators::validateEntityName($input->getArgument('entity'));
         list($bundle, $entity) = $this->parseShortcutNotation($entity);
+
+        $prefix = $input->getOption('route-prefix') ?: Inflector::tableize($entity);
+        $withWrite = $input->getOption('with-write');
+        $forceOverwrite = $input->getOption('overwrite');
+        $withDatatable = $input->hasOption('with-datatable') ? $input->getOption('with-datatable') : false;
+        $withVoter = $input->hasOption('with-voter') ? $input->getOption('with-voter') : false;
+
+        $entityClass = $this->getContainer()->get('doctrine')->getAliasNamespace($bundle).'\\'.$entity;
+        $metadata = $this->getEntityMetadata($entityClass);
+
         $bundle = $this->getContainer()->get('kernel')->getBundle($bundle);
 
-        $doctrine = $this->getContainer()->get("doctrine");
-        $em = $doctrine->getManager();
+        $crudQuestionHelper->writeSection($output, 'CRUD generation');
 
-        $entityClassname = $bundle->getNamespace().'\\Entity\\'.$entity;
-        $classMetaData = $em->getClassMetadata($entityClassname);
+        $this->getGenerator()->generate($bundle, $entity, $metadata[0], $prefix, $withWrite, $forceOverwrite, $withDatatable, $withVoter);
 
-        return MetaEntityFactory::createFromClassMetadata($classMetaData, $bundle);
-    }
+        $metaEntity = MetaEntityFactory::createFromClassMetadata($metadata[0], $bundle);
 
-    protected function interact(InputInterface $input, OutputInterface $output)
-    {
-        parent::interact($input, $output);
-
-        $questionHelper = $this->getQuestionHelper();
-
-        $withDatatable = $input->getOption('with-datatable') ?: true;
-        $question = new ConfirmationQuestion(
-            $questionHelper->getQuestion('Do you want to use a datatable?', $withDatatable ? 'yes' : 'no', '?'),
-            $withDatatable
-        );
-        $withDatatable = $questionHelper->ask($input, $output, $question);
-        $input->setOption('with-datatable', $withDatatable);
-
-        $withVoter = $input->getOption('with-voter') ?: true;
-        $question = new ConfirmationQuestion(
-            $questionHelper->getQuestion('Do you want to generate a voter?', $withVoter ? 'yes' : 'no', '?'),
-            $withVoter
-        );
-        $withVoter = $questionHelper->ask($input, $output, $question);
-        $input->setOption('with-voter', $withVoter);
-    }
-
-    protected function getDatatableGenerator()
-    {
-        if (null === $this->datatableGenerator) {
-            $this->datatableGenerator = $this->getContainer()->get(WameDatatableGenerator::class);
+        if ($withWrite) {
+            $this->getFormGenerator()->generateByMetaEntity($metaEntity);
+        }
+        if ($withDatatable) {
+            $this->getDatatableGenerator()->generate($metaEntity);
+        }
+        if ($withVoter) {
+            $this->getVoterGenerator()->generateByMetaEntity($metaEntity);
         }
 
-        return $this->datatableGenerator;
+        $crudQuestionHelper->writeGeneratorSummary($output, []);
     }
 
-    protected function getVoterGenerator()
+    protected function interact(InputInterface $input, OutputInterface $output): void
     {
-        if (null === $this->voterGenerator) {
-            $this->voterGenerator = $this->getContainer()->get(WameVoterGenerator::class);
-        }
+        $this->validateEntityInput($input);
+        $crudQuestionHelper = $this->getQuestionHelper();
 
-        return $this->voterGenerator;
+        $crudQuestionHelper->writeSection($output, 'Welcome to the WAME CRUD generator');
+
+        $entity = $input->getArgument('entity');
+        list($bundle, $entity) = $this->parseShortcutNotation($entity);
+
+        $crudQuestionHelper->askRoutePrefix($input, $output, $entity);
+        $crudQuestionHelper->askWithWrite($input, $output);
+        $crudQuestionHelper->askWithDatatable($input, $output);
+        $crudQuestionHelper->askWithVoter($input, $output);
+    }
+
+    protected function getDatatableGenerator(): WameDatatableGenerator
+    {
+        return $this->getContainer()->get(WameDatatableGenerator::class);
+    }
+
+    protected function getFormGenerator(): WameFormGenerator
+    {
+        return $this->getContainer()->get(WameFormGenerator::class);
+    }
+
+    protected function getVoterGenerator(): WameVoterGenerator
+    {
+        return $this->getContainer()->get(WameVoterGenerator::class);
+    }
+
+    protected function getGenerator(): DoctrineCrudGenerator
+    {
+        return new DoctrineCrudGenerator(
+            $this->getContainer()->getParameter('kernel.root_dir')
+        );
     }
 }

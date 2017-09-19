@@ -13,11 +13,6 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Validator\Constraint;
 use Wame\SensioGeneratorBundle\Command\WameValidators;
 
-/**
- * Generates bundles.
- *
- * @author Kevin Driessen <kevin@wame.nl>
- */
 class EntityQuestionHelper extends QuestionHelper
 {
     const MAX_OUTPUT_WIDTH = 70;

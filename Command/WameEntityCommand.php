@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Wame\SensioGeneratorBundle\Command;
 
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Wame\SensioGeneratorBundle\Command\Helper\EntityQuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,7 +17,7 @@ use Wame\SensioGeneratorBundle\Generator\WameEntityGenerator;
  *
  * @author Kevin Driessen <kevin@wame.nl>
  */
-class WameEntityCommand extends GenerateDoctrineCommand
+class WameEntityCommand extends ContainerAwareCommand
 {
     use WameCommandTrait;
 
@@ -131,6 +132,7 @@ EOT
      */
     protected function parseFields($input): array
     {
+        $input = $input ?: '';
         if (is_array($input)) {
             return $input;
         }
@@ -227,7 +229,7 @@ EOT
         return $fields;
     }
 
-    protected function createGenerator()
+    protected function getGenerator(): WameEntityGenerator
     {
         return $this->getContainer()->get(WameEntityGenerator::class);
     }
