@@ -12,6 +12,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Validator\Constraint;
 use Wame\SensioGeneratorBundle\Command\WameValidators;
+use Wame\SensioGeneratorBundle\Inflector\Inflector;
 
 class EntityQuestionHelper extends QuestionHelper
 {
@@ -89,11 +90,6 @@ class EntityQuestionHelper extends QuestionHelper
     public function askDisplayField(InputInterface $input, OutputInterface $output)
     {
         $entityFields = $input->getOption('fields');
-        //Do not ask questions if display-field is already set
-        if ($input->hasOption('display-field') && array_key_exists($input->getOption('display-field'), $entityFields)) {
-            return;
-        }
-
         $output->writeln([
             '',
             'If possible we should add a __toString method, you can do this by picking a "display field"',
@@ -126,7 +122,6 @@ class EntityQuestionHelper extends QuestionHelper
         if ($displayField) {
             $entityFields[$displayField]['displayField'] = true;
             $input->setOption('fields', $entityFields);
-            $input->setOption('display-field', $displayField);
         }
     }
 
@@ -192,7 +187,7 @@ class EntityQuestionHelper extends QuestionHelper
         return $this->ask($input, $output, $question);
     }
 
-    public function askTargetEntity(InputInterface $input, OutputInterface $output, string $bundleName): ?string
+    public function askTargetEntity(InputInterface $input, OutputInterface $output, string $bundleName, string $columnName): ?string
     {
         $existingEntities = $this->getExistingEntities();
 
@@ -203,11 +198,11 @@ class EntityQuestionHelper extends QuestionHelper
 
         $this->outputCompactOptionsList($output, array_flip($existingEntityOptions));
 
-        //TODO: add default value to show suggestion based on column-name
-        $question = new Question($this->getQuestion('Related Entity', null), null);
+        $defaultEntityOption = $this->guessEntityOption($columnName);
+
+        $question = new Question($this->getQuestion('Related Entity', $defaultEntityOption), $defaultEntityOption);
         $question->setAutocompleterValues(array_keys($existingEntities));
         $question->setNormalizer(WameValidators::getEntityNormalizer($bundleName, $existingEntityOptions));
-        // TODO: should we add a validator that checks if the entity exists?
         return $this->ask($input, $output, $question);
     }
 
@@ -420,12 +415,13 @@ class EntityQuestionHelper extends QuestionHelper
 
     protected function guessFieldType(string $columnName): string
     {
+        $this->guessFieldIsOneToMany($columnName);
         $lastThreeChars = substr($columnName, -3);
         $lastFourChars = substr($columnName, -4);
         $lastFiveChars = substr($columnName, -5);
         if ($lastThreeChars === '_at' || $lastThreeChars === '_on') {
             return 'datetime';
-        } if ($lastThreeChars === '_id' || $lastFiveChars === 'count') {
+        } if ($lastFiveChars === 'count') {
             return 'integer';
         } if (0 === strpos($columnName, 'is_') || 0 === strpos($columnName, 'has_')) {
             return 'boolean';
@@ -437,7 +433,37 @@ class EntityQuestionHelper extends QuestionHelper
             return 'text';
         } if ($lastFiveChars === 'price') {
             return 'decimal';
+        } if ($this->guessFieldIsOneToMany($columnName)) {
+            return 'one2many';
         }
         return 'string';
+    }
+
+    protected function guessFieldIsOneToMany(string $columnName)
+    {
+        foreach (array_keys($this->getExistingEntities()) as $existingEntity) {
+            $entityParts = explode(':', $existingEntity);
+            if ($columnName === Inflector::pluralTableize($entityParts[1])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected function guessEntityOption(string $columnName): ?string
+    {
+        $defaultEntityOption = null;
+        $columnNameAsPluralEntityName = Inflector::singularize(Inflector::classify($columnName));
+        $columnNameAsEntityName = Inflector::classify(str_replace('_id', '', $columnName));
+        foreach (array_keys($this->getExistingEntities()) as $existingEntity) {
+            $entityParts = explode(':', $existingEntity);
+            if ($columnNameAsPluralEntityName === $entityParts[1] || $columnNameAsEntityName === $entityParts[1]) {
+                $defaultEntityOption = $existingEntity;
+            }
+            if (strpos($entityParts[1], $columnNameAsEntityName) !== false) {
+                $defaultEntityOption = $existingEntity; //Use this option, but don't break loop for there might still be an exact match
+            }
+        }
+        return $defaultEntityOption;
     }
 }

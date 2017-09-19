@@ -27,11 +27,10 @@ class WameEntityCommand extends ContainerAwareCommand
         $this->setName('wame:generate:entity')
             ->addArgument('entity', InputArgument::REQUIRED, 'The entity class name to initialize (shortcut notation)')
             ->addOption('fields', null, InputOption::VALUE_REQUIRED, 'The fields to create with the new entity')
-            ->addOption('no-blameable', null, InputOption::VALUE_OPTIONAL, 'Do not add `blameable` fields/behaviour on the new entity')
-            ->addOption('no-timestampable', null, InputOption::VALUE_OPTIONAL, 'Do not add `timestampable` fields/behaviour on the new entity')
-            ->addOption('no-softdeleteable', null, InputOption::VALUE_OPTIONAL, 'Do not soft-delete the new entity')
+            ->addOption('no-blameable', null, InputOption::VALUE_NONE, 'Do not add `blameable` fields/behaviour on the new entity')
+            ->addOption('no-timestampable', null, InputOption::VALUE_NONE, 'Do not add `timestampable` fields/behaviour on the new entity')
+            ->addOption('no-softdeleteable', null, InputOption::VALUE_NONE, 'Do not soft-delete the new entity')
             ->addOption('behaviours', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Adds behavior (options are `blameable`,`timestampable`,`softdeleteable`)')
-            ->addOption('display-field', null, InputOption::VALUE_REQUIRED, 'The field that can represent the entity as a string')
             ->addOption('no-validation', null, InputOption::VALUE_NONE, 'Do not ask to about adding field validation')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> task generates a new Doctrine
@@ -208,7 +207,7 @@ EOT
                 $data['precision'] = $entityQuestionHelper->askFieldPrecision($input, $output);
                 $data['scale'] = $entityQuestionHelper->askFieldScale($input, $output);
             } elseif (in_array($type, ['one2one', 'many2one', 'many2many', 'one2many'], true)) {
-                $data['targetEntity'] = $entityQuestionHelper->askTargetEntity($input, $output, $bundle);
+                $data['targetEntity'] = $entityQuestionHelper->askTargetEntity($input, $output, $bundle, $columnName);
                 $data['referencedColumnName'] = $entityQuestionHelper->askReferenceColumnName($input, $output, $data['targetEntity']);
             } elseif ('enum' === $type) {
                 list ($enumType, $enumTypeClass) = $entityQuestionHelper->askFieldEnumType($input, $output);
