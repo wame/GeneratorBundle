@@ -7,7 +7,7 @@ use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
 
 class WameVoterGenerator extends Generator
 {
-    public function generateByMetaEntity(MetaEntity $metaEntity)
+    public function generateByMetaEntity(MetaEntity $metaEntity, $allowOverride = false): bool
     {
         //Add the AppVoter if it doesn't exist yet.
         $path = $metaEntity->getBundle()->getPath().'/Security/AppVoter.php';
@@ -23,8 +23,7 @@ class WameVoterGenerator extends Generator
         ]);
 
         $path = $metaEntity->getBundle()->getPath().'/Security/'.$metaEntity->getEntityName().'Voter.php';
-        static::dump($path, $voterContent);
 
-        return $path;
+        return static::dump($path, $voterContent, $allowOverride) !== false;
     }
 }

@@ -7,7 +7,7 @@ use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
 
 class WameDatatableGenerator extends Generator
 {
-    public function generate(MetaEntity $metaEntity)
+    public function generate(MetaEntity $metaEntity, $allowOverride = false): bool
     {
         $this->addAppDatatable($metaEntity);
         $this->addDatatableResultService($metaEntity);
@@ -16,9 +16,7 @@ class WameDatatableGenerator extends Generator
             'meta_entity' => $metaEntity,
         ]);
         $path = $metaEntity->getBundle()->getPath().'/Datatable/'.$metaEntity->getEntityName().'Datatable.php';
-         static::dump($path, $content);
-
-        return $path;
+        return static::dump($path, $content, $allowOverride) !== false;
     }
 
     protected function addAppDatatable(MetaEntity $metaEntity)

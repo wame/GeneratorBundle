@@ -75,9 +75,13 @@ class Generator
         }
     }
 
-    public static function dump($filename, $content)
+    public static function dump($filename, $content, $allowOverwrite = true)
     {
         if (file_exists($filename)) {
+            if ($allowOverwrite === false) {
+                self::writeln(sprintf('  <fg=yellow>already exists</> %s', self::relativizePath($filename)));
+                return false;
+            }
             self::writeln(sprintf('  <fg=yellow>updated</> %s', self::relativizePath($filename)));
         } else {
             self::writeln(sprintf('  <fg=green>created</> %s', self::relativizePath($filename)));

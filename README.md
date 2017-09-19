@@ -1,6 +1,12 @@
 ### under construction
 This readme isn't finished yet.
 
+Yet to implement:
+
+- enum generate command: generator is (near) complete, but command needs to be added.
+- 'savepoint file': at least for entities, it'd be nice to start from a saved point after a mistake 
+  was made.
+
 WameSensioGeneratorBundle
 =====================
 

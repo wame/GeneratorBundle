@@ -6,6 +6,8 @@ namespace Wame\SensioGeneratorBundle\Command;
 use Doctrine\Bundle\DoctrineBundle\Mapping\DisconnectedMetadataFactory;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Wame\SensioGeneratorBundle\Command\Helper\CrudQuestionHelper;
+use Wame\SensioGeneratorBundle\MetaData\MetaEntityFactory;
 
 trait WameCommandTrait
 {
@@ -71,5 +73,29 @@ trait WameCommandTrait
         $projectRootDir = dirname($this->getContainer()->getParameter('kernel.root_dir'));
 
         return str_replace($projectRootDir.'/', '', realpath($absolutePath) ?: $absolutePath);
+    }
+
+    protected function getMetaEntityFormInput(InputInterface $input)
+    {
+
+        $entity = WameValidators::validateEntityName($input->getArgument('entity'));
+        list($bundle, $entity) = $this->parseShortcutNotation($entity);
+
+        $entityClass = $this->getContainer()->get('doctrine')->getAliasNamespace($bundle).'\\'.$entity;
+        $metadata = $this->getEntityMetadata($entityClass);
+        $bundle = $this->getContainer()->get('kernel')->getBundle($bundle);
+        return MetaEntityFactory::createFromClassMetadata($metadata[0], $bundle);
+    }
+
+    protected function getCrudQuestionHelper(): CrudQuestionHelper
+    {
+        $question = $this->getHelperSet()->get('question');
+        if (!$question || (new \ReflectionClass($question))->getName() !== (new \ReflectionClass(CrudQuestionHelper::class))->getName()) {
+            $this->getHelperSet()->set($question = new CrudQuestionHelper(
+                $this->getContainer()->get('doctrine'),
+                $this->getContainer()->getParameter('kernel.bundles')
+            ));
+        }
+        return $question;
     }
 }

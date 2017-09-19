@@ -25,11 +25,6 @@ class WameCrudCommand extends ContainerAwareCommand
 {
     use WameCommandTrait;
 
-    /** @var  WameDatatableGenerator */
-    protected $datatableGenerator;
-    /** @var  WameVoterGenerator */
-    protected $voterGenerator;
-
     protected function configure()
     {
         $this
@@ -69,21 +64,9 @@ EOT
         ;
     }
 
-    protected function getQuestionHelper(): CrudQuestionHelper
-    {
-        $question = $this->getHelperSet()->get('question');
-        if (!$question || (new \ReflectionClass($question))->getName() !== (new \ReflectionClass(CrudQuestionHelper::class))->getName()) {
-            $this->getHelperSet()->set($question = new CrudQuestionHelper(
-                $this->getContainer()->get('doctrine'),
-                $this->getContainer()->getParameter('kernel.bundles')
-            ));
-        }
-        return $question;
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
-        $crudQuestionHelper = $this->getQuestionHelper();
+        $crudQuestionHelper = $this->getCrudQuestionHelper();
 
         $this->validateEntityInput($input);
         $entity = WameValidators::validateEntityName($input->getArgument('entity'));
@@ -107,13 +90,13 @@ EOT
         $metaEntity = MetaEntityFactory::createFromClassMetadata($metadata[0], $bundle);
 
         if ($withWrite) {
-            $this->getFormGenerator()->generateByMetaEntity($metaEntity);
+            $this->getFormGenerator()->generateByMetaEntity($metaEntity, $forceOverwrite);
         }
         if ($withDatatable) {
-            $this->getDatatableGenerator()->generate($metaEntity);
+            $this->getDatatableGenerator()->generate($metaEntity, $forceOverwrite);
         }
         if ($withVoter) {
-            $this->getVoterGenerator()->generateByMetaEntity($metaEntity);
+            $this->getVoterGenerator()->generateByMetaEntity($metaEntity, $forceOverwrite);
         }
 
         $crudQuestionHelper->writeGeneratorSummary($output, []);
@@ -121,7 +104,7 @@ EOT
 
     protected function interact(InputInterface $input, OutputInterface $output): void
     {
-        $crudQuestionHelper = $this->getQuestionHelper();
+        $crudQuestionHelper = $this->getCrudQuestionHelper();
 
         if (!$input->hasArgument('entity') || !$input->getArgument('entity')) {
             $crudQuestionHelper->askEntityName($input, $output, $this->defaultBundle);
