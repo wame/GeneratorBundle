@@ -23,15 +23,14 @@ class WameEntityCommand extends ContainerAwareCommand
 
     protected function configure()
     {
-
         $this->setName('wame:generate:entity')
             ->addArgument('entity', InputArgument::REQUIRED, 'The entity class name to initialize (shortcut notation)')
             ->addOption('fields', null, InputOption::VALUE_REQUIRED, 'The fields to create with the new entity')
+            ->addOption('no-validation', null, InputOption::VALUE_NONE, 'Do not ask to about adding field validation')
             ->addOption('no-blameable', null, InputOption::VALUE_NONE, 'Do not add `blameable` fields/behaviour on the new entity')
             ->addOption('no-timestampable', null, InputOption::VALUE_NONE, 'Do not add `timestampable` fields/behaviour on the new entity')
             ->addOption('no-softdeleteable', null, InputOption::VALUE_NONE, 'Do not soft-delete the new entity')
             ->addOption('behaviours', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Adds behavior (options are `blameable`,`timestampable`,`softdeleteable`)')
-            ->addOption('no-validation', null, InputOption::VALUE_NONE, 'Do not ask to about adding field validation')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> task generates a new Doctrine
 entity inside a bundle:
@@ -72,9 +71,6 @@ EOT
         $behaviours = $input->hasOption('behaviours') ? $input->getOption('behaviours') : [];
 
         $this->getGenerator()->generate($bundle, $entity, $fields, $behaviours);
-
-        $output->writeln(sprintf('> Generating entity <info>%s</info>: <comment>OK!</comment>', $entity));
-        $output->writeln(sprintf('> Generating repository class <info>%s</info>: <comment>OK!</comment>', $entity.'Repository'));
 
         $questionHelper->writeGeneratorSummary($output, []);
     }
@@ -121,7 +117,9 @@ EOT
             return;
         }
 
-        $entityQuestionHelper->askBehaviours($input, $output);
+        if ($this->enableTraitOptions) {
+            $entityQuestionHelper->askBehaviours($input, $output);
+        }
 
         // fields
         $input->setOption('fields', $this->addFields($input, $output, $entityQuestionHelper));

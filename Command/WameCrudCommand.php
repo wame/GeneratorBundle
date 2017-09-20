@@ -117,8 +117,12 @@ EOT
 
         $crudQuestionHelper->askRoutePrefix($input, $output, $entity);
         $crudQuestionHelper->askWithWrite($input, $output);
-        $crudQuestionHelper->askWithDatatable($input, $output);
-        $crudQuestionHelper->askWithVoter($input, $output);
+        if ($this->enableDatatables) {
+            $crudQuestionHelper->askWithDatatable($input, $output);
+        }
+        if ($this->enableVoters) {
+            $crudQuestionHelper->askWithVoter($input, $output);
+        }
     }
 
     protected function getDatatableGenerator(): WameDatatableGenerator

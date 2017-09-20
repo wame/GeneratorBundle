@@ -9,20 +9,22 @@ class WameDatatableGenerator extends Generator
 {
     public function generate(MetaEntity $metaEntity, $allowOverride = false): bool
     {
-        $this->addAppDatatable($metaEntity);
-        $this->addDatatableResultService($metaEntity);
+        $datatableDir = $metaEntity->getBundle()->getPath().'/Datatable';
+
+        $this->addAppDatatable($metaEntity, $datatableDir);
+        $this->addDatatableResultService($metaEntity, $datatableDir);
 
         $content = $this->render('datatable/datatable.php.twig', [
             'meta_entity' => $metaEntity,
         ]);
-        $path = $metaEntity->getBundle()->getPath().'/Datatable/'.$metaEntity->getEntityName().'Datatable.php';
+        $path = $datatableDir.'/'.$metaEntity->getEntityName().'Datatable.php';
         return static::dump($path, $content, $allowOverride) !== false;
     }
 
-    protected function addAppDatatable(MetaEntity $metaEntity)
+    protected function addAppDatatable(MetaEntity $metaEntity, string $datatableDir)
     {
         //Add the AppDatatable if it doesn't exist yet.
-        $path = $metaEntity->getBundle()->getPath().'/Datatable/AppDatatable.php';
+        $path = $datatableDir.'/AppDatatable.php';
         if (file_exists($path) === false) {
             $appDatatableContent = $this->render('datatable/AppDatatable.php.twig', [
                 'bundle_namespace' => $metaEntity->getBundleNamespace(),
@@ -31,10 +33,10 @@ class WameDatatableGenerator extends Generator
         }
     }
 
-    protected function addDatatableResultService(MetaEntity $metaEntity)
+    protected function addDatatableResultService(MetaEntity $metaEntity, string $datatableDir)
     {
         //Add the DatatableResultService if it doesn't exist yet.
-        $path = $metaEntity->getBundle()->getPath().'/Datatable/DatatableResultService.php';
+        $path = $datatableDir.'/DatatableResultService.php';
         if (file_exists($path) === false) {
             $appDatatableContent = $this->render('datatable/DatatableResultService.php.twig', [
                 'bundle_namespace' => $metaEntity->getBundleNamespace(),

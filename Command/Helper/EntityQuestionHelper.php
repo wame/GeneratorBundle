@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Wame\SensioGeneratorBundle\Command\Helper;
 
 use Doctrine\DBAL\Types\Type;
-use Fresh\DoctrineEnumBundle\DBAL\Types\AbstractEnumType;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -151,7 +150,6 @@ class EntityQuestionHelper extends QuestionHelper
         $types = $this->getTypes();
         $this->outputCompactOptionsList($output, $types);
         $typeOptions = array_keys($types);
-
         $defaultType = $this->guessFieldType($columnName);
 
         $question = new Question($this->getQuestion('Field type', $defaultType), $defaultType);
@@ -364,7 +362,7 @@ class EntityQuestionHelper extends QuestionHelper
             if (strpos(ltrim($typeClass, '\\'), 'Doctrine\DBAL\Types') === 0) {
                 continue;
             }
-            if (is_subclass_of($typeClass, AbstractEnumType::class)) {
+            if (is_subclass_of($typeClass, 'Fresh\DoctrineEnumBundle\DBAL\Types\AbstractEnumType')) {
                 $enumTypes[$type] = $typeClass;
             }
         }

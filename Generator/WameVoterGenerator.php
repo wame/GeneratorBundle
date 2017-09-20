@@ -9,8 +9,10 @@ class WameVoterGenerator extends Generator
 {
     public function generateByMetaEntity(MetaEntity $metaEntity, $allowOverride = false): bool
     {
+        $securityDir = $metaEntity->getBundle()->getPath().'/Security';
+
         //Add the AppVoter if it doesn't exist yet.
-        $path = $metaEntity->getBundle()->getPath().'/Security/AppVoter.php';
+        $path = $securityDir.'/AppVoter.php';
         if (file_exists($path) === false) {
             $appVoterContent = $this->render('security/AppVoter.php.twig', [
                 'bundle_namespace' => $metaEntity->getBundleNamespace(),
@@ -22,7 +24,7 @@ class WameVoterGenerator extends Generator
             'meta_entity' => $metaEntity,
         ]);
 
-        $path = $metaEntity->getBundle()->getPath().'/Security/'.$metaEntity->getEntityName().'Voter.php';
+        $path = $securityDir.'/'.$metaEntity->getEntityName().'Voter.php';
 
         return static::dump($path, $voterContent, $allowOverride) !== false;
     }

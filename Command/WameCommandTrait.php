@@ -14,15 +14,19 @@ trait WameCommandTrait
     protected $rootDir;
 
     protected $defaultBundle;
+    protected $enableTraitOptions;
+    protected $enableDatatables;
+    protected $enableVoters;
 
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         $container = $this->getContainer();
         parent::initialize($input, $output);
 
-        if ($container->hasParameter('wame_sensio_generator.default_bundle')) {
-            $this->defaultBundle = $container->getParameter('wame_sensio_generator.default_bundle');
-        }
+        $this->defaultBundle = $container->getParameter('wame_sensio_generator.default_bundle');
+        $this->enableTraitOptions = $this->getContainer()->getParameter('wame_sensio_generator.enable_traits');
+        $this->enableDatatables = $this->getContainer()->getParameter('wame_sensio_generator.enable_datatables');
+        $this->enableVoters = $this->getContainer()->getParameter('wame_sensio_generator.enable_voters');
 
         if (!$input->hasArgument('entity') || !$input->getArgument('entity')) {
             return;

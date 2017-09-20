@@ -47,7 +47,9 @@ class Generator
         if (is_dir($dir = $this->rootDir.'/Resources/WameSensioGeneratorBundle/skeleton')) {
             $skeletonDirs[] = $dir;
         }
-        $this->setSkeletonDirs([__DIR__.'/../Resources/skeleton']);
+        $skeletonDirs[] = __DIR__.'/../Resources/skeleton';
+
+        $this->setSkeletonDirs($skeletonDirs);
 
         $twigEnvironment = new \Twig_Environment(new \Twig_Loader_Filesystem($this->skeletonDirs), array(
             'debug' => true,
@@ -77,6 +79,9 @@ class Generator
 
     public static function dump($filename, $content, $allowOverwrite = true)
     {
+        //TODO: set other permissions?
+        $dir = dirname($filename);
+        self::mkdir($dir);
         if (file_exists($filename)) {
             if ($allowOverwrite === false) {
                 self::writeln(sprintf('  <fg=yellow>already exists</> %s', self::relativizePath($filename)));
