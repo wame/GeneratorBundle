@@ -3,39 +3,29 @@ declare(strict_types=1);
 
 namespace Wame\SensioGeneratorBundle\Generator;
 
-use Sensio\Bundle\GeneratorBundle\Generator\Generator;
-use Symfony\Component\Filesystem\Filesystem;
 use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
 
 class WameVoterGenerator extends Generator
 {
-    use WameGeneratorTrait;
-
-    public function __construct(string $rootDir)
+    public function generateByMetaEntity(MetaEntity $metaEntity, $allowOverride = false): bool
     {
-        $this->rootDir = $rootDir;
-    }
-
-    public function generateByMetaEntity(MetaEntity $metaEntity)
-    {
-        $fs = new Filesystem();
+        $securityDir = $metaEntity->getBundle()->getPath().'/Security';
 
         //Add the AppVoter if it doesn't exist yet.
-        $path = $metaEntity->getBundle()->getPath().'/Security/AppVoter.php';
-        if ($fs->exists($path) === false) {
+        $path = $securityDir.'/AppVoter.php';
+        if (file_exists($path) === false) {
             $appVoterContent = $this->render('security/AppVoter.php.twig', [
                 'bundle_namespace' => $metaEntity->getBundleNamespace(),
             ]);
-            $fs->dumpFile($path, $appVoterContent);
+            static::dump($path, $appVoterContent);
         }
 
         $voterContent = $this->render('security/voter.php.twig', [
             'meta_entity' => $metaEntity,
         ]);
 
-        $path = $metaEntity->getBundle()->getPath().'/Security/'.$metaEntity->getEntityName().'Voter.php';
-        $fs->dumpFile($path, $voterContent);
+        $path = $securityDir.'/'.$metaEntity->getEntityName().'Voter.php';
 
-        return $path;
+        return static::dump($path, $voterContent, $allowOverride) !== false;
     }
 }

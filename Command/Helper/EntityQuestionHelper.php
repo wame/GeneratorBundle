@@ -4,23 +4,19 @@ declare(strict_types=1);
 namespace Wame\SensioGeneratorBundle\Command\Helper;
 
 use Doctrine\DBAL\Types\Type;
-use Fresh\DoctrineEnumBundle\DBAL\Types\AbstractEnumType;
-use Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Validator\Constraint;
-use Wame\SensioGeneratorBundle\Command\Validators;
+use Wame\SensioGeneratorBundle\Command\WameValidators;
+use Wame\SensioGeneratorBundle\Inflector\Inflector;
 
-/**
- * Generates bundles.
- *
- * @author Fabien Potencier <fabien@symfony.com>
- */
 class EntityQuestionHelper extends QuestionHelper
 {
+    use HelperTrait;
+
     const MAX_OUTPUT_WIDTH = 70;
 
     /** @var RegistryInterface */
@@ -70,6 +66,17 @@ class EntityQuestionHelper extends QuestionHelper
         }
     }
 
+    public function askEntityName(InputInterface $input, OutputInterface $output, string $defaulBundle = null)
+    {
+        $question = new Question($this->getQuestion('Entity name', ''));
+
+        $question->setValidator(WameValidators::getEntityNameValidator($defaulBundle));
+        $question->setAutocompleterValues($this->bundles);
+        $entity = $this->ask($input, $output, $question);
+
+        $input->setArgument('entity', $entity);
+    }
+
     public function askBehaviours(InputInterface $input, OutputInterface $output)
     {
         // ask about timestampable/blameable/softdeletable behaviours
@@ -95,11 +102,6 @@ class EntityQuestionHelper extends QuestionHelper
     public function askDisplayField(InputInterface $input, OutputInterface $output)
     {
         $entityFields = $input->getOption('fields');
-        //Do not ask questions if display-field is already set
-        if ($input->hasOption('display-field') && array_key_exists($input->getOption('display-field'), $entityFields)) {
-            return;
-        }
-
         $output->writeln([
             '',
             'If possible we should add a __toString method, you can do this by picking a "display field"',
@@ -125,21 +127,20 @@ class EntityQuestionHelper extends QuestionHelper
 
         $question = new Question($this->getQuestion('Which field you want to use? (leave empty to skip)', $defaultField), $defaultField);
         $question->setAutocompleterValues(array_keys($displayFieldOptions));
-        $question->setValidator(Validators::getDisplayFieldValidator($displayFieldOptions));
+        $question->setValidator(WameValidators::getDisplayFieldValidator($displayFieldOptions));
 
         $displayField = $this->ask($input, $output, $question);
 
         if ($displayField) {
             $entityFields[$displayField]['displayField'] = true;
             $input->setOption('fields', $entityFields);
-            $input->setOption('display-field', $displayField);
         }
     }
 
     public function askFieldName(InputInterface $input, OutputInterface $output, $fields): ?string
     {
         $question = new Question($this->getQuestion('New field name (press <return> to stop adding fields)', null), null);
-        $question->setValidator(Validators::getFieldNameValidator($fields));
+        $question->setValidator(WameValidators::getFieldNameValidator($fields));
 
         return $this->ask($input, $output, $question);
     }
@@ -149,12 +150,11 @@ class EntityQuestionHelper extends QuestionHelper
         $types = $this->getTypes();
         $this->outputCompactOptionsList($output, $types);
         $typeOptions = array_keys($types);
-
         $defaultType = $this->guessFieldType($columnName);
 
         $question = new Question($this->getQuestion('Field type', $defaultType), $defaultType);
-        $question->setNormalizer(Validators::getTypeNormalizer($types));
-        $question->setValidator(Validators::getTypeValidator($typeOptions));
+        $question->setNormalizer(WameValidators::getTypeNormalizer($types));
+        $question->setValidator(WameValidators::getTypeValidator($typeOptions));
         $question->setAutocompleterValues(array_merge($typeOptions, static::$typeAliases));
         return $this->ask($input, $output, $question);
     }
@@ -162,7 +162,7 @@ class EntityQuestionHelper extends QuestionHelper
     public function askFieldLength(InputInterface $input, OutputInterface $output): ?int
     {
         $question = new Question($this->getQuestion('Field length', 255), 255);
-        $question->setValidator(Validators::getLengthValidator());
+        $question->setValidator(WameValidators::getLengthValidator());
         return $this->ask($input, $output, $question);
     }
 
@@ -170,7 +170,7 @@ class EntityQuestionHelper extends QuestionHelper
     {
         // 10 is the default value given in \Doctrine\DBAL\Schema\Column::$_precision
         $question = new Question($this->getQuestion('Precision', 10), 10);
-        $question->setValidator(Validators::getPrecisionValidator());
+        $question->setValidator(WameValidators::getPrecisionValidator());
         return (int) $this->ask($input, $output, $question);
     }
 
@@ -178,14 +178,14 @@ class EntityQuestionHelper extends QuestionHelper
     {
         // 0 is the default value given in \Doctrine\DBAL\Schema\Column::$_scale
         $question = new Question($this->getQuestion('Scale', 0), 0);
-        $question->setValidator(Validators::getScaleValidator());
+        $question->setValidator(WameValidators::getScaleValidator());
         return (int) $this->ask($input, $output, $question);
     }
 
     public function askFieldNullable(InputInterface $input, OutputInterface $output): ?bool
     {
         $question = new Question($this->getQuestion('Is nullable', 'false'), false);
-        $question->setValidator(Validators::getBoolValidator());
+        $question->setValidator(WameValidators::getBoolValidator());
         $question->setAutocompleterValues(['true', 'false']);
         return $this->ask($input, $output, $question);
     }
@@ -193,12 +193,12 @@ class EntityQuestionHelper extends QuestionHelper
     public function askFieldUnique(InputInterface $input, OutputInterface $output): ?bool
     {
         $question =  new Question($this->getQuestion('Unique', 'false'), false);
-        $question->setValidator(Validators::getBoolValidator());
+        $question->setValidator(WameValidators::getBoolValidator());
         $question->setAutocompleterValues(['true', 'false']);
         return $this->ask($input, $output, $question);
     }
 
-    public function askTargetEntity(InputInterface $input, OutputInterface $output, string $bundleName): ?string
+    public function askTargetEntity(InputInterface $input, OutputInterface $output, string $bundleName, string $columnName): ?string
     {
         $existingEntities = $this->getExistingEntities();
 
@@ -209,11 +209,11 @@ class EntityQuestionHelper extends QuestionHelper
 
         $this->outputCompactOptionsList($output, array_flip($existingEntityOptions));
 
-        //TODO: add default value to show suggestion based on column-name
-        $question = new Question($this->getQuestion('Related Entity', null), null);
+        $defaultEntityOption = $this->guessEntityOption($columnName);
+
+        $question = new Question($this->getQuestion('Related Entity', $defaultEntityOption), $defaultEntityOption);
         $question->setAutocompleterValues(array_keys($existingEntities));
-        $question->setNormalizer(Validators::getEntityNormalizer($bundleName, $existingEntityOptions));
-        // TODO: should we add a validator that checks if the entity exists?
+        $question->setNormalizer(WameValidators::getEntityNormalizer($bundleName, $existingEntityOptions));
         return $this->ask($input, $output, $question);
     }
 
@@ -246,7 +246,7 @@ class EntityQuestionHelper extends QuestionHelper
 
         $question = new Question($this->getQuestion('Which enum type', ''), '');
         $question->setAutocompleterValues(array_keys($enumTypes));
-        $question->setValidator(Validators::getEnumTypeValidator($enumOptionsList));
+        $question->setValidator(WameValidators::getEnumTypeValidator($enumOptionsList));
 
         return $this->ask($input, $output, $question);
     }
@@ -279,7 +279,7 @@ class EntityQuestionHelper extends QuestionHelper
         while (true) {
             $output->writeln('');
             $question = new Question($this->getQuestion('Add validation (press <return> to stop adding)', null));
-            $question->setValidator(Validators::getConstraintValidator($constraintOptions));
+            $question->setValidator(WameValidators::getConstraintValidator($constraintOptions));
             $type = $this->ask($input, $output, $question);
 
             if (!$type) {
@@ -362,35 +362,11 @@ class EntityQuestionHelper extends QuestionHelper
             if (strpos(ltrim($typeClass, '\\'), 'Doctrine\DBAL\Types') === 0) {
                 continue;
             }
-            if (is_subclass_of($typeClass, AbstractEnumType::class)) {
+            if (is_subclass_of($typeClass, 'Fresh\DoctrineEnumBundle\DBAL\Types\AbstractEnumType')) {
                 $enumTypes[$type] = $typeClass;
             }
         }
         return $enumTypes;
-    }
-
-    /**
-     * @return \Doctrine\ORM\Mapping\ClassMetadata[]
-     */
-    protected function getExistingEntities(): array
-    {
-        /** @var \Doctrine\ORM\Mapping\ClassMetadata[] $entityMetadata */
-        $entityMetadata = $this->registry->getManager()->getMetadataFactory()->getAllMetadata();
-
-        $entities = [];
-        foreach ($entityMetadata as $meta) {
-            $entityNamespace = $meta->getName();
-            $shortName = $meta->reflClass->getShortName();
-            $bundle = null;
-            foreach ($this->bundles as $bundleName => $bundleNamespace) {
-                if (strpos($entityNamespace, $bundleName) !== false) {
-                    $bundle = $bundleName;
-                }
-            }
-            $entities[$bundle . ':' . $shortName] = $meta;
-        }
-
-        return $entities;
     }
 
     protected function outputAvailableEntities(OutputInterface $output, array $existingEntityOptions)
@@ -400,38 +376,15 @@ class EntityQuestionHelper extends QuestionHelper
         $output->writeln('');
     }
 
-    protected function outputCompactOptionsList(OutputInterface $output, array $options, $offset = 0)
-    {
-        $count = $offset;
-        $i = 0;
-        foreach ($options as $option => $alias) {
-            if ($count > static::MAX_OUTPUT_WIDTH) {
-                $count = 0;
-                $output->writeln('');
-            }
-            $count += strlen(($alias ? $alias . ': ' : '') . $option);
-            if ($alias !== null) {
-                $output->write(sprintf('<info>%s</info>: ', $alias));
-            }
-            $output->write(sprintf('<comment>%s</comment>', $option));
-            if (count($options) !== $i + 1) {
-                $output->write(', ');
-            } else {
-                $output->write('.');
-            }
-            $i++;
-        }
-        $output->writeln('');
-    }
-
     protected function guessFieldType(string $columnName): string
     {
+        $this->guessFieldIsOneToMany($columnName);
         $lastThreeChars = substr($columnName, -3);
         $lastFourChars = substr($columnName, -4);
         $lastFiveChars = substr($columnName, -5);
         if ($lastThreeChars === '_at' || $lastThreeChars === '_on') {
             return 'datetime';
-        } if ($lastThreeChars === '_id' || $lastFiveChars === 'count') {
+        } if ($lastFiveChars === 'count') {
             return 'integer';
         } if (0 === strpos($columnName, 'is_') || 0 === strpos($columnName, 'has_')) {
             return 'boolean';
@@ -443,7 +396,37 @@ class EntityQuestionHelper extends QuestionHelper
             return 'text';
         } if ($lastFiveChars === 'price') {
             return 'decimal';
+        } if ($this->guessFieldIsOneToMany($columnName)) {
+            return 'one2many';
         }
         return 'string';
+    }
+
+    protected function guessFieldIsOneToMany(string $columnName)
+    {
+        foreach (array_keys($this->getExistingEntities()) as $existingEntity) {
+            $entityParts = explode(':', $existingEntity);
+            if ($columnName === Inflector::pluralTableize($entityParts[1])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected function guessEntityOption(string $columnName): ?string
+    {
+        $defaultEntityOption = null;
+        $columnNameAsPluralEntityName = Inflector::singularize(Inflector::classify($columnName));
+        $columnNameAsEntityName = Inflector::classify(str_replace('_id', '', $columnName));
+        foreach (array_keys($this->getExistingEntities()) as $existingEntity) {
+            $entityParts = explode(':', $existingEntity);
+            if ($columnNameAsPluralEntityName === $entityParts[1] || $columnNameAsEntityName === $entityParts[1]) {
+                $defaultEntityOption = $existingEntity;
+            }
+            if (strpos($entityParts[1], $columnNameAsEntityName) !== false) {
+                $defaultEntityOption = $existingEntity; //Use this option, but don't break loop for there might still be an exact match
+            }
+        }
+        return $defaultEntityOption;
     }
 }

@@ -223,12 +223,11 @@ class MetaEntity
 
     public function getDisplayFieldProperty(): ?MetaProperty
     {
-        $idProperty = null;
         foreach ($this->getProperties() as $property) {
             if ($property->isDisplayField()) {
                 return $property;
             }
         }
-        return $this->getIdProperty();
+        return null;
     }
 }

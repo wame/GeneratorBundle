@@ -1,18 +1,9 @@
 <?php
 declare(strict_types=1);
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Wame\SensioGeneratorBundle\Command;
 
-use Sensio\Bundle\GeneratorBundle\Command\GenerateDoctrineEntityCommand;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Wame\SensioGeneratorBundle\Command\Helper\EntityQuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -22,37 +13,53 @@ use Symfony\Component\DependencyInjection\Container;
 use Wame\SensioGeneratorBundle\Generator\WameEntityGenerator;
 
 /**
- * Initializes a Doctrine entity inside a bundle.
+ * Wame version of GenerateDoctrineEntityCommand
  *
- * @author Fabien Potencier <fabien@symfony.com>
+ * @author Kevin Driessen <kevin@wame.nl>
  */
-class WameEntityCommand extends GenerateDoctrineEntityCommand
+class WameEntityCommand extends ContainerAwareCommand
 {
     use WameCommandTrait;
 
-    protected function configure(): void
+    protected function configure()
     {
-        parent::configure();
         $this->setName('wame:generate:entity')
-            ->addArgument('entity', InputArgument::OPTIONAL, 'The entity class name to initialize (shortcut notation)')
-            ->addOption('no-blameable', null, InputOption::VALUE_OPTIONAL, 'Do not add `blameable` fields/behaviour on the new entity')
-            ->addOption('no-timestampable', null, InputOption::VALUE_OPTIONAL, 'Do not add `timestampable` fields/behaviour on the new entity')
-            ->addOption('no-softdeleteable', null, InputOption::VALUE_OPTIONAL, 'Do not soft-delete the new entity')
-            ->addOption('behaviours', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Adds behavior (options are `blameable`,`timestampable`,`softdeleteable`)')
-            ->addOption('display-field', null, InputOption::VALUE_REQUIRED, 'The field that can represent the entity as a string')
+            ->addArgument('entity', InputArgument::REQUIRED, 'The entity class name to initialize (shortcut notation)')
+            ->addOption('fields', null, InputOption::VALUE_REQUIRED, 'The fields to create with the new entity')
             ->addOption('no-validation', null, InputOption::VALUE_NONE, 'Do not ask to about adding field validation')
-        ;
+            ->addOption('no-blameable', null, InputOption::VALUE_NONE, 'Do not add `blameable` fields/behaviour on the new entity')
+            ->addOption('no-timestampable', null, InputOption::VALUE_NONE, 'Do not add `timestampable` fields/behaviour on the new entity')
+            ->addOption('no-softdeleteable', null, InputOption::VALUE_NONE, 'Do not soft-delete the new entity')
+            ->addOption('behaviours', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Adds behavior (options are `blameable`,`timestampable`,`softdeleteable`)')
+            ->setHelp(<<<EOT
+The <info>%command.name%</info> task generates a new Doctrine
+entity inside a bundle:
 
-        //TODO: remove option entity as this will be removed in 4.0
-        //TODO: remove format option, since we'll always use annotation
-        //TODO: make entity-argument required to save a lot of hassle.
+<info>php %command.full_name% Post</info>
+
+The above command would initialize a new entity in the following entity
+namespace <info>AppBundle\Entity\Post</info>.
+
+You can also optionally specify the fields you want to generate in the new
+entity:
+
+<info>php %command.full_name% Post --fields="title:string(255) body:text"</info>
+
+To deactivate the interaction mode, simply use the <comment>--no-interaction</comment> (or <comment>--n</comment>) option
+without forgetting to pass all needed options:
+
+<info>php %command.full_name% Post --format=annotation --fields="
+title:string(255 unique=true displayField=true) body:text(nullable=true) comment:one2many(targetEntity=Comment)
+" --no-interaction --behaviours=timestampable --behaviours=blameable</info>
+EOT
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $questionHelper = $this->getQuestionHelper();
 
-        $entity = Validators::validateEntityName($input->getArgument('entity'));
+        $entity = WameValidators::validateEntityName($input->getArgument('entity'));
         list($bundle, $entity) = $this->parseShortcutNotation($entity);
 
         $fields = $this->parseFields($input->getOption('fields'));
@@ -63,12 +70,7 @@ class WameEntityCommand extends GenerateDoctrineEntityCommand
 
         $behaviours = $input->hasOption('behaviours') ? $input->getOption('behaviours') : [];
 
-        /** @var WameEntityGenerator $generator */
-        $generator = $this->getGenerator();
-        $generator->generateFromCommand($bundle, $entity, $fields, $behaviours);
-
-        $output->writeln(sprintf('> Generating entity <info>%s</info>: <comment>OK!</comment>', $entity));
-        $output->writeln(sprintf('> Generating repository class <info>%s</info>: <comment>OK!</comment>', $entity.'Repository'));
+        $this->getGenerator()->generate($bundle, $entity, $fields, $behaviours);
 
         $questionHelper->writeGeneratorSummary($output, []);
     }
@@ -96,8 +98,12 @@ class WameEntityCommand extends GenerateDoctrineEntityCommand
         $entityQuestionHelper = $this->getQuestionHelper();
         $entityQuestionHelper->writeSection($output, 'Welcome to the WAME entity generator');
 
+        if (!$input->hasArgument('entity') || !$input->getArgument('entity')) {
+            $entityQuestionHelper->askEntityName($input, $output, $this->defaultBundle);
+        }
+
         //Makes the entity-argument required
-        $entity = Validators::validateEntityName($input->getArgument('entity'));
+        $entity = WameValidators::validateEntityName($input->getArgument('entity'));
         list($bundle, $entity) = $this->parseShortcutNotation($entity);
 
         $bundleNames = array_keys($this->getContainer()->get('kernel')->getBundles());
@@ -111,7 +117,9 @@ class WameEntityCommand extends GenerateDoctrineEntityCommand
             return;
         }
 
-        $entityQuestionHelper->askBehaviours($input, $output);
+        if ($this->enableTraitOptions) {
+            $entityQuestionHelper->askBehaviours($input, $output);
+        }
 
         // fields
         $input->setOption('fields', $this->addFields($input, $output, $entityQuestionHelper));
@@ -120,14 +128,57 @@ class WameEntityCommand extends GenerateDoctrineEntityCommand
         $entityQuestionHelper->askDisplayField($input, $output);
     }
 
-    protected function parseFields($inputFields)
+    /**
+     * Copy of parseFields in Sensio\Bundle\GeneratorBundle\Command\GenerateDoctrineEntityCommand
+     */
+    protected function parseFields($input): array
     {
-        //The parent method is private, so instead of parent::parseField, we use ReflectionClass
-        $method = (new \ReflectionClass(parent::class))->getMethod('parseFields');
-        $method->setAccessible(true);
-        return $method->invoke($this, $inputFields);
-    }
+        $input = $input ?: '';
+        if (is_array($input)) {
+            return $input;
+        }
 
+        $fields = array();
+        foreach (preg_split('{(?:\([^\(]*\))(*SKIP)(*F)|\s+}', $input) as $value) {
+            $elements = explode(':', $value);
+            $name = $elements[0];
+            $fieldAttributes = array();
+            if (strlen($name)) {
+                $fieldAttributes['fieldName'] = $name;
+                $type = isset($elements[1]) ? $elements[1] : 'string';
+                preg_match_all('{(.*)\((.*)\)}', $type, $matches);
+                $fieldAttributes['type'] = isset($matches[1][0]) ? $matches[1][0] : $type;
+                $length = null;
+                if ('string' === $fieldAttributes['type']) {
+                    $fieldAttributes['length'] = $length;
+                }
+                if (isset($matches[2][0]) && $length = $matches[2][0]) {
+                    $attributesFound = array();
+                    if (false !== strpos($length, '=')) {
+                        preg_match_all('{([^,= ]+)=([^,= ]+)}', $length, $result);
+                        $attributesFound = array_combine($result[1], $result[2]);
+                    } else {
+                        $fieldAttributes['length'] = $length;
+                    }
+                    $fieldAttributes = array_merge($fieldAttributes, $attributesFound);
+                    foreach (array('length', 'precision', 'scale') as $intAttribute) {
+                        if (isset($fieldAttributes[$intAttribute])) {
+                            $fieldAttributes[$intAttribute] = (int) $fieldAttributes[$intAttribute];
+                        }
+                    }
+                    foreach (array('nullable', 'unique') as $boolAttribute) {
+                        if (isset($fieldAttributes[$boolAttribute])) {
+                            $fieldAttributes[$boolAttribute] = filter_var($fieldAttributes[$boolAttribute], FILTER_VALIDATE_BOOLEAN);
+                        }
+                    }
+                }
+
+                $fields[$name] = $fieldAttributes;
+            }
+        }
+
+        return $fields;
+    }
 
     protected function addFields(InputInterface $input, OutputInterface $output, EntityQuestionHelper $entityQuestionHelper)
     {
@@ -158,10 +209,10 @@ class WameEntityCommand extends GenerateDoctrineEntityCommand
                 $data['precision'] = $entityQuestionHelper->askFieldPrecision($input, $output);
                 $data['scale'] = $entityQuestionHelper->askFieldScale($input, $output);
             } elseif (in_array($type, ['one2one', 'many2one', 'many2many', 'one2many'], true)) {
-                $data['targetEntity'] = $entityQuestionHelper->askTargetEntity($input, $output, $bundle);
+                $data['targetEntity'] = $entityQuestionHelper->askTargetEntity($input, $output, $bundle, $columnName);
                 $data['referencedColumnName'] = $entityQuestionHelper->askReferenceColumnName($input, $output, $data['targetEntity']);
             } elseif ('enum' === $type) {
-                list ($enumType, $enumTypeClass) = $entityQuestionHelper->askFieldEnumType($input, $output, $bundle);
+                list ($enumType, $enumTypeClass) = $entityQuestionHelper->askFieldEnumType($input, $output);
                 $data['enumType'] = $enumType;
                 $data['enumTypeClass'] = $enumTypeClass;
             }
@@ -179,7 +230,7 @@ class WameEntityCommand extends GenerateDoctrineEntityCommand
         return $fields;
     }
 
-    protected function createGenerator()
+    protected function getGenerator(): WameEntityGenerator
     {
         return $this->getContainer()->get(WameEntityGenerator::class);
     }

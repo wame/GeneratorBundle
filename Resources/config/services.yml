@@ -35,13 +35,11 @@ services:
         public: true
         class:  Wame\SensioGeneratorBundle\Generator\WameTranslationGenerator
         arguments:
-            - '%kernel.root_dir%/Resources/translations'
+            - '%kernel.root_dir%'
             - '%locale%'
     Wame\SensioGeneratorBundle\Generator\WameEntityGenerator:
         public: true
         arguments:
-            - '@filesystem'
-            - '@doctrine'
             - '@wame_translation_generator'
             - '@wame_repository_generator'
             - '%kernel.root_dir%'
