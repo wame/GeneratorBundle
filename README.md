@@ -1,28 +1,3 @@
-### TODO's
-
-- enum generate command: generator is (near) complete, but command needs to be added.
-- 'savepoint file': at least for entities, it'd be nice to start from a saved point after a mistake 
-  was made.
-- usage of the 'Resources/translations/roles.(en|nl).yml.twig'
-- interface: a concept is created, but no longer works after several changes.
-- configuration: 
-    - there are configuration settings for using different trait-classes,
-but the generator does not take these settings into account.
-This should be implemented or the settings should be removed.
-    - a setting for using datatables by default exists, but the generator
-    currently ignores this setting. This is still to be implemented.
-    - More settings/defaults:  
-    we may want to set specific traits to be used or not by default. 
-    For instance, some application may never use datatables, so that
-    option should be possible to disable for those applications.
-- tests  
-    - currently, this bundle still holds the sensio-testfiles, but these no
-    longer are compatible with this bundle. These tests need to be modified and
-    extended. 
-    - The sensiogenerator also generated test-files. Since files are rather empty,
-    they are left out, but generating test files still might be quite helpful.
-       
-
 WameSensioGeneratorBundle
 =====================
 
@@ -33,17 +8,14 @@ command names: `doctrine:generate:entity` becomes `wame:generate:entity`
 For more information about the sensioGeneratorBundle, see the official
 [SensioGeneratorBundle documentation](http://symfony.com/doc/current/bundles/SensioGeneratorBundle/index.html).
 
-## Goal of this bundle
 The SensioGenerator lacks what we want:
-* Typehints to conform PHP 7.1.
+* PHP 7.1 enables more typehints. We intent to use them.
 * Generation of entity relationships (many2one, one2many, one2one, many2many)
-* Ability to select enum-types.
-* Gedmo traits: for many entities we use softdeleteable, timestampable and/or blameable.
-* Datatables: for large sets of data a simple table won't do, so we use
-sg_datatables for them.
+* Ability to use enum-types.
+* Gedmo traits: we often use softdeleteable, timestampable and/or blameable.
+* Datatables: for large sets of data a simple table won't do, so we use sg_datatables for them.
 * Voters: for many entities with CRUD, we use specific voters. 
-* Translations: even though we may not need a multilanguage application, we
-use translation files for many names such as column names.
+* Translations: even though we may not need a multilanguage application, we use translation files for many names such as column names.
 
 This bundle adds these features.
 
@@ -77,7 +49,7 @@ The following configuration show the default settings:
         enable_traits: true         #use false if you don't plan on using gedmo traits
         enable_datatables: true     #use false if you don't plan on using SgDatatables
 
-##Entity generation
+## Entity generation
 
 command: `wame:generate:entity`  
 
@@ -158,9 +130,7 @@ Multiple validations can be passed by seperating them by a ';' as shown in the e
 It is not possible to set validation-options. You'll still need to modify the entity if
 you need them.
 
-
-
-##CRUD generation
+## CRUD generation
 
 command: `wame:generate:crud` 
 
@@ -178,8 +148,6 @@ add this option if you want to have the voter generated.
 
 These options only need to be used in non-interactive mode, since they will
 be asked for during interactive mode.
-
-
 
 ## Form generation
 
@@ -262,7 +230,7 @@ This file will only be generated if it doesn't exist yet and is not affected
 by the `--overwrite` option.
 
 
-#### Overwriting twig files
+## Overwriting twig files
 
 Just like the SensioGenerator, you can overwrite the twig skeleton files of the WameSensioGenerator
 in the following directory:
@@ -276,3 +244,29 @@ More than just crud, this bundle allows you to overwrite the following parts as 
 - repository
 - voter
 - translation
+
+## TODO's
+
+- enum generate command: generator is (near) complete, but command needs to be added.
+- 'savepoint file': at least for entities, it'd be nice to start from a saved point after a mistake 
+  was made.
+- usage of the 'Resources/translations/roles.(en|nl).yml.twig'
+- interface: a concept is created, but no longer works after several changes.
+- configuration: 
+    - there are configuration settings for using different trait-classes,
+but the generator does not take these settings into account.
+This should be implemented or the settings should be removed.
+    - a setting for using datatables by default exists, but the generator
+    currently ignores this setting. This is still to be implemented.
+    - More settings/defaults:  
+    we may want to set specific traits to be used or not by default. 
+    For instance, some application may never use datatables, so that
+    option should be possible to disable for those applications.
+- tests  
+    - currently, this bundle still holds the sensio-testfiles, but these no
+    longer are compatible with this bundle. These tests need to be modified and
+    extended. 
+    - The sensiogenerator also generated test-files. Since files are rather empty,
+    they are left out, but generating test files still might be quite helpful.
+- rename bundle:  
+This bundle started as a fork from SensioGeneratorBundle to just make a few modifications in the original code. Since we already have a WameGeneratorBundle, we named this form to WameSensioGeneratorBundle. However, for most code an entirely different approached is used and 'few' has become alot, so the 'Sensio' part feels a bit odd at this point.
