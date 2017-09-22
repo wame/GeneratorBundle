@@ -32,10 +32,7 @@ class WameEnumCommand extends ContainerAwareCommand
 
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
-        $container = $this->getContainer();
-        parent::initialize($input, $output);
-
-        $this->defaultBundle = $container->getParameter('wame_sensio_generator.default_bundle');
+        $this->initializeBaseSettings($input, $output);
 
         if (!$input->hasArgument('enum') || !$input->getArgument('enum')) {
             return;

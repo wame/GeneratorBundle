@@ -19,7 +19,7 @@ trait WameCommandTrait
     protected $enableDatatables;
     protected $enableVoters;
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initializeBaseSettings(InputInterface $input, OutputInterface $output)
     {
         $container = $this->getContainer();
         parent::initialize($input, $output);
@@ -38,6 +38,11 @@ trait WameCommandTrait
         if ($this->defaultBundle !== null && strpos($entity, ':') === false) {
             $input->setArgument('entity', $this->defaultBundle.':'.$entity);
         }
+    }
+
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        $this->initializeBaseSettings($input, $output);
     }
 
     protected function validateEntityInput(InputInterface $input): void
