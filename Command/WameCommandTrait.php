@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Mapping\DisconnectedMetadataFactory;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Wame\SensioGeneratorBundle\Command\Helper\CrudQuestionHelper;
+use Wame\SensioGeneratorBundle\Inflector\Inflector;
 use Wame\SensioGeneratorBundle\MetaData\MetaEntityFactory;
 
 trait WameCommandTrait
@@ -18,7 +19,7 @@ trait WameCommandTrait
     protected $enableDatatables;
     protected $enableVoters;
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initializeBaseSettings(InputInterface $input, OutputInterface $output)
     {
         $container = $this->getContainer();
         parent::initialize($input, $output);
@@ -32,11 +33,16 @@ trait WameCommandTrait
             return;
         }
 
-        $entity = $input->getArgument('entity');
+        $entity = Inflector::classify($input->getArgument('entity'));
 
         if ($this->defaultBundle !== null && strpos($entity, ':') === false) {
             $input->setArgument('entity', $this->defaultBundle.':'.$entity);
         }
+    }
+
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        $this->initializeBaseSettings($input, $output);
     }
 
     protected function validateEntityInput(InputInterface $input): void

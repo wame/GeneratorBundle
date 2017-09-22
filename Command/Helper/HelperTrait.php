@@ -11,6 +11,9 @@ trait HelperTrait
     /** @var RegistryInterface */
     protected $registry;
 
+    /** @var array */
+    protected $bundles;
+
     /**
      * @return \Doctrine\ORM\Mapping\ClassMetadata[]
      */

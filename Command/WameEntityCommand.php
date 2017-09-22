@@ -63,6 +63,8 @@ EOT
         list($bundle, $entity) = $this->parseShortcutNotation($entity);
 
         $fields = $this->parseFields($input->getOption('fields'));
+        WameValidators::validateFields($fields);
+        $fields = WameValidators::normalizeFields($fields);
 
         $questionHelper->writeSection($output, 'Entity generation');
 

@@ -47,7 +47,7 @@ class WameEntityGenerator extends Generator
         foreach ($fields as $field) {
             $metaProperty = (new MetaProperty())
                 ->setName($field['fieldName'])
-                ->setColumnName($field['columnName'])
+                ->setColumnName($field['columnName'] ?? $field['fieldName'])
                 ->setType($field['type'] ?? 'string')
                 ->setLength($field['length'] ?? null)
                 ->setUnique($field['unique'] ?? false)
@@ -62,13 +62,10 @@ class WameEntityGenerator extends Generator
                 ->setEnumType($field['enumType'] ?? null)
                 ->setId($field['id'] ?? false)
             ;
-            $validations = $field['validation'] ?? [];
+            $validations = isset($field['validation']) ? explode(';', $field['validation']): [];
+
             foreach ($validations as $validation) {
-                $metaProperty->addValidation(
-                    (new MetaValidation())
-                        ->setType($validation['type'])
-                        ->setOptions($validation['options'] ?? [])
-                );
+                $metaProperty->addValidation((new MetaValidation())->setType($validation));
             }
             $metaEntity->addProperty($metaProperty);
         }

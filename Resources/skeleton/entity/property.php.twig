@@ -19,7 +19,7 @@
 
 {%- block property_setter %}
     {{-''}}
-    public function set{{ property.name | capitalize }}({{ property.nullable ? '?' : '' }}{{ property.returnType }} ${{ property.name }}): self
+    public function set{{ property.name | classify }}({{ property.nullable ? '?' : '' }}{{ property.returnType }} ${{ property.name }}): self
     {
         $this->{{ property.name }} = ${{ property.name }};
 
@@ -29,7 +29,7 @@
 
 {%- block property_getter %}
     {{-''}}
-    public function get{{ property.name | capitalize }}(): ?{{ property.returnType }}
+    public function get{{ property.name | classify }}(): ?{{ property.returnType }}
     {
         return $this->{{ property.name }};
     }

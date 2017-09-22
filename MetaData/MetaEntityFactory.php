@@ -74,6 +74,7 @@ class MetaEntityFactory
                     ->setName($fieldName)
                     ->setColumnName($joinColumn['name'] ?? null)
                     ->setType(static::getRelationTypeFromAssociationMapping($associationMapping))
+                    ->setTargetEntity(static::getTargetEntityShortCutName($associationMapping['targetEntity'] ?? null))
                     ->setNullable($joinColumn['nullable'] ?? false)
                     ->setReferencedColumnName($joinColumn['referencedColumnName'] ?? 'id')
                     ->setUnique($joinColumn['unique'] ?? false)
@@ -96,22 +97,37 @@ class MetaEntityFactory
         return false;
     }
 
+    protected static function getTargetEntityShortCutName(?string $targetEntiyClassName): ?string
+    {
+        if (!$targetEntiyClassName) {
+            return null;
+        }
+        $targetEntityParts = explode('\\Entity\\', $targetEntiyClassName);
+        return $targetEntityParts[0] . ':' . $targetEntityParts[1];
+    }
+
     protected static function getRelationTypeFromAssociationMapping($associationMapping)
     {
         $type = null;
-        switch ($associationMapping['type']){
-            case 1:
-                $type = 'many2many';    //TODO: checken of dit klopt
-                break;
+        $mappingType = (int) $associationMapping['type'];
+        switch ($mappingType) {
             case 2:
                 $type = 'many2one';
                 break;
-            case 3:
-                $type = 'one2one';    //TODO: checken of dit klopt
+            case 1:
+                $type = 'one2one';
                 break;
             case 4:
                 $type = 'one2many';
                 break;
+            case 8:
+                $type = 'many2many';
+                break;
+        }
+        if ($type === null) {
+            dump("TODO: fix this type-retrieval");
+            dump($associationMapping);
+            exit();
         }
         return $type;
     }

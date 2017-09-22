@@ -85,7 +85,16 @@ EOT
 
         $crudQuestionHelper->writeSection($output, 'CRUD generation');
 
-        $this->getGenerator()->generate($bundle, $entity, $metadata[0], $prefix, $withWrite, $forceOverwrite, $withDatatable, $withVoter);
+        try {
+            $this->getGenerator()->generate($bundle, $entity, $metadata[0], $prefix, $withWrite, $forceOverwrite, $withDatatable, $withVoter);
+        } catch (\RuntimeException $exception) {
+            //The generator may throw an exception because the controller already exists, but we still want to generate the other classes
+            if ($forceOverwrite === false) {
+                $output->writeln(sprintf('<error>%s</error>', $exception->getMessage()));
+            } else { //however, if forceOverwrite is set, an error shouldn't be thrown because of an existing controller, so in this case we throw the error
+                throw new $exception;
+            }
+        }
 
         $metaEntity = MetaEntityFactory::createFromClassMetadata($metadata[0], $bundle);
 
