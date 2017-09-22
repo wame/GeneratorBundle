@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Wame\SensioGeneratorBundle\Generator;
 
-use Symfony\Component\Filesystem\Filesystem;
 use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
 
 class WameRepositoryGenerator extends Generator

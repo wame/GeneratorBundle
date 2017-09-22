@@ -230,6 +230,34 @@ This file will only be generated if it doesn't exist yet and is not affected
 by the `--overwrite` option.
 
 
+## Enum generation
+
+command: `wame:generate:enum`  
+argument: `enum`  
+options:  `--overwrite`, `--options`
+
+For `--options` a string can be provided that contains sets for each options
+in the following format:  
+"value,CONST,Label|value-two,CONST_TWO,Label two"
+
+For example, if you wish to create a StatusType with 'new', 'in-progress' and
+'completed' options, you could use the following command:  
+
+    php bin/console wame:generate:enum StatusType --options="new,NEW,New|in-progress,IN_PROGRESS,In progress|completed,COMPLETED,Completed"
+
+If you so prefer, you can also use the array format, but make sure it is provided as a string:
+
+    php bin/console wame:generate:enum StatusType --options="[
+        [new,NEW,New],
+        [in-progress,IN_PROGRESS,In progress]
+        [completed,COMPLETED,Completed]
+    ]"
+
+If you're feeling extra lazy, you can leave out the constant and label. These 
+will then automatically be determined by the generator.
+
+    php bin/console wame:generate:enum StatusType --options="new|in-progress|completed"
+
 ## Overwriting twig files
 
 Just like the SensioGenerator, you can overwrite the twig skeleton files of the WameSensioGenerator
@@ -247,7 +275,6 @@ More than just crud, this bundle allows you to overwrite the following parts as 
 
 ## TODO's
 
-- enum generate command: generator is (near) complete, but command needs to be added.
 - 'savepoint file': at least for entities, it'd be nice to start from a saved point after a mistake 
   was made.
 - usage of the 'Resources/translations/roles.(en|nl).yml.twig'

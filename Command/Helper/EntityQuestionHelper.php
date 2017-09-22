@@ -23,9 +23,6 @@ class EntityQuestionHelper extends QuestionHelper
     protected $registry;
 
     /** @var array */
-    protected $bundles;
-
-    /** @var array */
     protected $configuredTypes = [];
 
     protected $behaviours = [
@@ -99,7 +96,7 @@ class EntityQuestionHelper extends QuestionHelper
         $input->setOption('behaviours', $behaviours);
     }
 
-    public function askDisplayField(InputInterface $input, OutputInterface $output)
+    public function askDisplayField(InputInterface $input, OutputInterface $output): void
     {
         $entityFields = $input->getOption('fields');
         $output->writeln([
@@ -345,7 +342,7 @@ class EntityQuestionHelper extends QuestionHelper
         return $this->constraints;
     }
 
-    protected function getTypes()
+    protected function getTypes(): array
     {
         $types = array_merge(Type::getTypesMap(), $this->configuredTypes);
         $types = array_keys($types);
@@ -355,7 +352,7 @@ class EntityQuestionHelper extends QuestionHelper
         return $types;
     }
 
-    protected function getEnumTypes()
+    protected function getEnumTypes(): array
     {
         $enumTypes = [];
         foreach ($this->configuredTypes as $type => $typeClass) {
@@ -378,7 +375,6 @@ class EntityQuestionHelper extends QuestionHelper
 
     protected function guessFieldType(string $columnName): string
     {
-        $this->guessFieldIsOneToMany($columnName);
         $lastThreeChars = substr($columnName, -3);
         $lastFourChars = substr($columnName, -4);
         $lastFiveChars = substr($columnName, -5);
@@ -402,7 +398,7 @@ class EntityQuestionHelper extends QuestionHelper
         return 'string';
     }
 
-    protected function guessFieldIsOneToMany(string $columnName)
+    protected function guessFieldIsOneToMany(string $columnName): bool
     {
         foreach (array_keys($this->getExistingEntities()) as $existingEntity) {
             $entityParts = explode(':', $existingEntity);

@@ -25,7 +25,7 @@ class MetaEnumType
     /**
      * Creates ArrayCollection of MetaEnumTypes out of array in which the array conforms the following format:
      *      [
-     *          [{constant}, {value}, {label}],
+     *          [{value}, {constant}, {label}],
      *          ...
      *      ]
      */
@@ -33,10 +33,10 @@ class MetaEnumType
     {
         $metaEnumType = new MetaEnumType();
         foreach ($enumArrays as $enumArray) {
-            $metaEnumType->options->add(
+            $metaEnumType->getOptions()->add(
                 (new MetaEnumTypeOption())
-                    ->setConst($enumArray[0])
-                    ->setValue($enumArray[1])
+                    ->setValue($enumArray[0])
+                    ->setConst($enumArray[1])
                     ->setLabel($enumArray[2])
             );
         }

@@ -22,7 +22,7 @@ class MetaEnumTypeOption
         return $this->metaEnumType;
     }
 
-    public function setMetaEnumType(?$metaEnumType): self
+    public function setMetaEnumType(?MetaEnumType $metaEnumType): self
     {
         $this->metaEnumType = $metaEnumType;
         return $this;

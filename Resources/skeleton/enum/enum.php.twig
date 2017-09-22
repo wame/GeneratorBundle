@@ -13,8 +13,10 @@ final class {{ meta_enum.className }} extends AbstractEnumType
     {% endfor %}
 
     protected static $choices = [
-        {% for option in meta_enum.options -%}
-        self::{{ option.const | upper }} => '{{ option.label }}',
-        {% endfor %}
+        {%- for option in meta_enum.options -%}
+            {{- '\n        ' -}}
+            self::{{ option.const | upper }} => '{{ option.label }}',
+        {%- endfor -%}
+        {{- '\n    ' -}}
     ];
 }

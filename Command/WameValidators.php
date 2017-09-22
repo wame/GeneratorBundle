@@ -7,11 +7,27 @@ use Wame\SensioGeneratorBundle\Inflector\Inflector;
 
 class WameValidators extends Validators
 {
-    public static function getEntityNameValidator($defaulBundle): callable
+    public static function getEnumNameValidator($defaultBundle): callable
     {
-        return function ($name) use ($defaulBundle) {
-            if (strpos($name, ':') === false && $defaulBundle !== null) {
-                $name = $defaulBundle. ':'. $name;
+        return function ($enum) use ($defaultBundle) {
+            if (!preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $enum)) {
+                throw new \InvalidArgumentException('The enum name contains invalid characters.');
+            }
+            if (!preg_match('/Type$/', $enum)) {
+                throw new \InvalidArgumentException('The enum name must end with Type.');
+            }
+            if ($defaultBundle !== null && strpos($enum, ':') === false) {
+                $enum = $defaultBundle. ':'. $enum;
+            }
+            return $enum;
+        };
+    }
+
+    public static function getEntityNameValidator($defaultBundle): callable
+    {
+        return function ($name) use ($defaultBundle) {
+            if ($defaultBundle !== null && strpos($name, ':') === false) {
+                $name = $defaultBundle. ':'. $name;
             }
             return static::validateEntityName($name);
         };
