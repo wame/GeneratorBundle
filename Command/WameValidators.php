@@ -236,4 +236,54 @@ class WameValidators extends Validators
             return $field;
         };
     }
+
+    public static function validateFields(array $fields)
+    {
+        foreach ($fields as $field) {
+            $propertyName = isset($field['fieldName']) ? Inflector::camelize($field['fieldName']) : Inflector::camelize($field['columnName']);
+
+            $type = $field['type'] ?? null;
+            $targetEntity = $field['targetEntity'] ?? null;
+            $mappedBy = $field['mappedBy'] ?? null;
+            $inversedBy = $field['inversedBy'] ?? null;
+
+            if ($targetEntity === null && in_array($type, ['many2one', 'one2one', 'one2many', 'many2many'], true)) {
+                throw new \InvalidArgumentException(sprintf('The property \'%s\' is of type \'%s\', but has no targetEntity', $propertyName, $type));
+            }
+
+            if ($mappedBy && $inversedBy) {
+                throw new \InvalidArgumentException(sprintf('The property \'%s\' has both mappedBy and inversedBy set, which is not a possible combination', $propertyName));
+            }
+            if ($type === 'one2many' && $inversedBy) {
+                throw new \InvalidArgumentException(sprintf('The property \'%s\' is one2many, but has inversedBy set, which is not a possibile combination', $propertyName));
+            }
+            if ($type === 'many2one' && $mappedBy) {
+                throw new \InvalidArgumentException(sprintf('The property \'%s\' is many2one, but has mappedBy set, which is not a possibile combination', $propertyName));
+            }
+        }
+    }
+    public static function normalizeFields(array $fields): array
+    {
+        $newFieldSet = [];
+        foreach ($fields as $field) {
+            $propertyName = isset($field['fieldName']) ? Inflector::camelize($field['fieldName']) : Inflector::camelize($field['columnName']);
+            $columnName = $field['columnName'] ?? Inflector::tableize($propertyName);
+
+            $field['fieldName'] = $propertyName;
+            $field['columnName'] = $columnName;
+
+            $type = $field['type'] ?? null;
+
+            if (in_array($type, ['many2one', 'one2one'], true)) {
+                if (substr($propertyName, -2) === 'Id') {
+                    $field['fieldName'] = str_replace('Id', '', $propertyName);
+                }
+                if (substr($columnName, -3) !== '_id') {
+                    $field['columnName'] = $columnName.'_id';
+                }
+            }
+            $newFieldSet[] = $field;
+        }
+        return $newFieldSet;
+    }
 }

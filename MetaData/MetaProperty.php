@@ -231,7 +231,7 @@ class MetaProperty
     {
         //One2many MUST be mapped by other entity
         if ($this->mappedBy === null && $this->type === 'one2many') {
-            return Inflector::pluralize(Inflector::camelize($this->getEntity()->getEntityName()));
+            return Inflector::camelize($this->getEntity()->getEntityName());
         }
         return $this->mappedBy;
     }

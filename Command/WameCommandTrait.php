@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Mapping\DisconnectedMetadataFactory;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Wame\SensioGeneratorBundle\Command\Helper\CrudQuestionHelper;
+use Wame\SensioGeneratorBundle\Inflector\Inflector;
 use Wame\SensioGeneratorBundle\MetaData\MetaEntityFactory;
 
 trait WameCommandTrait
@@ -32,7 +33,7 @@ trait WameCommandTrait
             return;
         }
 
-        $entity = $input->getArgument('entity');
+        $entity = Inflector::classify($input->getArgument('entity'));
 
         if ($this->defaultBundle !== null && strpos($entity, ':') === false) {
             $input->setArgument('entity', $this->defaultBundle.':'.$entity);
