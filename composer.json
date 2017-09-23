@@ -1,14 +1,10 @@
 {
     "name": "wame/generator-bundle",
-    "description": "This bundle generates code for you",
-    "keywords": [],
+    "description": "Generator for your symfony entities and crud",
+    "keywords": ["wame", "generator", "symfony", "symfony3"],
     "type": "symfony-bundle",
     "license": "MIT",
     "authors": [
-        {
-            "name": "Fabien Potencier",
-            "email": "fabien@symfony.com"
-        },
         {
             "name": "Kevin Driessen",
             "email": "kevin@wame.nl"
@@ -30,6 +26,11 @@
         "symfony/filesystem": "~2.7|~3.0",
         "symfony/phpunit-bridge": "^3.3",
         "doctrine/orm": "~2.4"
+    },
+    "suggest": {
+        "sg/datatablesbundle": "^1.0",
+        "stof/doctrine-extensions-bundle": "^1.2",
+        "fresh/doctrine-enum-bundle": "^5.0"
     },
     "autoload": {
         "psr-4": { "Wame\\GeneratorBundle\\": "" },

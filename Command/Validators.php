@@ -4,6 +4,9 @@ declare(strict_types=1);
 /*
  * TRY NOT TO MODIFY
  * This file is a copy of the Sensio\Bundle\GeneratorBundle\Command\Validators
+ *
+ * Original file:
+ * https://github.com/sensiolabs/SensioGeneratorBundle/blob/v3.1.6/Command/Validators.php
  */
 
 namespace Wame\GeneratorBundle\Command;
