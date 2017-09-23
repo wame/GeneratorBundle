@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Wame\SensioGeneratorBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Exception\InvalidOptionException;
 use Wame\SensioGeneratorBundle\Command\Helper\EntityQuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -31,6 +32,7 @@ class WameEntityCommand extends ContainerAwareCommand
             ->addOption('no-timestampable', null, InputOption::VALUE_NONE, 'Do not add `timestampable` fields/behaviour on the new entity')
             ->addOption('no-softdeleteable', null, InputOption::VALUE_NONE, 'Do not soft-delete the new entity')
             ->addOption('behaviours', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Adds behavior (options are `blameable`,`timestampable`,`softdeleteable`)')
+            ->addOption( 'savepoint', 's', InputOption::VALUE_NONE, 'Load savepoint (interactive mode only)')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> task generates a new Doctrine
 entity inside a bundle:
@@ -98,29 +100,34 @@ EOT
     protected function interact(InputInterface $input, OutputInterface $output)
     {
         $entityQuestionHelper = $this->getQuestionHelper();
-        $entityQuestionHelper->writeSection($output, 'Welcome to the WAME entity generator');
 
-        if (!$input->hasArgument('entity') || !$input->getArgument('entity')) {
-            $entityQuestionHelper->askEntityName($input, $output, $this->defaultBundle);
-        }
+        if ($input->hasOption('load-savepoint') && $input->getOption('load-savepoint')) {
+            $input = $this->loadSavePoint($input, $output);
+        } else {
+            $entityQuestionHelper->writeSection($output, 'Welcome to the WAME entity generator');
 
-        //Makes the entity-argument required
-        $entity = WameValidators::validateEntityName($input->getArgument('entity'));
-        list($bundle, $entity) = $this->parseShortcutNotation($entity);
+            if (!$input->hasArgument('entity') || !$input->getArgument('entity')) {
+                $entityQuestionHelper->askEntityName($input, $output, $this->defaultBundle);
+            }
 
-        $bundleNames = array_keys($this->getContainer()->get('kernel')->getBundles());
-        if (in_array($bundle, $bundleNames, true) === false) {
-            $output->writeln(sprintf('<bg=red>Bundle "%s" does not exist.</>', $bundle));
-            return;
-        }
-        // check reserved words
-        if ($this->isReservedWord($entity)) {
-            $output->writeln(sprintf('<bg=red> "%s" is a reserved word</>.', $entity));
-            return;
-        }
+            //Makes the entity-argument required
+            $entity = WameValidators::validateEntityName($input->getArgument('entity'));
+            list($bundle, $entity) = $this->parseShortcutNotation($entity);
 
-        if ($this->enableTraitOptions) {
-            $entityQuestionHelper->askBehaviours($input, $output);
+            $bundleNames = array_keys($this->getContainer()->get('kernel')->getBundles());
+            if (in_array($bundle, $bundleNames, true) === false) {
+                $output->writeln(sprintf('<bg=red>Bundle "%s" does not exist.</>', $bundle));
+                return;
+            }
+            // check reserved words
+            if ($this->isReservedWord($entity)) {
+                $output->writeln(sprintf('<bg=red> "%s" is a reserved word</>.', $entity));
+                return;
+            }
+
+            if ($this->enableTraitOptions) {
+                $entityQuestionHelper->askBehaviours($input, $output);
+            }
         }
 
         // fields
@@ -187,7 +194,7 @@ EOT
         $fields = $this->parseFields($input->getOption('fields'));
         $output->writeln(array(
             '',
-            'Instead of starting with a blank entity, you can add some fields now.',
+            'You can add some fields now.',
             'Note that the primary key will be added automatically (named <comment>id</comment>).',
             '',
         ));
@@ -228,6 +235,8 @@ EOT
             $data['validation'] = $entityQuestionHelper->askFieldValidations($input, $output);
 
             $fields[$columnName] = $data;
+
+            $this->makeSavePoint($input, $fields);
         }
         return $fields;
     }
@@ -235,5 +244,38 @@ EOT
     protected function getGenerator(): WameEntityGenerator
     {
         return $this->getContainer()->get(WameEntityGenerator::class);
+    }
+
+    protected function makeSavePoint(InputInterface $input, $fields)
+    {
+        $input->setOption('fields', $fields);
+        $cacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
+        $savePointPath = $cacheDir. '/generator-savepoint.txt';
+        file_put_contents($savePointPath, serialize($input));
+    }
+
+    protected function loadSavePoint(InputInterface $input, OutputInterface $output): InputInterface
+    {
+        $entityQuestionHelper = $this->getQuestionHelper();
+        $savePointPath = $this->getContainer()->getParameter('kernel.cache_dir'). '/generator-savepoint.txt';
+
+        if (file_exists($savePointPath) === false) {
+            throw new InvalidOptionException("No savepoint found. You cannot use the --savepoint option before a savepoint is created.");
+        }
+
+        /** @var InputInterface $savePointInput */
+        $savePointInput = unserialize(file_get_contents($savePointPath));
+
+        $input->setArgument('entity', $savePointInput->getArgument('entity'));
+        $input->setOption('behaviours', $savePointInput->getOption('behaviours'));
+        $input->setOption('fields', $savePointInput->getOption('fields'));
+
+        $entityQuestionHelper->writeSection($output, 'Using entity savepoint for '. $input->getArgument('entity'));
+
+        $fields = $this->parseFields($input->getOption('fields'));
+
+        $output->writeln(sprintf('<info>Fields added so far: %s</info>', implode(', ', array_keys($fields))));
+
+        return $input;
     }
 }
