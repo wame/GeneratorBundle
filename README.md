@@ -9,15 +9,48 @@ For more information about the sensioGeneratorBundle, see the official
 [SensioGeneratorBundle documentation](http://symfony.com/doc/current/bundles/SensioGeneratorBundle/index.html).
 
 The SensioGenerator lacks what we want:
-* PHP 7.1 enables more typehints. We intent to use them.
+* PHP 7.1 enables more type hinting. We intent to use them.
 * Generation of entity relationships (many2one, one2many, one2one, many2many)
 * Ability to use enum-types.
 * Gedmo traits: we often use softdeleteable, timestampable and/or blameable.
 * Datatables: for large sets of data a simple table won't do, so we use sg_datatables for them.
 * Voters: for many entities with CRUD, we use specific voters. 
-* Translations: even though we may not need a multilanguage application, we use translation files for many names such as column names.
+* Translations: even though we may not need a multilanguage application, 
+we use translation files for property names to keep their definition centralized.
 
 This bundle adds these features.
+
+## Installation
+
+    composer require wame/generator-bundle:dev-master --dev
+    
+In your `app/AppKernel.php` file, add the bundle for the development environment:
+
+     public function registerBundles()
+        {
+            ...
+            
+            if (in_array($this->getEnvironment(), ['dev', 'test'], true)) {
+                ...
+                if ('dev' === $this->getEnvironment()) {
+                    $bundles[] = new \Wame\GeneratorBundle\WameGeneratorBundle();
+                }
+            }
+            ...
+        }
+
+ 
+## Configuration options
+No configuration is required, but you might want to alter some
+settings to specific needs. 
+The following configuration show the default settings:
+
+    wame_generator:
+        default_bundle: 'AppBundle' #The bundle used whenever none is specified.
+        enable_voters: true         #use false if you don't plan on using voters
+        enable_traits: true         #use false if you don't plan on using gedmo traits
+        enable_datatables: true     #use false if you don't plan on using SgDatatables
+
 
 ## Required / Recommended bundles
 
@@ -37,17 +70,6 @@ that you won't be bothered with questions about using traits.
  If you do not intent to use enum, simply do not use it when asked for a
  property type.
  
- 
-## Configuration options
-No configuration is required, but you might want to alter some
-settings to specific needs. 
-The following configuration show the default settings:
-
-    wame_generator:
-        default_bundle: 'AppBundle' #The bundle used whenever none is specified.
-        enable_voters: true         #use false if you don't plan on using voters
-        enable_traits: true         #use false if you don't plan on using gedmo traits
-        enable_datatables: true     #use false if you don't plan on using SgDatatables
 
 ## Entity generation
 
@@ -132,17 +154,16 @@ you need them.
 
 #### Savepoint
 
+Ever generated an entity, made a mistake after you've already added several fields and out
+of reflex you canceled the command? Savepoint will prevent you from starting all over.
+
+
 In interactive mode, after every field you've added, a savepoint-file will be updated.
 If during the next field you make a mistake, you can cancel the generation and
 start from the savepoint by using the savepoint option, eg:
 
     php bin/console wame:generate:entity --savepoint
-    
-For instance, if you're creating an entity Product, and you just added
-the fields 'name', 'product_type' and you're currently adding the field 
-'active_from', but mistakenly choose the type 'string' instead of date,
-you can cancelt the command, use the command above and start adding
-'active_from' again.
+
 
 ## CRUD generation
 
@@ -289,21 +310,20 @@ More than just crud, this bundle allows you to overwrite the following parts as 
 
 ## TODO's
 
-- usage of the 'Resources/translations/roles.(en|nl).yml.twig'
-- interface: a concept is created, but no longer works after several changes.
-- configuration: 
-    - there are configuration settings for using different trait-classes,
+- Usage of the 'Resources/translations/roles.(en|nl).yml.twig'
+- Interface: a concept is created, but no longer works after several changes.
+- Configuration: 
+    - There are configuration settings for using different trait-classes,
 but the generator does not take these settings into account.
 This should be implemented or the settings should be removed.
-    - a setting for using datatables by default exists, but the generator
+    - A setting for using datatables by default exists, but the generator
     currently ignores this setting. This is still to be implemented.
     - More settings/defaults:  
     we may want to set specific traits to be used or not by default. 
     For instance, some application may never use datatables, so that
     option should be possible to disable for those applications.
-- tests  
-    - currently, this bundle still holds the sensio-testfiles, but these no
-    longer are compatible with this bundle. These tests need to be modified and
-    extended. 
-    - The sensiogenerator also generated test-files. Since files are rather empty,
+- Tests  
+    - Currently, this bundle still holds the sensio-testfiles, but these no
+    longer are compatible with this bundle. These tests need to be modified. 
+    - The sensiogenerator also generated test-files. Since those files are rather empty,
     they are left out, but generating test files still might be quite helpful.
