@@ -130,6 +130,20 @@ Multiple validations can be passed by seperating them by a ';' as shown in the e
 It is not possible to set validation-options. You'll still need to modify the entity if
 you need them.
 
+#### Savepoint
+
+In interactive mode, after every field you've added, a savepoint-file will be updated.
+If during the next field you make a mistake, you can cancel the generation and
+start from the savepoint by using the savepoint option, eg:
+
+    php bin/console wame:generate:entity --savepoint
+    
+For instance, if you're creating an entity Product, and you just added
+the fields 'name', 'product_type' and you're currently adding the field 
+'active_from', but mistakenly choose the type 'string' instead of date,
+you can cancelt the command, use the command above and start adding
+'active_from' again.
+
 ## CRUD generation
 
 command: `wame:generate:crud` 
@@ -275,8 +289,6 @@ More than just crud, this bundle allows you to overwrite the following parts as 
 
 ## TODO's
 
-- 'savepoint file': at least for entities, it'd be nice to start from a saved point after a mistake 
-  was made.
 - usage of the 'Resources/translations/roles.(en|nl).yml.twig'
 - interface: a concept is created, but no longer works after several changes.
 - configuration: 
