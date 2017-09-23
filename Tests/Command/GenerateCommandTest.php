@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Wame\SensioGeneratorBundle\Tests\Command;
+namespace Wame\GeneratorBundle\Tests\Command;
 
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Filesystem\Filesystem;
-use Wame\SensioGeneratorBundle\Command\Helper\QuestionHelper;
+use Wame\GeneratorBundle\Command\Helper\QuestionHelper;
 use Symfony\Component\DependencyInjection\Container;
 
 abstract class GenerateCommandTest extends \PHPUnit_Framework_TestCase

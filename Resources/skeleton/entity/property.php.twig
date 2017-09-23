@@ -1,5 +1,5 @@
 {% use 'entity/property_dockblock.php.twig' %}
-{# @var property \Wame\SensioGeneratorBundle\MetaData\MetaProperty #}
+{# @var property \Wame\GeneratorBundle\MetaData\MetaProperty #}
 {%- block property %}
     {{- block('property_docblock') }}
     private ${{ property.name }};

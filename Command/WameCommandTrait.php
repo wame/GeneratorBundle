@@ -1,14 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\Command;
+namespace Wame\GeneratorBundle\Command;
 
 use Doctrine\Bundle\DoctrineBundle\Mapping\DisconnectedMetadataFactory;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Wame\SensioGeneratorBundle\Command\Helper\CrudQuestionHelper;
-use Wame\SensioGeneratorBundle\Inflector\Inflector;
-use Wame\SensioGeneratorBundle\MetaData\MetaEntityFactory;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Wame\GeneratorBundle\Command\Helper\CrudQuestionHelper;
+use Wame\GeneratorBundle\Inflector\Inflector;
+use Wame\GeneratorBundle\MetaData\MetaEntityFactory;
 
 trait WameCommandTrait
 {
@@ -21,13 +22,14 @@ trait WameCommandTrait
 
     protected function initializeBaseSettings(InputInterface $input, OutputInterface $output)
     {
+        /** @var ContainerInterface $container */
         $container = $this->getContainer();
         parent::initialize($input, $output);
 
-        $this->defaultBundle = $container->getParameter('wame_sensio_generator.default_bundle');
-        $this->enableTraitOptions = $this->getContainer()->getParameter('wame_sensio_generator.enable_traits');
-        $this->enableDatatables = $this->getContainer()->getParameter('wame_sensio_generator.enable_datatables');
-        $this->enableVoters = $this->getContainer()->getParameter('wame_sensio_generator.enable_voters');
+        $this->defaultBundle = $container->getParameter('wame_generator.default_bundle');
+        $this->enableTraitOptions = $container->getParameter('wame_generator.enable_traits');
+        $this->enableDatatables = $container->getParameter('wame_generator.enable_datatables');
+        $this->enableVoters = $container->getParameter('wame_generator.enable_voters');
 
         if (!$input->hasArgument('entity') || !$input->getArgument('entity')) {
             return;

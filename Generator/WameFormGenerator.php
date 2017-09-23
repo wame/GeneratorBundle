@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\Generator;
+namespace Wame\GeneratorBundle\Generator;
 
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
-use Wame\SensioGeneratorBundle\MetaData\MetaEntityFactory;
+use Wame\GeneratorBundle\MetaData\MetaEntity;
+use Wame\GeneratorBundle\MetaData\MetaEntityFactory;
 
 class WameFormGenerator extends Generator
 {

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\Util;
+namespace Wame\GeneratorBundle\Util;
 
 /**
  * Copied from https://github.com/mathiasverraes/classfunctions

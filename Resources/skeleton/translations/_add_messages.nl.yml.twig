@@ -1,5 +1,5 @@
 
-{# @var meta_entity \Wame\SensioGeneratorBundle\MetaData\MetaEntity #}
+{# @var meta_entity \Wame\GeneratorBundle\MetaData\MetaEntity #}
 {% set entity_humanized =  meta_entity.entityName | humanize %}
 {% set entity_humanized_lowered =  entity_humanized | lower %}
 {{ meta_entity.entityName | pluralize | tabalize | capitalize }}: {{ meta_entity.entityName | pluralize | humanize | capitalize }}

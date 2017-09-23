@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\Generator;
+namespace Wame\GeneratorBundle\Generator;
 
-use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
+use Wame\GeneratorBundle\MetaData\MetaEntity;
 
 class WameRepositoryGenerator extends Generator
 {

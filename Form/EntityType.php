@@ -1,8 +1,8 @@
 <?php
+declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\Form;
+namespace Wame\GeneratorBundle\Form;
 
-use phpDocumentor\Reflection\DocBlock\Tags\Property;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -13,8 +13,8 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
-use Wame\SensioGeneratorBundle\MetaData\MetaTrait;
+use Wame\GeneratorBundle\MetaData\MetaEntity;
+use Wame\GeneratorBundle\MetaData\MetaTrait;
 
 class EntityType extends AbstractType
 {
@@ -152,7 +152,7 @@ class EntityType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Wame\SensioGeneratorBundle\MetaData\MetaEntity',
+            'data_class' => 'Wame\GeneratorBundle\MetaData\MetaEntity',
         ));
     }
 

@@ -1,20 +1,19 @@
 <?php
 declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\Command;
+namespace Wame\GeneratorBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Wame\SensioGeneratorBundle\Command\Helper\CrudQuestionHelper;
-use Wame\SensioGeneratorBundle\Generator\DoctrineCrudGenerator;
-use Wame\SensioGeneratorBundle\Generator\WameDatatableGenerator;
-use Wame\SensioGeneratorBundle\Generator\WameFormGenerator;
-use Wame\SensioGeneratorBundle\Generator\WameVoterGenerator;
-use Wame\SensioGeneratorBundle\Inflector\Inflector;
-use Wame\SensioGeneratorBundle\MetaData\MetaEntityFactory;
+use Wame\GeneratorBundle\Generator\DoctrineCrudGenerator;
+use Wame\GeneratorBundle\Generator\WameDatatableGenerator;
+use Wame\GeneratorBundle\Generator\WameFormGenerator;
+use Wame\GeneratorBundle\Generator\WameVoterGenerator;
+use Wame\GeneratorBundle\Inflector\Inflector;
+use Wame\GeneratorBundle\MetaData\MetaEntityFactory;
 
 /**
  * Wame version of GenerateDoctrineCrudCommand
@@ -49,13 +48,13 @@ Using the --with-write option allows to generate the new, edit and delete action
 
 Every generated file is based on a template. There are default templates but they can be overridden by placing custom templates in one of the following locations, by order of priority:
 
-<info>BUNDLE_PATH/Resources/WameSensioGeneratorBundle/skeleton/crud
-APP_PATH/Resources/WameSensioGeneratorBundle/skeleton/crud</info>
+<info>BUNDLE_PATH/Resources/WameGeneratorBundle/skeleton/crud
+APP_PATH/Resources/WameGeneratorBundle/skeleton/crud</info>
 
 And
 
-<info>__bundle_path__/Resources/WameSensioGeneratorBundle/skeleton/form
-__project_root__/app/Resources/WameSensioGeneratorBundle/skeleton/form</info>
+<info>__bundle_path__/Resources/WameGeneratorBundle/skeleton/form
+__project_root__/app/Resources/WameGeneratorBundle/skeleton/form</info>
 
 You can check https://github.com/sensio/SensioGeneratorBundle/tree/master/Resources/skeleton
 in order to know the file structure of the skeleton

@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\Generator;
+namespace Wame\GeneratorBundle\Generator;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
-use Wame\SensioGeneratorBundle\MetaData\MetaProperty;
-use Wame\SensioGeneratorBundle\MetaData\MetaTrait;
-use Wame\SensioGeneratorBundle\MetaData\MetaValidation;
+use Wame\GeneratorBundle\MetaData\MetaEntity;
+use Wame\GeneratorBundle\MetaData\MetaProperty;
+use Wame\GeneratorBundle\MetaData\MetaTrait;
+use Wame\GeneratorBundle\MetaData\MetaValidation;
 
 class WameEntityGenerator extends Generator
 {
@@ -62,7 +62,8 @@ class WameEntityGenerator extends Generator
                 ->setEnumType($field['enumType'] ?? null)
                 ->setId($field['id'] ?? false)
             ;
-            $validations = isset($field['validation']) ? explode(';', $field['validation']): [];
+            $validationInput = $field['validation'] ?? [];
+            $validations = is_string($validationInput) ? explode(';', $validationInput) : $validationInput;
 
             foreach ($validations as $validation) {
                 $metaProperty->addValidation((new MetaValidation())->setType($validation));

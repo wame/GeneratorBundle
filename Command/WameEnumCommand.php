@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\Command;
+namespace Wame\GeneratorBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -11,9 +11,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Yaml\Yaml;
-use Wame\SensioGeneratorBundle\Command\Helper\QuestionHelper;
-use Wame\SensioGeneratorBundle\Generator\WameEnumGenerator;
-use Wame\SensioGeneratorBundle\Inflector\Inflector;
+use Wame\GeneratorBundle\Command\Helper\QuestionHelper;
+use Wame\GeneratorBundle\Generator\WameEnumGenerator;
+use Wame\GeneratorBundle\Inflector\Inflector;
 
 class WameEnumCommand extends ContainerAwareCommand
 {

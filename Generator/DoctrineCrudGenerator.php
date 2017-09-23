@@ -5,7 +5,7 @@ declare(strict_types=1);
  * This file is a modified copy of the DoctrineCrudGenerator that is part of the Symfony package.
  */
 
-namespace Wame\SensioGeneratorBundle\Generator;
+namespace Wame\GeneratorBundle\Generator;
 
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;

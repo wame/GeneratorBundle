@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Wame\SensioGeneratorBundle\Tests\Generator;
+namespace Wame\GeneratorBundle\Tests\Generator;
 
-use Wame\SensioGeneratorBundle\Generator\CommandGenerator;
+use Wame\GeneratorBundle\Generator\CommandGenerator;
 
 class CommandGeneratorTest extends GeneratorTest
 {

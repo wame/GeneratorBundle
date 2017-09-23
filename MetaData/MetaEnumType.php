@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\MetaData;
+namespace Wame\GeneratorBundle\MetaData;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;

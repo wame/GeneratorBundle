@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\Command;
+namespace Wame\GeneratorBundle\Command;
 
-use Wame\SensioGeneratorBundle\Inflector\Inflector;
+use Wame\GeneratorBundle\Inflector\Inflector;
 
 class WameValidators extends Validators
 {

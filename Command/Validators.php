@@ -6,7 +6,7 @@ declare(strict_types=1);
  * This file is a copy of the Sensio\Bundle\GeneratorBundle\Command\Validators
  */
 
-namespace Wame\SensioGeneratorBundle\Command;
+namespace Wame\GeneratorBundle\Command;
 
 /**
  * Validator functions.

@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\Generator;
+namespace Wame\GeneratorBundle\Generator;
 
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Wame\SensioGeneratorBundle\MetaData\MetaEnumType;
+use Wame\GeneratorBundle\MetaData\MetaEnumType;
 
 class WameEnumGenerator extends Generator
 {

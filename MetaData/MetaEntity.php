@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\MetaData;
+namespace Wame\GeneratorBundle\MetaData;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Wame\SensioGeneratorBundle\Inflector\Inflector;
+use Wame\GeneratorBundle\Inflector\Inflector;
 
 class MetaEntity
 {

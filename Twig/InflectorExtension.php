@@ -1,9 +1,9 @@
 <?php
 declare(strict_types = 1);
 
-namespace Wame\SensioGeneratorBundle\Twig;
+namespace Wame\GeneratorBundle\Twig;
 
-use Wame\SensioGeneratorBundle\Inflector\Inflector;
+use Wame\GeneratorBundle\Inflector\Inflector;
 
 class InflectorExtension extends \Twig_Extension
 {

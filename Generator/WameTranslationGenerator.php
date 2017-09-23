@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\Generator;
+namespace Wame\GeneratorBundle\Generator;
 
 use Symfony\Component\Yaml\Yaml;
-use Wame\SensioGeneratorBundle\Inflector\Inflector;
-use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
+use Wame\GeneratorBundle\Inflector\Inflector;
+use Wame\GeneratorBundle\MetaData\MetaEntity;
 
 class WameTranslationGenerator extends Generator
 {

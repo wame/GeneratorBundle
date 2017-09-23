@@ -1,20 +1,20 @@
 <?php
 declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\Controller;
+namespace Wame\GeneratorBundle\Controller;
 
 use Doctrine\Bundle\DoctrineBundle\Mapping\DisconnectedMetadataFactory;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Wame\SensioGeneratorBundle\Form\EntityType;
-use Wame\SensioGeneratorBundle\Generator\DoctrineCrudGenerator;
-use Wame\SensioGeneratorBundle\Generator\WameDatatableGenerator;
-use Wame\SensioGeneratorBundle\Generator\WameEntityGenerator;
-use Wame\SensioGeneratorBundle\Generator\WameVoterGenerator;
-use Wame\SensioGeneratorBundle\Inflector\Inflector;
-use Wame\SensioGeneratorBundle\MetaData\MetaEntity;
+use Wame\GeneratorBundle\Form\EntityType;
+use Wame\GeneratorBundle\Generator\DoctrineCrudGenerator;
+use Wame\GeneratorBundle\Generator\WameDatatableGenerator;
+use Wame\GeneratorBundle\Generator\WameEntityGenerator;
+use Wame\GeneratorBundle\Generator\WameVoterGenerator;
+use Wame\GeneratorBundle\Inflector\Inflector;
+use Wame\GeneratorBundle\MetaData\MetaEntity;
 
 class GenerateController extends Controller
 {
@@ -66,7 +66,7 @@ class GenerateController extends Controller
             }
         }
 
-        return $this->render('@WameSensioGenerator/entity.html.twig', [
+        return $this->render('@WameGenerator/entity.html.twig', [
             'form' => $form->createView()
         ]);
     }

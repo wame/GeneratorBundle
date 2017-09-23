@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\MetaData;
+namespace Wame\GeneratorBundle\MetaData;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use \Wame\SensioGeneratorBundle\Inflector\Inflector;
+use \Wame\GeneratorBundle\Inflector\Inflector;
 
 class MetaProperty
 {

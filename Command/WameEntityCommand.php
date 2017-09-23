@@ -1,17 +1,17 @@
 <?php
 declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\Command;
+namespace Wame\GeneratorBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Exception\InvalidOptionException;
-use Wame\SensioGeneratorBundle\Command\Helper\EntityQuestionHelper;
+use Wame\GeneratorBundle\Command\Helper\EntityQuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Container;
-use Wame\SensioGeneratorBundle\Generator\WameEntityGenerator;
+use Wame\GeneratorBundle\Generator\WameEntityGenerator;
 
 /**
  * Wame version of GenerateDoctrineEntityCommand
@@ -101,7 +101,7 @@ EOT
     {
         $entityQuestionHelper = $this->getQuestionHelper();
 
-        if ($input->hasOption('load-savepoint') && $input->getOption('load-savepoint')) {
+        if ($input->hasOption('savepoint') && $input->getOption('savepoint')) {
             $input = $this->loadSavePoint($input, $output);
         } else {
             $entityQuestionHelper->writeSection($output, 'Welcome to the WAME entity generator');

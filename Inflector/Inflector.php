@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\Inflector;
+namespace Wame\GeneratorBundle\Inflector;
 
 use Doctrine\Common\Inflector\Inflector as DoctrineInflector;
 

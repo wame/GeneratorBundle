@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\Command\Helper;
+namespace Wame\GeneratorBundle\Command\Helper;
 
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Console\Output\OutputInterface;

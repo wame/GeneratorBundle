@@ -1,5 +1,5 @@
 {
-    "name": "wame/sensio-generator-bundle",
+    "name": "wame/generator-bundle",
     "description": "This bundle generates code for you",
     "keywords": [],
     "type": "symfony-bundle",
@@ -32,7 +32,7 @@
         "doctrine/orm": "~2.4"
     },
     "autoload": {
-        "psr-4": { "Wame\\SensioGeneratorBundle\\": "" },
+        "psr-4": { "Wame\\GeneratorBundle\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]

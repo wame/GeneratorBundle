@@ -6,7 +6,7 @@ declare(strict_types=1);
  * This file is a copy of the Sensio\Bundle\GeneratorBundle\Command\Helper\QuestionHelper
  */
 
-namespace Wame\SensioGeneratorBundle\Command\Helper;
+namespace Wame\GeneratorBundle\Command\Helper;
 
 use Symfony\Component\Console\Helper\QuestionHelper as BaseQuestionHelper;
 use Symfony\Component\Console\Output\OutputInterface;

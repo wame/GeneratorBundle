@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Wame\SensioGeneratorBundle\Tests\Command;
+namespace Wame\GeneratorBundle\Tests\Command;
 
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -183,7 +183,7 @@ DATA;
     protected function getCommand($generator)
     {
         $command = $this
-            ->getMockBuilder('Wame\SensioGeneratorBundle\Command\GenerateDoctrineCrudCommand')
+            ->getMockBuilder('Wame\GeneratorBundle\Command\GenerateDoctrineCrudCommand')
             ->setMethods(array('getEntityMetadata'))
             ->getMock()
         ;
@@ -215,7 +215,7 @@ DATA;
     {
         // get a noop generator
         return $this
-            ->getMockBuilder('Wame\SensioGeneratorBundle\Generator\DoctrineCrudGenerator')
+            ->getMockBuilder('Wame\GeneratorBundle\Generator\DoctrineCrudGenerator')
             ->disableOriginalConstructor()
             ->setMethods(array('generate'))
             ->getMock()
@@ -225,7 +225,7 @@ DATA;
     protected function getFormGenerator()
     {
         return $this
-            ->getMockBuilder('Wame\SensioGeneratorBundle\Generator\DoctrineFormGenerator')
+            ->getMockBuilder('Wame\GeneratorBundle\Generator\DoctrineFormGenerator')
             ->disableOriginalConstructor()
             ->setMethods(array('generate'))
             ->getMock()

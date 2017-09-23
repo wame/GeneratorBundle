@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\MetaData;
+namespace Wame\GeneratorBundle\MetaData;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
  *  - Validations are not recognized.
  *  - displayField (in toString method) won't be set
  *
- * @package Wame\SensioGeneratorBundle\MetaData
+ * @package Wame\GeneratorBundle\MetaData
  */
 class MetaEntityFactory
 {

@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\Command;
+namespace Wame\GeneratorBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Wame\SensioGeneratorBundle\Generator\WameFormGenerator;
+use Wame\GeneratorBundle\Generator\WameFormGenerator;
 
 class WameFormCommand extends ContainerAwareCommand
 {

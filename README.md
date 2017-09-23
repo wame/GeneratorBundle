@@ -1,7 +1,7 @@
-WameSensioGeneratorBundle
+WameGeneratorBundle
 =====================
 
-Extension and modification of the `SensioGeneratorBundle`. 
+Modified version of the `SensioGeneratorBundle`. 
 Basic usage is quite similar, except that 'doctrine' is replaced with 'wame' in the
 command names: `doctrine:generate:entity` becomes `wame:generate:entity`
 
@@ -25,12 +25,12 @@ By default, the following bundles are assumed to be installed and configured:
 - [DatatablesBundle](https://github.com/stwe/DatatablesBundle)
 for datatables.  
 If you do not wish to use datatables, you could add 
-`wame_sensio_generator.enable_datatables: false` to your config.yml, so
+`wame_generator.enable_datatables: false` to your config.yml, so
 that you won't be bothered with the question of using datatables.
 - [StofDoctrineExtensionsBundle](http://symfony.com/doc/master/bundles/StofDoctrineExtensionsBundle/index.html)
 for Gedmo trait-options. 
 If you do not wish to use these traits, you could add
-`wame_sensio_generator.enable_traits: false` to your config.yml, so
+`wame_generator.enable_traits: false` to your config.yml, so
 that you won't be bothered with questions about using traits.
 - [DoctrineEnumBundle](https://github.com/fre5h/DoctrineEnumBundle)
  for enumerables.  
@@ -43,7 +43,7 @@ No configuration is required, but you might want to alter some
 settings to specific needs. 
 The following configuration show the default settings:
 
-    wame_sensio_bundle:
+    wame_generator:
         default_bundle: 'AppBundle' #The bundle used whenever none is specified.
         enable_voters: true         #use false if you don't plan on using voters
         enable_traits: true         #use false if you don't plan on using gedmo traits
@@ -92,7 +92,7 @@ use `wame:generate:entity Product`.
 If you wish to use a different default bundle, you can override this
 setting in your config.yml
 
-    wame_sensio_generator:
+    wame_generator:
         default_bundle: AppBundle
         
 You can replace AppBundle with any bundle name you need it to be.
@@ -111,8 +111,8 @@ specifiy the targetEntity for relations and the enumType for enum.
 Example:
 
     `php bin/console wame:generate:entity Product --fields="
-    bookStore:many2one(targetEntity=BookStore)
-    type:enum(enumType=BookType)
+        bookStore:many2one(targetEntity=BookStore)
+        type:enum(enumType=BookType)
     "` -n
 
 #### Validations
@@ -274,9 +274,9 @@ will then automatically be determined by the generator.
 
 ## Overwriting twig files
 
-Just like the SensioGenerator, you can overwrite the twig skeleton files of the WameSensioGenerator
+Just like the SensioGenerator, you can overwrite the twig skeleton files of the WameGenerator
 in the following directory:
-`App/Resources/WameSensioGeneratorBundle/skeleton`
+`App/Resources/WameGeneratorBundle/skeleton`
 
 For more information about overwriting skeleton files, see: http://symfony.com/doc/2.5/bundles/SensioGeneratorBundle/index.html#overriding-skeleton-templates
 
@@ -307,5 +307,3 @@ This should be implemented or the settings should be removed.
     extended. 
     - The sensiogenerator also generated test-files. Since files are rather empty,
     they are left out, but generating test files still might be quite helpful.
-- rename bundle:  
-This bundle started as a fork from SensioGeneratorBundle to just make a few modifications in the original code. Since we already have a WameGeneratorBundle, we named this form to WameSensioGeneratorBundle. However, for most code an entirely different approached is used and 'few' has become alot, so the 'Sensio' part feels a bit odd at this point.

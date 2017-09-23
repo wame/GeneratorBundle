@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\Generator;
+namespace Wame\GeneratorBundle\Generator;
 
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Wame\SensioGeneratorBundle\Twig\InflectorExtension;
+use Wame\GeneratorBundle\Twig\InflectorExtension;
 
 class Generator
 {
@@ -44,7 +44,7 @@ class Generator
      */
     protected function getTwigEnvironment()
     {
-        if (is_dir($dir = $this->rootDir.'/Resources/WameSensioGeneratorBundle/skeleton')) {
+        if (is_dir($dir = $this->rootDir.'/Resources/WameGeneratorBundle/skeleton')) {
             $skeletonDirs[] = $dir;
         }
         $skeletonDirs[] = __DIR__.'/../Resources/skeleton';

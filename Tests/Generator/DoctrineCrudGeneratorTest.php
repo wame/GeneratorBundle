@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Wame\SensioGeneratorBundle\Tests\Generator;
+namespace Wame\GeneratorBundle\Tests\Generator;
 
-use Wame\SensioGeneratorBundle\Generator\DoctrineCrudGenerator;
+use Wame\GeneratorBundle\Generator\DoctrineCrudGenerator;
 
 class DoctrineCrudGeneratorTest extends GeneratorTest
 {

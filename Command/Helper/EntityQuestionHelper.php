@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Wame\SensioGeneratorBundle\Command\Helper;
+namespace Wame\GeneratorBundle\Command\Helper;
 
 use Doctrine\DBAL\Types\Type;
 use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -10,8 +10,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Validator\Constraint;
-use Wame\SensioGeneratorBundle\Command\WameValidators;
-use Wame\SensioGeneratorBundle\Inflector\Inflector;
+use Wame\GeneratorBundle\Command\WameValidators;
+use Wame\GeneratorBundle\Inflector\Inflector;
 
 class EntityQuestionHelper extends QuestionHelper
 {
