@@ -217,7 +217,7 @@ EOT
             list ($bundle) = $this->parseShortcutNotation($input->getArgument('entity'));
             if ($type === Type::STRING) {
                 $data['length'] = $entityQuestionHelper->askFieldLength($input, $output);
-            } elseif ('decimal' === Type::DECIMAL) {
+            } elseif ($type === Type::DECIMAL) {
                 $data['precision'] = $entityQuestionHelper->askFieldPrecision($input, $output);
                 $data['scale'] = $entityQuestionHelper->askFieldScale($input, $output);
             } elseif (Type::isRelationType($type)) {
@@ -227,13 +227,13 @@ EOT
                 $data['enumType'] = $entityQuestionHelper->askFieldEnumType($input, $output);
             } elseif (substr($type, -4) === 'Type') {
                 $data['enumType'] = $type;
-                $data['type'] = Type::ENUM;
+                $data['type'] = $type = Type::ENUM;
             }
 
             $data['nullable'] = $entityQuestionHelper->askFieldNullable($input, $output);
             $data['unique'] = $entityQuestionHelper->askFieldUnique($input, $output);
 
-            $data['validation'] = $entityQuestionHelper->askFieldValidations($input, $output);
+            $data['validation'] = $entityQuestionHelper->askFieldValidations($input, $output, $data);
 
             $fields[$columnName] = $data;
 

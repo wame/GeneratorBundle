@@ -121,14 +121,8 @@
 
 {%- block property_dockblock_validation %}
     {%- for validation in property.validations %}
-        {%- set validationOptions = "" %}
-        {%- for optionValue,optionKey in validation.options %}
-            {%- if loop.first %}{% set validationOptions = validationOptions ~ "(" %}{% endif %}
-            {%- if loop.first == false %}{% set validationOptions = validationOptions ~ ", " %}{% endif %}
-            {%- set validationOptions = validationOptions ~ optionKey~"="~optionValue %}
-            {%- if loop.last %}{% set validationOptions = validationOptions ~ ")" %}{% endif %}
-        {%- endfor -%}
+        {# @var validation Wame\GeneratorBundle\MetaData\MetaValidation #}
     {{-''}}
-     * @Assert\{{ validation.type ~ validationOptions }}
+     * @Assert\{{ validation.annotationFormatted }}
     {%- endfor -%}
 {%- endblock %}

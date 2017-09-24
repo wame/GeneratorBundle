@@ -31,8 +31,6 @@ class EntityQuestionHelper extends QuestionHelper
         'softdeleteable' => true,
     ];
 
-    protected $constraints;
-
     public function __construct(RegistryInterface $registry, ?array $bundles, array $configuredTypes)
     {
         $this->registry = $registry;
@@ -227,44 +225,48 @@ class EntityQuestionHelper extends QuestionHelper
         return $this->ask($input, $output, $question);
     }
 
-    public function askFieldValidations(InputInterface $input, OutputInterface $output): ?array
+    public function askFieldValidations(InputInterface $input, OutputInterface $output, array $data): ?array
     {
+        $type = $data['type'];
+        $nullable = $data['nullable'] ?? false;
         if ($input->hasOption('no-validation') && $input->getOption('no-validation')) {
             return null;
         }
-        $output->writeln([
-            'It\'s a good idea to add validation to your entity properties!',
-            'Check the documentation for more into:',
-            'http://symfony.com/doc/current/book/validation.html',
-            '',
-            'These are the default available constraints:'
-        ]);
 
         $fieldConstraints = [];
 
-        $constraints = $this->getPropertyValidationConstraints();
-        $constraintClasses = [];
-        foreach ($constraints as $constraintClass => $constraint) {
-            $name = substr($constraintClass, strrpos($constraintClass, '\\') + 1);
-            $constraintClasses[$constraintClass] = $name;
+        //Try to determine some constraints (that should always be set for a certain type) automatically
+        $defaultConstraints = ValidationConstraints::getDefaultValidationsForType($type, $nullable);
+        if (!empty($defaultConstraints)) {
+            $output->writeln([
+                'These constraints are already set: ',
+                '<info>'.implode(', ', $defaultConstraints).'</info>',
+                ''
+            ]);
+            foreach ($defaultConstraints as $defaultConstraint) {
+                $fieldConstraints[] = ['type' => $defaultConstraint, 'options' => []];
+            }
         }
-        $constraintOptions = empty($constraints) ? [] : array_combine(range(1, count($constraints)), $constraintClasses);
 
-        $this->outputCompactOptionsList($output, array_flip($constraintOptions));
+        $output->writeln('Available options:');
+        $constraintChoices = ValidationConstraints::getConstraintChoicesForType($type, $defaultConstraints);
+        $this->outputCompactOptionsList($output, $constraintChoices);
 
         while (true) {
             $output->writeln('');
             $question = new Question($this->getQuestion('Add validation (press <return> to stop adding)', null));
-            $question->setValidator(WameValidators::getConstraintValidator($constraintOptions));
-            $type = $this->ask($input, $output, $question);
+            $question->setNormalizer(WameValidators::getConstraintsNormalizer($constraintChoices));
+            $question->setValidator(WameValidators::getConstraintValidator(array_keys($constraintChoices)));
+            $question->setAutocompleterValues($constraintChoices);
+            $constraint = $this->ask($input, $output, $question);
 
-            if (!$type) {
+            if (!$constraint) {
                 break;
             }
 
             $fieldConstraints[] = [
-                'type' => $type,
-                'options' => [],
+                'type' => $constraint,
+                'options' => $this->askValidationOptions($input, $output, $constraint),
             ];
 
             $currentConstraints = array_map(function ($fieldConstraint) {
@@ -276,49 +278,31 @@ class EntityQuestionHelper extends QuestionHelper
         return $fieldConstraints;
     }
 
-    /**
-     * @return Constraint[]
-     */
-    protected function getPropertyValidationConstraints(): array
+    protected function askValidationOptions(InputInterface $input, OutputInterface $output, string $validationConstraint)
     {
-        //TODO: perhaps we should use an array with predefined constrains instead, so that we only show constraints that make any sense.
-        //TODO: also, using predefined constraints, we can add options such as 'today' or 'greater than zero', etc
-        if ($this->constraints) {
-            return $this->constraints;
-        }
-
-        $constraints = [];
-        $componentNamespace = '\Symfony\Component\Validator\Constraints';
-
-        // Try to get all default constraints by scanning the Component's Constraints folder
-        $dir = dirname((new \ReflectionClass($componentNamespace.'\Valid'))->getFileName());
-        foreach (scandir($dir, SCANDIR_SORT_ASCENDING) as $file) {
-            if (preg_match('/^(.+)(?!(Validator|Provider))\.php$/', $file, $matches)) {
-                $constraintClass = $componentNamespace . '\\' . $matches[1];
-                if (!is_subclass_of($constraintClass, Constraint::class)) {
-                    continue;
+        $options = [];
+        $constraintOptions = ValidationConstraints::getOptionsForConstraint($validationConstraint);
+        foreach ($constraintOptions as $constraintOptionName => $constraintOptionType) {
+            if ($constraintOptionType === 'array') {
+                $options[$constraintOptionName] = [];
+                while (true) {
+                    $question = new Question($this->getQuestion(sprintf('Add %s value for %s (press <return> to stop adding)', $constraintOptionName, $validationConstraint), null));
+                    $optionArrayValue = $this->ask($input, $output, $question);
+                    if (!$optionArrayValue) {
+                        break;
+                    }
+                    $options[$constraintOptionName][] = $optionArrayValue;
                 }
-                $ref = new \ReflectionClass($constraintClass);
-                if ($ref->isAbstract()) {
-                    continue;
+            } else {
+                $question = new Question($this->getQuestion(sprintf('Provide %s for %s', $constraintOptionName, $validationConstraint), null));
+                $optionValue = $this->ask($input, $output, $question);
+                if ($constraintOptionType === 'int') {
+                    $optionValue = (int) $optionValue;
                 }
-
-                /** @var Constraint $constraint */
-                try {
-                    $constraint = new $constraintClass();
-                } catch (\Exception $e) {
-                    continue;
-                }
-                if (!in_array(Constraint::PROPERTY_CONSTRAINT, (array)$constraint->getTargets(), true)) {
-                    continue;
-                }
-                $constraints[ltrim($constraintClass, '\\')] = $constraint;
+                $options[$constraintOptionName] = $optionValue;
             }
         }
-
-        $this->constraints = $constraints;
-
-        return $this->constraints;
+        return $options;
     }
 
     protected function getTypes(): array

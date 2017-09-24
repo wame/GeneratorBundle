@@ -66,7 +66,14 @@ class WameEntityGenerator extends Generator
             $validations = is_string($validationInput) ? explode(';', $validationInput) : $validationInput;
 
             foreach ($validations as $validation) {
-                $metaProperty->addValidation((new MetaValidation())->setType($validation));
+                if (is_array($validation)) {
+                    $metaProperty->addValidation((new MetaValidation())
+                        ->setType($validation['type'])
+                        ->setOptions($validation['options'])
+                    );
+                } else {
+                    $metaProperty->addValidation((new MetaValidation())->setType($validation));
+                }
             }
             $metaEntity->addProperty($metaProperty);
         }

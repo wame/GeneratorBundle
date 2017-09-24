@@ -193,30 +193,16 @@ class WameValidators extends Validators
         };
     }
 
-    public static function getConstraintsNormalizer(): callable
+    public static function getConstraintsNormalizer($constraintSet): callable
     {
-        return function ($value) {
-            if (is_int($value) || ctype_digit($value)) {
-                return (int) $value;
+        return function ($constraints) use ($constraintSet) {
+            if (!$constraints) {
+                return null;
             }
-            if (is_array($value)) {
-                return $value;
+            if (in_array($constraints, $constraintSet, true)) {
+                return array_search($constraints, $constraintSet);
             }
-            if ($value === 'yes') {
-                return true;
-            }
-            if ($value === 'no') {
-                return false;
-            }
-            try {
-                $decodeValue = @json_decode($value, true);
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    throw new \RuntimeException('Could not decode value as json');
-                }
-                return $decodeValue;
-            } catch (\Exception $e) {
-                return $value;
-            }
+            return Inflector::classify($constraints);
         };
     }
 

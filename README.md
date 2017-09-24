@@ -141,15 +141,25 @@ Example:
 
 In interactive mode, for each field you'll be asked to add validations.
 
+Certain validations will be added automatically. For example: if a string-field is
+not-nullable, then the 'NotBlank' validation will be applied. Other not-nullable
+fields will get the 'NotNull' validation.
+
+If you don't want to be bothered with validation, you can use the
+`--no-validation` option. This will also prevent automatically added validations.
+
 You can also pass validations to the fields in non-interactive mode, for example:
 
     `php bin/console wame:generate:entity Customer --fields="
-    email:string(validation=Email;NotBlank)
+        email:string(validation=Email;NotBlank)
     "` -n
 
 Multiple validations can be passed by seperating them by a ';' as shown in the example.
 
-It is not possible to set validation-options. You'll still need to modify the entity if
+In non-interactive mode no validations will be added automatically, so make sure you 
+add all desired validations yourself.
+
+It is not possible to set validation-options. You'll still must modify the entity if
 you need them.
 
 #### Savepoint
