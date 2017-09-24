@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Container;
+use Wame\GeneratorBundle\DBAL\Types\Type;
 use Wame\GeneratorBundle\Generator\WameEntityGenerator;
 
 /**
@@ -139,6 +140,8 @@ EOT
 
     /**
      * Copy of parseFields in Sensio\Bundle\GeneratorBundle\Command\GenerateDoctrineEntityCommand
+     * @param string|array $input
+     * @return array
      */
     protected function parseFields($input): array
     {
@@ -212,25 +215,23 @@ EOT
             $data = ['columnName' => $columnName, 'fieldName' => lcfirst(Container::camelize($columnName)), 'type' => $type];
 
             list ($bundle) = $this->parseShortcutNotation($input->getArgument('entity'));
-            if ($type === 'string') {
+            if ($type === Type::STRING) {
                 $data['length'] = $entityQuestionHelper->askFieldLength($input, $output);
-            } elseif ('decimal' === $type) {
+            } elseif ('decimal' === Type::DECIMAL) {
                 $data['precision'] = $entityQuestionHelper->askFieldPrecision($input, $output);
                 $data['scale'] = $entityQuestionHelper->askFieldScale($input, $output);
-            } elseif (in_array($type, ['one2one', 'many2one', 'many2many', 'one2many'], true)) {
+            } elseif (Type::isRelationType($type)) {
                 $data['targetEntity'] = $entityQuestionHelper->askTargetEntity($input, $output, $bundle, $columnName);
                 $data['referencedColumnName'] = $entityQuestionHelper->askReferenceColumnName($input, $output, $data['targetEntity']);
-            } elseif ('enum' === $type) {
-                list ($enumType, $enumTypeClass) = $entityQuestionHelper->askFieldEnumType($input, $output);
-                $data['enumType'] = $enumType;
-                $data['enumTypeClass'] = $enumTypeClass;
+            } elseif (Type::ENUM === $type) {
+                $data['enumType'] = $entityQuestionHelper->askFieldEnumType($input, $output);
+            } elseif (substr($type, -4) === 'Type') {
+                $data['enumType'] = $type;
+                $data['type'] = Type::ENUM;
             }
 
             $data['nullable'] = $entityQuestionHelper->askFieldNullable($input, $output);
-
-            if ($unique = $entityQuestionHelper->askFieldUnique($input, $output)) {
-                $data['unique'] = $unique;
-            }
+            $data['unique'] = $entityQuestionHelper->askFieldUnique($input, $output);
 
             $data['validation'] = $entityQuestionHelper->askFieldValidations($input, $output);
 

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Wame\GeneratorBundle\Command\Helper;
 
-use Doctrine\DBAL\Types\Type;
+use Wame\GeneratorBundle\DBAL\Types\Type;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -32,27 +32,6 @@ class EntityQuestionHelper extends QuestionHelper
     ];
 
     protected $constraints;
-
-    protected static $typeAliases = [
-        Type::TARRAY => 'a',
-        Type::JSON_ARRAY => 'json',
-        Type::BOOLEAN => 'b',
-        Type::DATETIME => 'dt',
-        Type::DATETIMETZ => 'dtz',
-        Type::DATE => 'd',
-        Type::TIME => 't',
-        Type::INTEGER => 'i',
-        Type::SMALLINT => 'si',
-        Type::OBJECT => 'o',
-        Type::STRING => 's',
-        Type::TEXT => 'x',
-        Type::FLOAT => 'fl',
-        'one2one' => 'o2o',
-        'many2one' => 'm2o',
-        'many2many' => 'm2m',
-        'one2many' => 'o2m',
-        'enum' => 'e',
-    ];
 
     public function __construct(RegistryInterface $registry, ?array $bundles, array $configuredTypes)
     {
@@ -106,7 +85,7 @@ class EntityQuestionHelper extends QuestionHelper
         ]);
         $displayFieldOptions = array_keys(array_filter($entityFields, function ($field) {
             //To avoid too much complexity, relations aren't options for display field.
-            return !in_array($field['type'], ['many2one', 'one2many', 'many2many', 'one2one'], true);
+            return Type::isRelationType($field['type']) === false;
         }));
 
         $displayFieldOptions = $displayFieldOptions ? array_combine(range(1, count($displayFieldOptions)), $displayFieldOptions) : [];
@@ -152,7 +131,7 @@ class EntityQuestionHelper extends QuestionHelper
         $question = new Question($this->getQuestion('Field type', $defaultType), $defaultType);
         $question->setNormalizer(WameValidators::getTypeNormalizer($types));
         $question->setValidator(WameValidators::getTypeValidator($typeOptions));
-        $question->setAutocompleterValues(array_merge($typeOptions, static::$typeAliases));
+        $question->setAutocompleterValues(array_merge($typeOptions, Type::getAliases()));
         return $this->ask($input, $output, $question);
     }
 
@@ -347,7 +326,7 @@ class EntityQuestionHelper extends QuestionHelper
         $types = array_merge(Type::getTypesMap(), $this->configuredTypes);
         $types = array_keys($types);
         $types = array_combine($types, array_fill(0, count($types), null));
-        $aliases = static::$typeAliases;
+        $aliases = Type::getAliases();
         $types = array_merge($types, $aliases);
         return $types;
     }
@@ -379,23 +358,23 @@ class EntityQuestionHelper extends QuestionHelper
         $lastFourChars = substr($columnName, -4);
         $lastFiveChars = substr($columnName, -5);
         if ($lastThreeChars === '_at' || $lastThreeChars === '_on') {
-            return 'datetime';
+            return TYPE::DATETIME;
         } if ($lastFiveChars === 'count') {
-            return 'integer';
+            return TYPE::INTEGER;
         } if (0 === strpos($columnName, 'is_') || 0 === strpos($columnName, 'has_')) {
-            return 'boolean';
+            return TYPE::BOOLEAN;
         } if ($lastFourChars === 'date') {
-            return 'date';
+            return TYPE::DATE;
         } if ($lastThreeChars === '_id') {
-            return 'many2one';
+            return Type::MANY2ONE;
         } if (in_array($columnName, ['summary', 'description', 'text'], true)) {
-            return 'text';
+            return TYPE::TEXT;
         } if ($lastFiveChars === 'price') {
-            return 'decimal';
+            return TYPE::DECIMAL;
         } if ($this->guessFieldIsOneToMany($columnName)) {
-            return 'one2many';
+            return TYPE::ONE2MANY;
         }
-        return 'string';
+        return Type::STRING;
     }
 
     protected function guessFieldIsOneToMany(string $columnName): bool

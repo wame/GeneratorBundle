@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Wame\GeneratorBundle\MetaData;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Wame\GeneratorBundle\DBAL\Types\Type;
 use \Wame\GeneratorBundle\Inflector\Inflector;
 
 class MetaProperty
@@ -18,7 +19,7 @@ class MetaProperty
     protected $columnName;
 
     /** @var string */
-    protected $type = 'string';
+    protected $type = Type::STRING;
 
     /** @var string */
     protected $enumType;
@@ -160,10 +161,6 @@ class MetaProperty
         return $this->precision;
     }
 
-    /**
-     * @param int $precision
-     * @return MetaProperty
-     */
     public function setPrecision(?int $precision): MetaProperty
     {
         $this->precision = $precision;
@@ -230,7 +227,7 @@ class MetaProperty
     public function getMappedBy(): ?string
     {
         //One2many MUST be mapped by other entity
-        if ($this->mappedBy === null && $this->type === 'one2many') {
+        if ($this->mappedBy === null && $this->type === Type::ONE2MANY) {
             return Inflector::camelize($this->getEntity()->getEntityName());
         }
         return $this->mappedBy;
@@ -245,7 +242,7 @@ class MetaProperty
     public function isOrphanRemoval(): bool
     {
         //Can only be true for many2many or one2many
-        return in_array($this->type, ['many2many', 'one2many'], true) && $this->orphanRemoval;
+        return in_array($this->type, [Type::ONE2MANY, Type::MANY2MANY], true) && $this->orphanRemoval;
     }
 
     /**
@@ -306,7 +303,7 @@ class MetaProperty
 
     public function isRelationType()
     {
-        return in_array($this->getType(), ['many2one', 'many2many', 'one2many', 'one2one'], true);
+        return Type::isRelationType($this->getType());
     }
 
     public function getTabalizedTargetEntity()
@@ -316,30 +313,40 @@ class MetaProperty
 
     public function getReturnType($annotation = false)
     {
-        //TODO: check more types. Perhaps also use constants
         switch ($type = $this->getType()) {
-            case 'datetime':
-            case 'datetimetz':
-            case 'date':
-            case 'time':
+
+            case Type::DATETIME:
+            case Type::DATETIMETZ:
+            case Type::DATE:
+            case Type::TIME:
                 return '\DateTime';
-            case 'one2many':
-            case 'many2many':
+            case Type::DATETIME_IMMUTABLE:
+            case Type::DATETIMETZ_IMMUTABLE:
+            case Type::TIME_IMMUTABLE:
+                return '\DateTimeImmutable';
+            case Type::DATEINTERVAL:
+                return '\DateInterval';
+            case Type::ONE2MANY:
+            case Type::MANY2MANY:
                 return 'Collection'. ($annotation ? '|'.$this->getTargetEntity().'[]' : '');
-            case 'many2one':
-            case 'one2one':
+            case Type::MANY2ONE:
+            case Type::ONE2ONE:
                 return $this->getTargetEntity();
-            case 'enum':
-            case 'text':
-            case 'blob':
-            case 'decimal':
+            case Type::ENUM:
+            case Type::TEXT:
+            case Type::BLOB:
+            case Type::GUID:
+            case Type::BINARY:
+            case Type::DECIMAL:
+            case TYPE::STRING:
+            case TYPE::JSON:
                 return 'string';
-            case 'integer':
-            case 'smallint':
-            case 'bigint':
+            case Type::INTEGER:
+            case Type::SMALLINT:
+            case Type::BIGINT:
                 return 'int';
-            case 'simple_array':
-            case 'json_array':
+            case Type::SIMPLE_ARRAY:
+            case Type::JSON_ARRAY:
                 return 'array';
             default:
                 return $type;
