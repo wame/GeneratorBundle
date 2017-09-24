@@ -270,7 +270,7 @@ and fields that are defined in the traits.
 Most likely you'll need to make some changes to this file to fit your needs.
 
 If you generate the first datatable, two extra classes will be generated:
-- AppDatatable`   
+- AppDatatable   
 This is an abstract class that other datatables will extend.
 - DatatableResultService  
 This is a service class that will be used in controllers. It will call for
@@ -323,6 +323,29 @@ alter this file to fit your needs.
 This file will only be generated if it doesn't exist yet and is not affected
 by the `--overwrite` option.
 
+**TIP:**  
+If you haven't set up any security settings yet, like configuring the FOSUSerBundle,
+the generated code becomes hard to check in your interface as  you need to be the admin. 
+
+A quick way to log in, without setting up the entire security and login, 
+is to add the following to your `app/config/config_dev.yml`
+
+    security:
+        encoders:
+            Symfony\Component\Security\Core\User\User: plaintext
+        firewalls:
+            main:
+                anonymous: ~
+                http_basic: ~
+        providers:
+            in_memory:
+                memory:
+                    users:
+                        admin:
+                            password: admin
+                            roles: 'ROLE_ADMIN'
+
+This will directly enable you to login using basic_auth when you are in development-environment.
 
 ## Enum generation
 
