@@ -57,7 +57,7 @@ class WameEntityGenerator extends Generator
                 ->setTargetEntity($field['targetEntity'] ?? null)
                 ->setMappedBy($field['mappedBy'] ?? null)
                 ->setInversedBy($field['inversedBy'] ?? null)
-                ->setDisplayField($field['displayField'] ?? false)
+                ->setDisplayField($field['display'] ?? false)
                 ->setReferencedColumnName($field['referencedColumnName'] ?? 'id')
                 ->setEnumType($field['enumType'] ?? null)
                 ->setId($field['id'] ?? false)
@@ -65,19 +65,18 @@ class WameEntityGenerator extends Generator
             $validationInput = $field['validation'] ?? [];
             $validations = is_string($validationInput) ? explode(';', $validationInput) : $validationInput;
 
-            foreach ($validations as $validation) {
+            foreach ($validations as $validationName => $validation) {
                 if (is_array($validation)) {
                     $metaProperty->addValidation((new MetaValidation())
-                        ->setType($validation['type'])
-                        ->setOptions($validation['options'])
+                        ->setType($validation['type'] ?? $validationName)
+                        ->setOptions($validation['options'] ?? $validation)
                     );
                 } else {
-                    $metaProperty->addValidation((new MetaValidation())->setType($validation));
+                    $metaProperty->addValidation((new MetaValidation())->setType(is_bool($validation) ? $validationName : $validation));
                 }
             }
             $metaEntity->addProperty($metaProperty);
         }
-
         $this->generateByMetaEntity($metaEntity);
     }
 

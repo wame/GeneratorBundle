@@ -104,6 +104,41 @@ eg `--display-field=title`
 * --no-validation  
 Set this option to skip questions about validation
 
+
+#### Altered --fields option
+
+The `--fields` option can be used in the exact same way as in the original doctrine generator:
+
+    wame:generate:entity Product --fields="title:string(255)"
+    
+Once there are quite a few fields with several settings each fields, this syntax can
+become a mess. Also, there are limitations to using this syntax 
+(more about this will be explained in the 'Validations' section).
+
+To provide a cleaner way of adding fields, the ability to use json-like syntax has been added.
+The above example would become:
+
+    wame:generate:entity Product --fields="{title:{type: string, length: 255}}"
+
+Json requires that keys and values are surrounded by quotes. Since the
+fields-option requires a string, all json-quotes would have to be escaped.
+You can use escape quotes if you prefer, but once the fields-option is parsed,
+quotes will be added automatically, so you don't need to.
+
+Additionally, you can parse boolean options, without value. For example,
+`{title:{type:string,nullable}}` would be the same as 
+`{title:{type:string,nullable:true}}`.
+
+Furthermore, newlines, tabs and abundant spaces are automatically converted,
+so if your command-line can handle it, you could write the example as below:
+
+    wame:generate:entity Product --fields="{
+        title:{
+            type: string,
+            length: 255
+        }
+    }"
+
 #### Default bundle (Appbundle)
 After dozens of times, even typing a simple AppBundle:EntityName becomes cumbersome. 
 Since many application will only use the AppBundle, the generator assumes
@@ -159,8 +194,25 @@ Multiple validations can be passed by seperating them by a ';' as shown in the e
 In non-interactive mode no validations will be added automatically, so make sure you 
 add all desired validations yourself.
 
-It is not possible to set validation-options. You'll still must modify the entity if
-you need them.
+It is not possible to set validation-options if you want to use the traditional
+field syntax. If you want to add validation-options, you can use the json-syntax instead:
+
+    php bin/console wame:generate:entity Customer --fields="{
+        email:{
+            type:string,
+            validation:{
+                Email,
+                NotBlank,
+                Length: {
+                    min: 5,
+                    max: 150,
+                    minMessage: \"We do not believe an email can have fewer than 5 characters.\",
+                    maxMessage: \"For some inexplicable emails longer than 150 chars are not allowed here.\"
+                }
+            }
+        }
+    }"
+
 
 #### Savepoint
 
@@ -190,9 +242,6 @@ and `--format` options have been removed.
 add this option if you want to have the datatable generated. 
 * ---with-voter
 add this option if you want to have the voter generated.
-
-These options only need to be used in non-interactive mode, since they will
-be asked for during interactive mode.
 
 ## Form generation
 

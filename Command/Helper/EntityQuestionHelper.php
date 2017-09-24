@@ -106,7 +106,7 @@ class EntityQuestionHelper extends QuestionHelper
         $displayField = $this->ask($input, $output, $question);
 
         if ($displayField) {
-            $entityFields[$displayField]['displayField'] = true;
+            $entityFields[$displayField]['display'] = true;
             $input->setOption('fields', $entityFields);
         }
     }

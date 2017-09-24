@@ -13,6 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Wame\GeneratorBundle\DBAL\Types\Type;
 use Wame\GeneratorBundle\Generator\WameEntityGenerator;
+use Wame\GeneratorBundle\Inflector\Inflector;
 
 /**
  * Wame version of GenerateDoctrineEntityCommand
@@ -52,7 +53,7 @@ To deactivate the interaction mode, simply use the <comment>--no-interaction</co
 without forgetting to pass all needed options:
 
 <info>php %command.full_name% Post --format=annotation --fields="
-title:string(255 unique=true displayField=true) body:text(nullable=true) comment:one2many(targetEntity=Comment)
+title:string(255 unique=true display=true) body:text(nullable=true) comment:one2many(targetEntity=Comment)
 " --no-interaction --behaviours=timestampable --behaviours=blameable</info>
 EOT
             );
@@ -138,6 +139,43 @@ EOT
         $entityQuestionHelper->askDisplayField($input, $output);
     }
 
+    protected function parseFieldsAsjson($input): ?array
+    {
+        if (!$input) {
+            return [];
+        }
+
+        //Remove newlines and tabs
+        $input = str_replace(["\r\n", "\n", "\t"], '', $input);
+
+        //Remove spaces before and after special json-characters (: , { } [ ])
+        $input = preg_replace('/ +([:,}{\[\]])/i', '\1', $input);
+        $input = preg_replace('/([:,}{\[\]]) +/i', '\1', $input);
+
+        //Add quotes around key and values
+        $input = preg_replace('/([,{])\'?([\w ]+)\'?:/i', '\1"\2":', $input);
+        $input = preg_replace('/:\'?([\w ]+)\'?([,}])/i', ':"\1"\2', $input);
+        //Remove just added quotes from values that are digit only (example: {"length":"255"} will become {"length":255}
+        $input = preg_replace('/:"(\d+)"/i', ':\1', $input);
+        //Converted key-less fields to booleans (example: {nullable} will become {"nullable":true}
+        $input = preg_replace('/([,{])([\w]+)([,}])/i', '\1"\2":true\3', $input);
+        //Convert boolean again, since there could be overlap. {nullable,unique} would become {"nullable":true,unique} if executed once
+        $input = preg_replace('/([,{])([\w]+)([,}])/i', '\1"\2":true\3', $input);
+
+        $decodedInput = json_decode($input, true);
+
+        if ($decodedInput === null) {
+            throw new \InvalidArgumentException('The input could not be converted to valid json. Please make sure there aren\'t any forgotten/misplaced characters.');
+        }
+
+        foreach ($decodedInput as $fieldName => &$fieldData) {
+            $fieldData['fieldName'] = Inflector::camelize($fieldName);
+            $fieldData['columnName'] = Inflector::tableize($fieldName);
+        }
+
+        return $decodedInput;
+    }
+
     /**
      * Copy of parseFields in Sensio\Bundle\GeneratorBundle\Command\GenerateDoctrineEntityCommand
      * @param string|array $input
@@ -145,6 +183,10 @@ EOT
      */
     protected function parseFields($input): array
     {
+        if ($input && !is_array($input) && strpos($input, '{') !== false) {
+            return $this->parseFieldsAsjson($input);
+        }
+
         $input = $input ?: '';
         if (is_array($input)) {
             return $input;
