@@ -3,13 +3,19 @@
 {% endblock extends %}
 
 {% block body %}
-{{ "{% block body %}" }}
-    <h1>{{ entity_singularized|capitalize }} creation</h1>
+{{ "{% block page_title_text %}" }}
+    {{ "{{ '"~entity_singularized~".new_title' | trans }}" }}
+{{ "{% endblock %}" }}
 
-    {{ '{{ form_start(form) }}' }}
-        {{ '{{ form_widget(form) }}' }}
-        <input type="submit" value="Create" />
-    {{ '{{ form_end(form) }}' }}
+{{ "{% block body %}" }}
+    <div class="panel">
+        <div class="panel-body">
+            {{ '{{ form_start(form) }}' }}
+            {{ '{{ form_widget(form) }}' }}
+            <input type="submit" value="{{ "{{ 'button.create' | trans }}" }}" class="btn btn-primary" />
+            {{ '{{ form_end(form) }}' }}
+        </div>
+    </div>
 
 {% set hide_edit, hide_delete = true, true %}
 {{ include('crud/views/others/record_actions.html.twig.twig') -}}

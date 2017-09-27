@@ -138,6 +138,7 @@ class DoctrineCrudGenerator extends Generator
             'record_actions' => $this->getRecordActions(),
             'route_prefix' => $this->routePrefix,
             'route_name_prefix' => $this->routeNamePrefix,
+            'use_voter' => $this->useVoter,
         ]);
     }
 

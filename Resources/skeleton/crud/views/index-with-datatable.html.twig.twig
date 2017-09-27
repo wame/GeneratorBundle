@@ -3,15 +3,25 @@
 {% endblock extends %}
 
 {% block body %}
-{{ "{% block body %}" }}
-    <h1>{{ entity_pluralized|capitalize }} list</h1>
+{{ "{% block page_title_text %}" }}
+    {{ "{{ '"~entity_singularized~".index_title' | trans }}" }}
+{{ "{% endblock %}" }}
 
-    <div class="box">
-        <div class="box-body">
+{{ "{% block body %}" }}
+    <div class="panel">
+        <div class="panel-heading">
+            {%- if 'new' in actions %}
+
+                <div class="pull-right">
+                    <a href="{{ "{{ path('" ~ route_name_prefix ~ "_new') }}" }}" class="btn btn-primary">{{ "{{ 'action.create' | trans ~ ' ' ~ '"~entity_singularized | capitalize ~"' | trans | lower }}" }}</a>
+                </div>
+            {%- endif %}
+
+        </div>
+        <div class="panel-body">
             {{ '{{ sg_datatables_render_html(datatable) }}' }}
         </div>
     </div>
-
 {{ "{% endblock %}" }}
 {% endblock body %}
 

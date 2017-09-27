@@ -172,7 +172,7 @@ class MetaEntity
     public function hasTrait($traitName): bool
     {
         foreach ($this->getTraits() as $trait) {
-            if ($trait->getName() === $traitName) {
+            if (strtolower($trait->getName()) === strtolower($traitName)) {
                 return true;
             }
         }

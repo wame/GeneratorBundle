@@ -3,89 +3,93 @@
 {% endblock extends %}
 
 {% block body %}
+{{ "{% block page_title_text %}" }}
+    {{ "{{ '"~entity_singularized~".index_title' | trans }}" }}
+{{ "{% endblock %}" }}
+
 {{ "{% block body %}" }}
-    <h1>{{ entity_pluralized|capitalize }} list</h1>
+    <div class="panel">
+        <div class="panel-heading">
+            {%- if 'new' in actions %}
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-            {%- for field, metadata in fields if field not in 'deletedAt,createdAt,updatedAt,updatedBy,deletedBy,createdBy'  %}
-
-                <th>{{ '{{ \'' ~ entity_singularized | tabalize ~ '.' ~field|tabalize ~ '\' | trans }}' }}</th>
-
-            {%- endfor %}
-
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {{ '{% for ' ~ entity_singularized ~ ' in ' ~ entity_pluralized ~ ' %}' }}
-            <tr>
-
-        {%- for field, metadata in fields %}
-            {% if field not in 'deletedAt,createdAt,updatedAt,updatedBy,deletedBy,createdBy' %}
-            {%- if loop.first and ('show' in actions) %}
-
-                <td>{{ '{{ ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ ' }}' }}</td>
-
-            {%- elseif metadata.type in ['datetime'] %}
-
-                <td>{{ '{% if ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ ' %}{{ ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ '|date(\'Y-m-d H:i:s\') }}{% endif %}' }}</td>
-
-            {%- elseif metadata.type in ['date'] %}
-
-                <td>{{ '{% if ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ ' %}{{ ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ '|date(\'Y-m-d\') }}{% endif %}' }}</td>
-
-            {%- elseif metadata.type in ['time'] %}
-
-                <td>{{ '{% if ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ ' %}{{ ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ '|date(\'H:i:s\') }}{% endif %}' }}</td>
-
-            {%- elseif metadata.type in ['array'] %}
-
-                <td>{{ '{% if ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ ' %}{{ ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ '|join(\', \') }}{% endif %}' }}</td>
-
-            {%- elseif metadata.type in ['boolean'] %}
-
-                <td>{{ '{% if ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ ' %}Yes{% else %}No{% endif %}' }}</td>
-
-            {%- else %}
-
-                <td>{{ '{{ ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ ' }}' }}</td>
-
+            <div class="pull-right">
+                <a href="{{ "{{ path('" ~ route_name_prefix ~ "_new') }}" }}" class="btn btn-primary">{{ "{{ 'action.create' | trans ~ ' ' ~ '"~entity_singularized | capitalize ~"' | trans | lower }}" }}</a>
+            </div>
             {%- endif %}
 
-            {%- endif %}
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                    {%- for field, metadata in fields if field not in 'deletedAt,createdAt,updatedAt,updatedBy,deletedBy,createdBy'  %}
 
-            {%- if loop.last %}
+                        <th>{{ '{{ \'' ~ entity_singularized | tabalize ~ '.' ~field|tabalize ~ '\' | trans }}' }}</th>
 
-                <td class="action-column">
-                    {%- for action in record_actions -%}
-                        {%- set btn_type = (action == 'edit' ? 'warning' : (action == 'delete' ? 'danger' : 'default')) -%}
-                        {{- '\n                    ' -}}
-                        <a href="{{ "{{ path('" ~ route_name_prefix ~ "_" ~ action ~ "', { '"~ identifier ~"': " ~ entity_singularized ~ "."~ identifier ~" }) }}" }}" class="btn btn-{{ btn_type }}">
-                            {{- '\n                        ' -}}
-                            {{- '{{ \'action.' ~action~ '\' | trans }}' -}}
-                        {{- '\n                    ' -}}
-                        </a>
-                    {%- endfor -%}
-                    {{- '\n                ' -}}
-                </td>
+                    {%- endfor %}
 
-            {%- endif %}
-        {%- endfor %}
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {{ '{% for ' ~ entity_singularized ~ ' in ' ~ entity_pluralized ~ ' %}' }}
+                    <tr>
 
-            </tr>
-        {{ '{% endfor %}' }}
-        </tbody>
-    </table>
+                {%- for field, metadata in fields %}
+                    {% if field not in 'deletedAt,createdAt,updatedAt,updatedBy,deletedBy,createdBy' %}
+                    {%- if loop.first and ('show' in actions) %}
 
-    {% if 'new' in actions -%}
-    <ul>
-        <li>
-            <a href="{{ "{{ path('" ~ route_name_prefix ~ "_new') }}" }}">Create a new {{ entity_singularized }}</a>
-        </li>
-    </ul>
-    {%- endif %}
+                        <td>{{ '{{ ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ ' }}' }}</td>
 
+                    {%- elseif metadata.type in ['datetime'] %}
+
+                        <td>{{ '{% if ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ ' %}{{ ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ '|date(\'Y-m-d H:i:s\') }}{% endif %}' }}</td>
+
+                    {%- elseif metadata.type in ['date'] %}
+
+                        <td>{{ '{% if ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ ' %}{{ ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ '|date(\'Y-m-d\') }}{% endif %}' }}</td>
+
+                    {%- elseif metadata.type in ['time'] %}
+
+                        <td>{{ '{% if ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ ' %}{{ ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ '|date(\'H:i:s\') }}{% endif %}' }}</td>
+
+                    {%- elseif metadata.type in ['array'] %}
+
+                        <td>{{ '{% if ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ ' %}{{ ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ '|join(\', \') }}{% endif %}' }}</td>
+
+                    {%- elseif metadata.type in ['boolean'] %}
+
+                        <td>{{ '{% if ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ ' %}Yes{% else %}No{% endif %}' }}</td>
+
+                    {%- else %}
+
+                        <td>{{ '{{ ' ~ entity_singularized ~ '.' ~ field|replace({'_': ''}) ~ ' }}' }}</td>
+
+                    {%- endif %}
+
+                    {%- endif %}
+
+                    {%- if loop.last %}
+
+                        <td class="action-column">
+                            {%- for action in record_actions %}
+                            {%- set btn_type = (action == 'edit' ? 'warning' : (action == 'delete' ? 'danger' : 'default')) %}
+
+                            <a href="{{ "{{ path('" ~ route_name_prefix ~ "_" ~ action ~ "', { '"~ identifier ~"': " ~ entity_singularized ~ "."~ identifier ~" }) }}" }}" class="btn btn-{{ btn_type }}">
+                                {{ '{{ \'action.' ~action~ '\' | trans }}' }}
+                            </a>
+                            {%- endfor %}
+
+                        </td>
+
+                    {%- endif %}
+                {%- endfor %}
+
+                    </tr>
+                {{ '{% endfor %}' }}
+                </tbody>
+            </table>
+        </div>
+    </div>
 {{ "{% endblock %}" }}
 {% endblock body %}
