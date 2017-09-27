@@ -72,7 +72,7 @@ class WameEntityGenerator extends Generator
                         ->setOptions($validation['options'] ?? $validation)
                     );
                 } else {
-                    $metaProperty->addValidation((new MetaValidation())->setType(is_bool($validation) ? $validationName : $validation));
+                    $metaProperty->addValidation((new MetaValidation())->setType(is_bool($validation) || !$validation ? $validationName : $validation));
                 }
             }
             $metaEntity->addProperty($metaProperty);

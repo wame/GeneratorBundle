@@ -139,27 +139,30 @@ EOT
         $entityQuestionHelper->askDisplayField($input, $output);
     }
 
-    protected function parseFieldsAsjson($input): ?array
+    protected function parseFieldsAsjson(string $input): ?array
     {
         if (!$input) {
             return [];
         }
 
-        //Remove newlines and tabs
-        $input = str_replace(["\r\n", "\n", "\t"], '', $input);
+        //Remove newlines, tabs, space-indents
+        $input = str_replace(["\r\n", "\n", "\t", '  '], '', $input);
+        //Remove comma's at the end of an 'array'
+        $input = preg_replace('/, ?}/i', '}', $input);
 
-        //Remove spaces before and after special json-characters (: , { } [ ])
+        //Remove spaces before and after json-characters (: , { } [ ])
         $input = preg_replace('/ +([:,}{\[\]])/i', '\1', $input);
         $input = preg_replace('/([:,}{\[\]]) +/i', '\1', $input);
 
-        //Add quotes around key and values
+        //Add quotes around keys => {key:value} becomes {"key":value}
         $input = preg_replace('/([,{])\'?([\w ]+)\'?:/i', '\1"\2":', $input);
-        $input = preg_replace('/:\'?([\w ]+)\'?([,}])/i', ':"\1"\2', $input);
-        //Remove just added quotes from values that are digit only (example: {"length":"255"} will become {"length":255}
-        $input = preg_replace('/:"(\d+)"/i', ':\1', $input);
-        //Converted key-less fields to booleans (example: {nullable} will become {"nullable":true}
+        //Add quotes around values => {"key":some value} becomes {"key":"some value"}
+        $input = preg_replace('/:\'?([^,}{]+)\'?([,}])/i', ':"\1"\2', $input);
+        //Remove just added quotes from digits, null ands booleans => {"length":"255"} becomes {"length":255}
+        $input = preg_replace('/:"(true|false|null|\d+)"/i', ':\1', $input);
+        //Keys without value will become booleans => {nullable} will become {"nullable":true}
         $input = preg_replace('/([,{])([\w]+)([,}])/i', '\1"\2":true\3', $input);
-        //Convert boolean again, since there could be overlap. {nullable,unique} would become {"nullable":true,unique} if executed once
+        //Repeat same expressiong, because {nullable,unique} would become {"nullable":true,unique} if executed only once
         $input = preg_replace('/([,{])([\w]+)([,}])/i', '\1"\2":true\3', $input);
 
         $decodedInput = json_decode($input, true);
@@ -178,19 +181,21 @@ EOT
 
     /**
      * Copy of parseFields in Sensio\Bundle\GeneratorBundle\Command\GenerateDoctrineEntityCommand
+     * with the exception of the first few lines that check if we should parse these fields as json
+     * or if we are dealing with an array already.
      * @param string|array $input
      * @return array
      */
     protected function parseFields($input): array
     {
-        if ($input && !is_array($input) && strpos($input, '{') !== false) {
+        if (is_array($input)) {
+            return $input;
+        }
+        if ($input && strpos($input, '{') !== false) {
             return $this->parseFieldsAsjson($input);
         }
 
         $input = $input ?: '';
-        if (is_array($input)) {
-            return $input;
-        }
 
         $fields = array();
         foreach (preg_split('{(?:\([^\(]*\))(*SKIP)(*F)|\s+}', $input) as $value) {
@@ -226,11 +231,9 @@ EOT
                         }
                     }
                 }
-
                 $fields[$name] = $fieldAttributes;
             }
         }
-
         return $fields;
     }
 
