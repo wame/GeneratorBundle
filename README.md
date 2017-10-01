@@ -9,17 +9,17 @@ regarding entity and CRUD generations.
 
 ## Documentation
 
-1. [Introduction](Resources/doc/introduction.md)
-2. [Getting started](Resources/doc/getting_started.md)
-3. [Configuration options](Resources/doc/configuration.md)
-4. [Entity Generation](Resources/doc/entity_generation.md)
-5. [CRUD Generation](Resources/doc/crud_generation.md)
-6. [Enum Generation](Resources/doc/enum_generation.md)
-7. [Form Generation](Resources/doc/form_generation.md)
-8. [Voter Generation](Resources/doc/voter_generation.md)
-9. [Datatable Generation](Resources/doc/datatable_generation.md)
-10. [Overriding twig files](Resources/doc/overriding_twig.md)
-11. [Extending this bundle](Resources/doc/extending_bundle.md)
+1. [Introduction](Resources/doc/1_introduction.md)
+2. [Getting started](Resources/doc/2_getting_started.md)
+3. [Configuration options](Resources/doc/3_configuration.md)
+4. [Entity Generation](Resources/doc/4_entity_generation.md)
+5. [CRUD Generation](Resources/doc/5_crud_generation.md)
+6. [Enum Generation](Resources/doc/6_enum_generation.md)
+7. [Form Generation](Resources/doc/7_form_generation.md)
+8. [Voter Generation](Resources/doc/8_voter_generation.md)
+9. [Datatable Generation](Resources/doc/9_datatable_generation.md)
+10. [Overriding twig files](Resources/doc/10_overriding_twig.md)
+11. [Extending this bundle](Resources/doc/11_extending_bundle.md)
 
 
 #### TODO's
