@@ -24,7 +24,7 @@ class WameVoterGenerator extends Generator
             'meta_entity' => $metaEntity,
         ]);
 
-        $path = $securityDir.'/'.$metaEntity->getEntityName().'Voter.php';
+        $path = $securityDir.'/'.$metaEntity->getDirectory('/').$metaEntity->getEntityName().'Voter.php';
 
         return static::dump($path, $voterContent, $allowOverride) !== false;
     }

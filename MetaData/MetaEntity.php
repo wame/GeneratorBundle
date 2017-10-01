@@ -19,6 +19,9 @@ class MetaEntity
     /** @var BundleInterface */
     protected $bundle;
 
+    /** @var string */
+    protected $directory;
+
     /** @var MetaInterface[]|ArrayCollection */
     protected $interfaces;
 
@@ -35,7 +38,7 @@ class MetaEntity
     {
         $this->bundle = $bundle;
         $this->setEntityName($entityName);
-        $this->setTableName($entityName);
+        $this->setTableName($this->getEntityName());
         $this->properties = new ArrayCollection();
         $this->interfaces = new ArrayCollection();
         $this->traits = new ArrayCollection();
@@ -48,6 +51,12 @@ class MetaEntity
 
     public function setEntityName(string $entityName): self
     {
+        $entityName = str_replace('/', '\\', $entityName);
+        if (strpos($entityName, '\\') !== false) {
+            $entityNameParts = explode('\\', $entityName);
+            $this->setDirectory($entityNameParts[0]);
+            $entityName = $entityNameParts[1];
+        }
         $this->entityName = Inflector::classify($entityName);
         return $this;
     }
@@ -73,9 +82,30 @@ class MetaEntity
         return $this->getBundle() ? $this->getBundle()->getNamespace() : null;
     }
 
+    public function getEntityNameSpace($withEntityName = true): ?string
+    {
+        if (!$bundleNameSpace = $this->getBundleNamespace()) {
+            return null;
+        }
+        $dirPart = $this->getDirectory() ? '\\'.$this->getDirectory() : '';
+        $namePart = $withEntityName ? '\\'.$this->getEntityName() : '';
+        return $bundleNameSpace . '\\Entity' . $dirPart . $namePart;
+    }
+
     public function setBundle(BundleInterface $bundle): self
     {
         $this->bundle = $bundle;
+        return $this;
+    }
+
+    public function getDirectory(string $trailingSlash = ''): ?string
+    {
+        return $this->directory ? ($this->directory . $trailingSlash) : null;
+    }
+
+    public function setDirectory(?string $directory): self
+    {
+        $this->directory = $directory;
         return $this;
     }
 

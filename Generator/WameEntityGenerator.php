@@ -86,7 +86,7 @@ class WameEntityGenerator extends Generator
         $entityContent = $this->render('entity/entity.php.twig', [
             'meta_entity' => $metaEntity,
         ]);
-        $entityPath = $metaEntity->getBundle()->getPath().'/Entity/'.$metaEntity->getEntityName().'.php';
+        $entityPath = $metaEntity->getBundle()->getPath().'/Entity/'.$metaEntity->getDirectory('/').$metaEntity->getEntityName().'.php';
         static::dump($entityPath, $entityContent);
 
         $includeRepo ? $this->repositoryGenerator->generateByMetaEntity($metaEntity) : null;

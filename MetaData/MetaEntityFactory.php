@@ -28,6 +28,7 @@ class MetaEntityFactory
         $entityMetadata = (new MetaEntity($bundle, $reflectionClass->getShortName()))
             ->setTableName($classMetadata->getTableName())
         ;
+
         static::setInterfaces($entityMetadata, $reflectionClass);
         static::setTraits($entityMetadata, $reflectionClass);
 
@@ -35,8 +36,18 @@ class MetaEntityFactory
 
         static::setAssociationFields($entityMetadata, $classMetadata, $reflectionClass);
 
+        static::setDirectory($entityMetadata, $reflectionClass);
 
         return $entityMetadata;
+    }
+
+    protected static function setDirectory(MetaEntity $metaEntity, \ReflectionClass $reflectionClass)
+    {
+        $dir = str_replace([$metaEntity->getEntityName(), $metaEntity->getBundleNamespace(), '\\Entity\\'], '', $reflectionClass->getName());
+        $dir = rtrim($dir, '\\');
+        if (!empty($dir)) {
+            $metaEntity->setDirectory($dir);
+        }
     }
 
     protected static function setFields(MetaEntity $metaEntity, ClassMetadata $classMetadata, \ReflectionClass $reflectionClass)

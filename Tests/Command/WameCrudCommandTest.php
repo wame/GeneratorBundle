@@ -10,6 +10,8 @@ class WameCrudCommandTest extends WameCommandTest
         parent::setUp();
         //Create Book entity, so we can use this entity for the tests
         copy($this->getTestFilePath('Entity/BookDetailInfo.php'), $this->getResultFilePath('Entity/BookDetailInfo.php'));
+        //Create entity test file for using subdirectories
+        copy($this->getTestFilePath('Entity/Admin/SpecialConfiguration.php'), $this->getResultFilePath('Entity/Admin/SpecialConfiguration.php'));
     }
 
     /**
@@ -39,6 +41,19 @@ class WameCrudCommandTest extends WameCommandTest
                     'Security/AppVoter.php',
                     'Security/BookDetailInfoVoter.php',
                     'Form/BookDetailInfoType.php',
+                ]
+            ],
+            //Test subdirectories
+            [
+                ['entity' => 'WameGeneratorBundle:Admin\SpecialConfiguration','--overwrite' => true],
+                [
+                    'Controller/Admin/SpecialConfigurationController.php',
+                    'Datatable/AppDatatable.php',
+                    'Datatable/DatatableResultService.php',
+                    'Datatable/Admin/SpecialConfigurationDatatable.php',
+                    'Security/AppVoter.php',
+                    'Security/Admin/SpecialConfigurationVoter.php',
+                    'Form/Admin/SpecialConfigurationType.php',
                 ]
             ],
         ];

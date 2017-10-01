@@ -3,7 +3,7 @@
 <?php
 declare(strict_types=1);
 
-namespace {{ meta_entity.bundleNamespace }}\Entity;
+namespace {{ meta_entity.entityNameSpace(false) }};
 
 use Doctrine\ORM\Mapping as ORM;
 {% if meta_entity.hasTrait('SoftDeleteable') %}
@@ -28,7 +28,7 @@ use Fresh\DoctrineEnumBundle\Validator\Constraints as EnumAssert;
 
 /**
  * @ORM\Table(name="{{ meta_entity.tableName }}")
- * @ORM\Entity(repositoryClass="{{ meta_entity.bundleNamespace }}\Repository\{{ meta_entity.entityName }}Repository")
+ * @ORM\Entity(repositoryClass="{{ meta_entity.bundleNamespace }}\Repository\{{ meta_entity.directory('\\') }}{{ meta_entity.entityName }}Repository")
 {% if meta_entity.hasTrait('SoftDeleteable') %}
  * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
 {% endif %}

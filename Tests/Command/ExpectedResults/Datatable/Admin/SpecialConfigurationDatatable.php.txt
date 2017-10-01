@@ -1,0 +1,22 @@
+<?php
+declare(strict_types=1);
+
+namespace Wame\GeneratorBundle\Datatable\Admin;
+
+use Wame\GeneratorBundle\Datatable\AppDatatable;
+use Sg\DatatablesBundle\Datatable\Column\Column;
+
+class SpecialConfigurationDatatable extends AppDatatable
+{
+    protected function addColumns(?array $options = []): void
+    {
+        $this->columnBuilder
+            ->add('id', Column::class, [
+                'title' => $this->translator->trans('special_configuration.id'),
+            ])
+            ->add('title', Column::class, [
+                'title' => $this->translator->trans('special_configuration.title'),
+            ])
+        ;
+    }
+}

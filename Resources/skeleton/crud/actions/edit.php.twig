@@ -14,7 +14,7 @@
     {
 {% block method_body %}
     {%- if use_voter is defined and use_voter %}
-        $this->denyAccessUnlessGranted({{ entity }}Voter::EDIT, ${{ entity_singularized }});
+        $this->denyAccessUnlessGranted({{ entity_class }}Voter::EDIT, ${{ entity_singularized }});
         {{- '\n\n' -}}
     {%- endif %}
         $deleteForm = $this->createDeleteForm(${{ entity_singularized }});

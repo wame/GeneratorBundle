@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Wame\GeneratorBundle\Tests\Command;
 
+use Wame\GeneratorBundle\Tests\Command\CommandDataFiles\EntityAdminSpecialConfiguration;
 use Wame\GeneratorBundle\Tests\Command\CommandDataFiles\EntityAuthor;
 use Wame\GeneratorBundle\Tests\Command\CommandDataFiles\EntityBook;
 use Wame\GeneratorBundle\Tests\Command\CommandDataFiles\EntityBookDetailInfo;
@@ -50,6 +51,8 @@ class WameEntityCommandTest extends WameCommandTest
             [EntityLibrary::$commandOptions, ['Entity/Library.php']],
             [EntityPerson::$commandOptions, ['Entity/Person.php']],
             [EntityAuthor::$commandOptions, ['Entity/Author.php']],
+            //Test usage of subdirectory
+            [EntityAdminSpecialConfiguration::$commandOptions, ['Entity/Admin/SpecialConfiguration.php']],
         ];
     }
 }

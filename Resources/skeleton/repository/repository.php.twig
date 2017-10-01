@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace {{ meta_entity.bundleNamespace }}\Repository;
+namespace {{ meta_entity.bundleNamespace }}\Repository{{ meta_entity.directory ? '\\'~meta_entity.directory : '' }};
 
 use Doctrine\ORM\EntityRepository;
 

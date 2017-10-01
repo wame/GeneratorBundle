@@ -25,10 +25,11 @@ trait HelperTrait
         $entities = [];
         foreach ($entityMetadata as $meta) {
             $entityNamespace = $meta->getName();
+            dump($entityNamespace);
             $shortName = $meta->reflClass->getShortName();
             $bundle = null;
             foreach ($this->bundles as $bundleName => $bundleNamespace) {
-                if (strpos($entityNamespace, $bundleName) !== false) {
+                if (strpos(str_replace('\\','',$entityNamespace), $bundleName) !== false) {
                     $bundle = $bundleName;
                 }
             }

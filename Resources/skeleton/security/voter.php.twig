@@ -3,10 +3,13 @@
 <?php
 declare(strict_types=1);
 
-namespace {{ meta_entity.bundleNamespace }}\Security;
+namespace {{ meta_entity.bundleNamespace }}\Security{{ meta_entity.directory ? '\\'~meta_entity.directory : '' }};
 
-use {{ meta_entity.bundleNamespace }}\Entity\{{ meta_entity.entityName }};
+use {{ meta_entity.entityNameSpace }};
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+{% if meta_entity.directory -%}
+use {{ meta_entity.bundleNamespace }}\Security\AppVoter;
+{% endif %}
 
 class {{ meta_entity.entityName }}Voter extends AppVoter
 {

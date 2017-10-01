@@ -13,7 +13,7 @@
     {
 {% block method_body %}
     {%- if use_voter is defined and use_voter %}
-        $this->denyAccessUnlessGranted({{ entity }}Voter::CREATE);
+        $this->denyAccessUnlessGranted({{ entity_class }}Voter::CREATE);
         {{- '\n\n' -}}
     {%- endif %}
         ${{ entity_singularized }} = new {{ entity_class }}();

@@ -1,0 +1,10 @@
+<?php
+declare(strict_types=1);
+
+namespace Wame\GeneratorBundle\Repository\Admin;
+
+use Doctrine\ORM\EntityRepository;
+
+class SpecialConfigurationRepository extends EntityRepository
+{
+}

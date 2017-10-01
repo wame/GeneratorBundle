@@ -1,0 +1,148 @@
+<?php
+declare(strict_types=1);
+
+namespace Wame\GeneratorBundle\Controller\Admin;
+
+use Wame\GeneratorBundle\Entity\Admin\SpecialConfiguration;
+use Wame\GeneratorBundle\Form\Admin\SpecialConfigurationType;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Form\Form;
+use Wame\GeneratorBundle\Security\Admin\SpecialConfigurationVoter;
+use Wame\GeneratorBundle\Datatable\DatatableResultService;
+use Wame\GeneratorBundle\Datatable\Admin\SpecialConfigurationDatatable;
+use Symfony\Component\HttpFoundation\Response;
+
+/**
+ * @Route("/admin_special_configuration")
+ */
+class SpecialConfigurationController extends Controller
+{
+    /**
+     * @Route("/", name="admin_special_configuration_index")
+     * @Method("GET")
+     */
+    public function indexAction(SpecialConfigurationDatatable $datatable): Response
+    {
+        $this->denyAccessUnlessGranted(SpecialConfigurationVoter::INDEX);
+
+        $datatable->buildDatatable();
+
+        return $this->render('admin/special_configuration/index.html.twig', [
+            'datatable' => $datatable,
+        ]);
+    }
+    /**
+     * @Route("/", name="admin_special_configuration_result")
+     * @Method("POST")
+     */
+    public function resultAction(SpecialConfigurationDatatable $datatable, DatatableResultService $datatableResultService): Response
+    {
+        $this->denyAccessUnlessGranted(SpecialConfigurationVoter::SEARCH);
+
+        return $datatableResultService->getDatatableResult($datatable);
+    }
+
+    /**
+     * @Route("/new", name="admin_special_configuration_new")
+     * @Method({"GET", "POST"})
+     */
+    public function newAction(Request $request): Response
+    {
+        $this->denyAccessUnlessGranted(SpecialConfigurationVoter::CREATE);
+
+        $specialConfiguration = new SpecialConfiguration();
+        $form = $this->createForm(SpecialConfigurationType::class, $specialConfiguration);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($specialConfiguration);
+            $em->flush();
+
+            $this->addFlash('success', 'admin_special_configuration.create_success');
+
+            return $this->redirectToRoute('admin_special_configuration_show', ['id' => $specialConfiguration->getId()]);
+        }
+
+        return $this->render('admin/special_configuration/new.html.twig', [
+            'specialConfiguration' => $specialConfiguration,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/{id}", name="admin_special_configuration_show")
+     * @Method("GET")
+     */
+    public function showAction(SpecialConfiguration $specialConfiguration): Response
+    {
+        $this->denyAccessUnlessGranted(SpecialConfigurationVoter::VIEW, $specialConfiguration);
+        $deleteForm = $this->createDeleteForm($specialConfiguration);
+
+        return $this->render('admin/special_configuration/show.html.twig', [
+            'specialConfiguration' => $specialConfiguration,
+            'delete_form' => $deleteForm->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/{id}/edit", name="admin_special_configuration_edit")
+     * @Method({"GET", "POST"})
+     */
+    public function editAction(Request $request, SpecialConfiguration $specialConfiguration): Response
+    {
+        $this->denyAccessUnlessGranted(SpecialConfigurationVoter::EDIT, $specialConfiguration);
+
+        $deleteForm = $this->createDeleteForm($specialConfiguration);
+        $editForm = $this->createForm(SpecialConfigurationType::class, $specialConfiguration);
+        $editForm->handleRequest($request);
+
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
+            $this->getDoctrine()->getManager()->flush();
+
+            $this->addFlash('success', 'admin_special_configuration.edit_success');
+
+            return $this->redirectToRoute('admin_special_configuration_show', ['id' => $specialConfiguration->getId()]);
+        }
+
+        return $this->render('admin/special_configuration/edit.html.twig', [
+            'specialConfiguration' => $specialConfiguration,
+            'edit_form' => $editForm->createView(),
+            'delete_form' => $deleteForm->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/{id}", name="admin_special_configuration_delete")
+     * @Method("DELETE")
+     */
+    public function deleteAction(Request $request, SpecialConfiguration $specialConfiguration): Response
+    {
+        $this->denyAccessUnlessGranted(SpecialConfigurationVoter::DELETE, $specialConfiguration);
+
+        $form = $this->createDeleteForm($specialConfiguration);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($specialConfiguration);
+            $em->flush();
+
+            $this->addFlash('success', 'admin_special_configuration.delete_success');
+        }
+
+        return $this->redirectToRoute('admin_special_configuration_index');
+    }
+
+    private function createDeleteForm(SpecialConfiguration $specialConfiguration): Form
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('admin_special_configuration_delete', ['id' => $specialConfiguration->getId()]))
+            ->setMethod('DELETE')
+            ->getForm()
+        ;
+    }
+}

@@ -4,7 +4,7 @@
 
 {% block body %}
 {{ "{% block page_title_text %}" }}
-    {{ "{{ '"~entity_singularized~".show_title' | trans }}" }}
+    {{ "{{ '"~entity_singularized|tabalize~".show_title' | trans }}" }}
 {{ "{% endblock %}" }}
 
 {{ "{% block body %}" }}

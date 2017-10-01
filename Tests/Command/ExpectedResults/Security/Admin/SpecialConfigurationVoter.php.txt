@@ -1,0 +1,45 @@
+<?php
+declare(strict_types=1);
+
+namespace Wame\GeneratorBundle\Security\Admin;
+
+use Wame\GeneratorBundle\Entity\Admin\SpecialConfiguration;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Wame\GeneratorBundle\Security\AppVoter;
+
+class SpecialConfigurationVoter extends AppVoter
+{
+    const INDEX     = 'SPECIAL_CONFIGURATION_INDEX';
+    const SEARCH    = 'SPECIAL_CONFIGURATION_SEARCH';
+    const VIEW      = 'SPECIAL_CONFIGURATION_VIEW';
+    const CREATE    = 'SPECIAL_CONFIGURATION_CREATE';
+    const EDIT      = 'SPECIAL_CONFIGURATION_EDIT';
+    const DELETE    = 'SPECIAL_CONFIGURATION_DELETE';
+
+    static protected $supportedAttributes = [
+        self::INDEX,
+        self::SEARCH,
+        self::VIEW,
+        self::CREATE,
+        self::EDIT,
+        self::DELETE,
+    ];
+
+    static protected $supportedClasses = [
+        SpecialConfiguration::class
+    ];
+
+    protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
+    {
+        switch ($attribute) {
+            case self::INDEX:
+            case self::SEARCH:
+            case self::VIEW:
+            case self::CREATE:
+            case self::EDIT:
+            case self::DELETE:
+                return $this->isAdmin($token);
+        }
+        throw new \LogicException('This code should not be reached!');
+    }
+}

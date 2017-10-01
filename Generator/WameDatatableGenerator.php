@@ -17,7 +17,7 @@ class WameDatatableGenerator extends Generator
         $content = $this->render('datatable/datatable.php.twig', [
             'meta_entity' => $metaEntity,
         ]);
-        $path = $datatableDir.'/'.$metaEntity->getEntityName().'Datatable.php';
+        $path = $datatableDir.'/'.$metaEntity->getDirectory('/').$metaEntity->getEntityName().'Datatable.php';
         return static::dump($path, $content, $allowOverride) !== false;
     }
 

@@ -13,7 +13,7 @@
     {
 {% block method_body %}
     {%- if use_voter is defined and use_voter %}
-        $this->denyAccessUnlessGranted({{ entity }}Voter::VIEW, ${{ entity_singularized }});
+        $this->denyAccessUnlessGranted({{ entity_class }}Voter::VIEW, ${{ entity_singularized }});
         {{- '\n' -}}
     {%- endif %}
 {% if 'delete' in actions %}

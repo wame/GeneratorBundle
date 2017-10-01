@@ -7,12 +7,12 @@
 {% endblock phpdoc_method_annotations %}
      */
 {% block method_definition %}
-    public function indexAction({{ entity }}Datatable $datatable): Response
+    public function indexAction({{ entity_class }}Datatable $datatable): Response
 {% endblock method_definition %}
     {
 {% block method_body %}
     {%- if use_voter is defined and use_voter %}
-        $this->denyAccessUnlessGranted({{ entity }}Voter::INDEX);
+        $this->denyAccessUnlessGranted({{ entity_class }}Voter::INDEX);
         {{- '\n\n' -}}
     {%- endif %}
         $datatable->buildDatatable();

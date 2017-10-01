@@ -45,7 +45,7 @@ class CrudQuestionHelper extends QuestionHelper
     public function askRoutePrefix(InputInterface $input, OutputInterface $output, $entity)
     {
         // route prefix
-        $prefix = $input->getOption('route-prefix') ?: Inflector::tableize($entity);
+        $prefix = $input->getOption('route-prefix') ?: str_replace('\\', '_', Inflector::tableize( $entity));
 
         $output->writeln(array(
             '',

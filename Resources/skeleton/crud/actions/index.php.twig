@@ -12,7 +12,7 @@
     {
 {% block method_body %}
     {%- if use_voter is defined and use_voter %}
-        $this->denyAccessUnlessGranted({{ entity }}Voter::INDEX);
+        $this->denyAccessUnlessGranted({{ entity_class }}Voter::INDEX);
         {{- '\n\n' -}}
     {%- endif %}
         $em = $this->getDoctrine()->getManager();
