@@ -104,8 +104,8 @@ class WameEnumCommand extends ContainerAwareCommand
             $constantValue = $questionHelper->ask($input, $output, $question);
 
 
-            $displayDefault = Inflector::humanize($optionValue);
-            $question = new Question($questionHelper->getQuestion('Constant for this option', $displayDefault), $displayDefault);
+            $displayDefault = str_replace('-', ' ', Inflector::humanize($optionValue));
+            $question = new Question($questionHelper->getQuestion('Label for this option', $displayDefault), $displayDefault);
             $displayValue = $questionHelper->ask($input, $output, $question);
 
             $enumOptions[] = [$constantDefault, $constantValue, $displayValue];

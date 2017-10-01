@@ -136,7 +136,7 @@ class EntityQuestionHelper extends QuestionHelper
     {
         $question = new Question($this->getQuestion('Field length', 255), 255);
         $question->setValidator(WameValidators::getLengthValidator());
-        return $this->ask($input, $output, $question);
+        return (int) $this->ask($input, $output, $question);
     }
 
     public function askFieldPrecision(InputInterface $input, OutputInterface $output): ?int

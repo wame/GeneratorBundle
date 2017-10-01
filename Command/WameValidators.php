@@ -76,6 +76,7 @@ class WameValidators extends Validators
             if (!$length) {
                 return $length;
             }
+            $length = (int) $length;
 
             $result = filter_var($length, FILTER_VALIDATE_INT, array(
                 'options' => array('min_range' => 1),

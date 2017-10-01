@@ -25,7 +25,6 @@ trait HelperTrait
         $entities = [];
         foreach ($entityMetadata as $meta) {
             $entityNamespace = $meta->getName();
-            dump($entityNamespace);
             $shortName = $meta->reflClass->getShortName();
             $bundle = null;
             foreach ($this->bundles as $bundleName => $bundleNamespace) {

@@ -1,0 +1,17 @@
+<?php
+declare(strict_types=1);
+
+namespace Wame\GeneratorBundle\DBAL\Types;
+
+use Fresh\DoctrineEnumBundle\DBAL\Types\AbstractEnumType;
+
+final class SchoolType extends AbstractEnumType
+{
+    const PRIMARY = 'PRIMARY';
+    const SPECIAL_EDUCATION = 'SPECIAL_EDUCATION';
+
+    protected static $choices = [
+        self::PRIMARY => 'Primary school',
+        self::SPECIAL_EDUCATION => 'Special education',
+    ];
+}

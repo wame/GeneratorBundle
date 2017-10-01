@@ -74,4 +74,43 @@ class WameEnumCommandTest extends WameCommandTest
         ]);
         $this->assertFileNotEqualsTestFile('DBAL/Types/BookType.php');
     }
+
+
+    public function testInteractiveCommandResult()
+    {
+        $commandTester = $this->getExecutedCommandTester('wame:generate:enum', [],
+            //Enum name, should end with Type:
+            "School\n"
+            //Enum name, should end with Type:
+            ."SchoolType\n"
+            //New option value [as persisted] (press <return> to stop adding values):
+            ."primary\n"
+            //Constant for this option [PRIMARY]:
+            ."\n"
+            //Label for this option [Primary]:
+            ."Primary school\n"
+            //New option value [as persisted] (press <return> to stop adding values):
+            ."special-education\n"
+            //Constant for this option [SPECIAL_EDUCATION]:
+            ."SPECIAL_EDUCATION\n"
+            //Label for this option [Special education]:
+            ."\n"
+            //New option value [as persisted] (press <return> to stop adding values):
+            ."\n"
+            //Confirm automatic update of the config [yes]?
+            ."yes\n"
+
+        );
+        $commandDisplay = $commandTester->getDisplay();
+
+        $this->assertContains('Enum name, should end with Type:', $commandDisplay);
+        $this->assertContains('The enum name must end with Type.', $commandDisplay);
+        $this->assertContains('Constant for this option [SPECIAL_EDUCATION]', $commandDisplay);
+        $this->assertContains('Label for this option [Special education]', $commandDisplay);
+        $this->assertContains('Registering the doctrine enum type:', $commandDisplay);
+        //TODO: assert that the type is actually registered to config.yml
+        $this->assertContains('Everything is OK!', $commandDisplay);
+
+        $this->assertFileEqualsTestFile('DBAL/Types/SchoolType.php');
+    }
 }

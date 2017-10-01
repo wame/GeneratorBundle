@@ -136,9 +136,7 @@ class MetaEntityFactory
                 break;
         }
         if ($type === null) {
-            dump("TODO: fix this type-retrieval");
-            dump($associationMapping);
-            exit();
+            throw new \InvalidArgumentException(sprintf("No relationship-type could be determined for mapping type = %d", $mappingType));
         }
         return $type;
     }

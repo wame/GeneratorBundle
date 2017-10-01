@@ -1,0 +1,54 @@
+<?php
+declare(strict_types=1);
+
+namespace Wame\GeneratorBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
+/**
+ * @ORM\Table(name="interacteds")
+ * @ORM\Entity(repositoryClass="Wame\GeneratorBundle\Repository\InteractedRepository")
+ */
+class Interacted
+{
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="title", type="string", length=100)
+     * @Assert\NotBlank
+     * @Assert\Length(max=100, min=10)
+     */
+    private $title;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): self
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->getTitle() ?: '';
+    }
+}
