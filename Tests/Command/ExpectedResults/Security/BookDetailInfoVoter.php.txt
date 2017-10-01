@@ -1,0 +1,44 @@
+<?php
+declare(strict_types=1);
+
+namespace Wame\GeneratorBundle\Security;
+
+use Wame\GeneratorBundle\Entity\BookDetailInfo;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+
+class BookDetailInfoVoter extends AppVoter
+{
+    const INDEX     = 'BOOK_DETAIL_INFO_INDEX';
+    const SEARCH    = 'BOOK_DETAIL_INFO_SEARCH';
+    const VIEW      = 'BOOK_DETAIL_INFO_VIEW';
+    const CREATE    = 'BOOK_DETAIL_INFO_CREATE';
+    const EDIT      = 'BOOK_DETAIL_INFO_EDIT';
+    const DELETE    = 'BOOK_DETAIL_INFO_DELETE';
+
+    static protected $supportedAttributes = [
+        self::INDEX,
+        self::SEARCH,
+        self::VIEW,
+        self::CREATE,
+        self::EDIT,
+        self::DELETE,
+    ];
+
+    static protected $supportedClasses = [
+        BookDetailInfo::class
+    ];
+
+    protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
+    {
+        switch ($attribute) {
+            case self::INDEX:
+            case self::SEARCH:
+            case self::VIEW:
+            case self::CREATE:
+            case self::EDIT:
+            case self::DELETE:
+                return $this->isAdmin($token);
+        }
+        throw new \LogicException('This code should not be reached!');
+    }
+}

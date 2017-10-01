@@ -1,0 +1,30 @@
+<?php
+declare(strict_types=1);
+
+namespace Wame\GeneratorBundle\Datatable;
+
+use Sg\DatatablesBundle\Datatable\Column\Column;
+
+class BookDetailInfoDatatable extends AppDatatable
+{
+    protected function addColumns(?array $options = []): void
+    {
+        $this->columnBuilder
+            ->add('id', Column::class, [
+                'title' => $this->translator->trans('book_detail_info.id'),
+            ])
+            ->add('type', Column::class, [
+                'title' => $this->translator->trans('book_detail_info.type'),
+            ])
+            ->add('subTitle', Column::class, [
+                'title' => $this->translator->trans('book_detail_info.sub_title'),
+            ])
+            ->add('summary', Column::class, [
+                'title' => $this->translator->trans('book_detail_info.summary'),
+            ])
+            ->add('inLibrarySince', Column::class, [
+                'title' => $this->translator->trans('book_detail_info.in_library_since'),
+            ])
+        ;
+    }
+}

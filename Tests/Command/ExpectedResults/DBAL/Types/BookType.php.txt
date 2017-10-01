@@ -1,0 +1,17 @@
+<?php
+declare(strict_types=1);
+
+namespace Wame\GeneratorBundle\DBAL\Types;
+
+use Fresh\DoctrineEnumBundle\DBAL\Types\AbstractEnumType;
+
+final class BookType extends AbstractEnumType
+{
+    const FICTION = 'fiction';
+    const NON_FICTION = 'non-fiction';
+
+    protected static $choices = [
+        self::FICTION => 'Fiction',
+        self::NON_FICTION => 'Non fiction',
+    ];
+}

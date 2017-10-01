@@ -9,7 +9,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Validator\Constraint;
 use Wame\GeneratorBundle\Command\WameValidators;
 use Wame\GeneratorBundle\Inflector\Inflector;
 

@@ -35,8 +35,6 @@ This should be implemented or the settings should be removed.
     we may want to set specific traits to be used or not by default. 
     For instance, some application may never use datatables, so that
     option should be possible to disable for those applications.
-- Tests  
-    - Currently, this bundle still holds the sensio-testfiles, but these no
-    longer are compatible with this bundle. These tests need to be modified. 
-    - The sensiogenerator also generated test-files. Since those files are rather empty,
-    they are left out, but generating test files still might be quite helpful.
+- Tests:
+    - lots of tests need still to be added, like interactive tests
+     and testing expected failures.

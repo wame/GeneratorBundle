@@ -1,0 +1,101 @@
+<?php
+declare(strict_types=1);
+
+namespace Wame\GeneratorBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Gedmo\Timestampable\Traits\TimestampableEntity as Timestampable;
+use Gedmo\Blameable\Traits\BlameableEntity as Blameable;
+use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity as Softdeleteable;
+
+/**
+ * @ORM\Table(name="libraries")
+ * @ORM\Entity(repositoryClass="Wame\GeneratorBundle\Repository\LibraryRepository")
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
+ */
+class Library
+{
+    use Timestampable;
+    use Blameable;
+    use Softdeleteable;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="name", type="string")
+     */
+    private $name;
+
+    /**
+     * @var Collection|Book[]
+     *
+     * @ORM\ManyToMany(targetEntity="Wame\GeneratorBundle\Entity\Book", inversedBy="libraries", orphanRemoval=true, cascade={"persist"})
+     * @ORM\JoinTable(name="libraries_books",
+     *   joinColumns={
+     *     @ORM\JoinColumn(name="library_id", referencedColumnName="id", onDelete="CASCADE")
+     *   },
+     *   inverseJoinColumns={
+     *     @ORM\JoinColumn(name="book_id", referencedColumnName="id", onDelete="CASCADE")
+     *   }
+     * )
+     */
+    private $books;
+
+    public function __construct()
+    {
+        $this->books = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getBooks(): ?Collection
+    {
+        return $this->books;
+    }
+
+    public function addBook(Book $book): self
+    {
+        $this->books->add($book);
+
+        return $this;
+    }
+
+    public function removeBook(Book $book): self
+    {
+        $this->books->remove($book);
+
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->getName() ?: '';
+    }
+}

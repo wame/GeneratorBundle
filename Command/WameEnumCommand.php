@@ -65,6 +65,8 @@ class WameEnumCommand extends ContainerAwareCommand
             $this->enableDBALType($input, $output);
         }
         $output->writeln('');
+
+        $questionHelper->writeGeneratorSummary($output, []);
     }
 
     protected function getQuestionHelper(): QuestionHelper
@@ -111,8 +113,28 @@ class WameEnumCommand extends ContainerAwareCommand
         $input->setOption('options', $enumOptions);
     }
 
+    protected function parseEnumOptionsAsJson(string $enumOptions): ?array
+    {
+        //Surround the strings with quotes
+        $enumOptions = preg_replace('/([\[,])([^",\[\]]+)([,\]])/i', '\1"\2"\3', $enumOptions);
+        //Do it again, because there will be overlap
+        $enumOptions = preg_replace('/([\[,])([^",\[\]]+)([,\]])/i', '\1"\2"\3', $enumOptions);
+        $enumOptionsAsArray = json_decode($enumOptions, true);
+        if ($enumOptionsAsArray === null) {
+            throw new \InvalidArgumentException('The options-input could not be converted. Please make sure there aren\'t any forgotten/misplaced characters.');
+        }
+        return $this->addMissingEnumOptionValues($enumOptionsAsArray);
+    }
+
     /**
-     * Copy of parseFields in Sensio\Bundle\GeneratorBundle\Command\GenerateDoctrineEntityCommand
+     * Parse string of enumOptions to array
+     * Examples
+     *     "option-a;OPTION_A;Option A|option-b"
+     *      changes into:
+     *     [["option-a","OPTION_A","Option A"],["option-b","OPTION_B","Option B"]]
+     *
+     * @param string|array $enumOptions
+     * @return array
      */
     protected function parseEnumOptions($enumOptions): array
     {
@@ -121,9 +143,17 @@ class WameEnumCommand extends ContainerAwareCommand
             return $enumOptions;
         }
         $enumOptionsAsArray = [];
+        $enumOptions = str_replace(["\r\n", "\n", "\t", '  '], '', $enumOptions);
 
-        //enable using array format and semilocons
-        $enumOptions = str_replace(["\r\n","\n",'],[','], [',';','[',']',', '], ['','','|', '',',','','',','], $enumOptions);
+        //Strip spaces right before or after a comma, vertical bar or bracket
+        $enumOptions = preg_replace('/ *([;,|\[\]]) */i', '\1', $enumOptions);
+
+        if (strpos($enumOptions, '[') !== false) {
+            return $this->parseEnumOptionsAsJson($enumOptions);
+        }
+
+        $enumOptions = str_replace([";",','], ',', $enumOptions);
+
         $enumOptionSets = explode('|', $enumOptions);
 
         foreach ($enumOptionSets as $enumOptionSet) {
@@ -132,16 +162,23 @@ class WameEnumCommand extends ContainerAwareCommand
             if ($numberOfParts < 1 || $numberOfParts > 3) {
                 throw new \InvalidArgumentException("The providion option '--options' has invalid content");
             }
+            $enumOptionsAsArray[] = $enumOptionParts;
+        }
+        return $this->addMissingEnumOptionValues($enumOptionsAsArray);
+    }
 
-            $enumOptionsAsArray[] = [
-                $enumOptionParts[0],
-                $enumOptionParts[1] ?? Inflector::constantize($enumOptionParts[0]),
-                $enumOptionParts[2] ?? Inflector::humanize($enumOptionParts[0]),
+    protected function addMissingEnumOptionValues(array $enumOptionsAsArray)
+    {
+        foreach ($enumOptionsAsArray as $key => $enumOptionArraySet)
+        {
+            $enumOptionsAsArray[$key] = [
+                $enumOptionArraySet[0],
+                $enumOptionArraySet[1] ?? Inflector::constantize($enumOptionArraySet[0]),
+                $enumOptionArraySet[2] ?? str_replace('-', ' ', Inflector::humanize($enumOptionArraySet[0])),
             ];
         }
         return $enumOptionsAsArray;
     }
-
 
     protected function enableDBALType(InputInterface $input, OutputInterface $output)
     {

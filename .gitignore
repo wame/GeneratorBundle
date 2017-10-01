@@ -1,3 +1,12 @@
 phpunit.xml
 vendor
 composer.lock
+Entity/*
+Repository/*
+Controller/*
+Datatable/*
+Security/*
+Form/*
+Controller/*
+DBAL/Types/*
+!DBAL/Types/Type.php

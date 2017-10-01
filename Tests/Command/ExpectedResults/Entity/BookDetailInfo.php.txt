@@ -1,0 +1,138 @@
+<?php
+declare(strict_types=1);
+
+namespace Wame\GeneratorBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
+use Fresh\DoctrineEnumBundle\Validator\Constraints as EnumAssert;
+use Gedmo\Timestampable\Traits\TimestampableEntity as Timestampable;
+use Gedmo\Blameable\Traits\BlameableEntity as Blameable;
+use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity as Softdeleteable;
+
+/**
+ * @ORM\Table(name="book_detail_infos")
+ * @ORM\Entity(repositoryClass="Wame\GeneratorBundle\Repository\BookDetailInfoRepository")
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
+ */
+class BookDetailInfo
+{
+    use Timestampable;
+    use Blameable;
+    use Softdeleteable;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
+     * @var Book
+     *
+     * @ORM\OneToOne(targetEntity="Wame\GeneratorBundle\Entity\Book", inversedBy="bookDetailInfo", cascade={"persist"})
+     * @ORM\JoinColumn(name="book_id", referencedColumnName="id", nullable=false)
+     * @Assert\NotNull
+     */
+    private $book;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="BookType", nullable=true)
+     * @EnumAssert\Enum(entity="Wame\GeneratorBundle\DBAL\Types\BookType")
+     */
+    private $type;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="sub_title", type="string", nullable=true)
+     */
+    private $subTitle;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="summary", type="text", nullable=true)
+     */
+    private $summary;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="in_library_since", type="date")
+     * @Assert\NotNull
+     * @Assert\Date
+     */
+    private $inLibrarySince;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getBook(): ?Book
+    {
+        return $this->book;
+    }
+
+    public function setBook(Book $book): self
+    {
+        $this->book = $book;
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(?string $type): self
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function getSubTitle(): ?string
+    {
+        return $this->subTitle;
+    }
+
+    public function setSubTitle(?string $subTitle): self
+    {
+        $this->subTitle = $subTitle;
+
+        return $this;
+    }
+
+    public function getSummary(): ?string
+    {
+        return $this->summary;
+    }
+
+    public function setSummary(?string $summary): self
+    {
+        $this->summary = $summary;
+
+        return $this;
+    }
+
+    public function getInLibrarySince(): ?\DateTime
+    {
+        return $this->inLibrarySince;
+    }
+
+    public function setInLibrarySince(\DateTime $inLibrarySince): self
+    {
+        $this->inLibrarySince = $inLibrarySince;
+
+        return $this;
+    }
+}

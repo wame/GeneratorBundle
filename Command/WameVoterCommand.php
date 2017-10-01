@@ -46,6 +46,7 @@ class WameVoterCommand extends ContainerAwareCommand
             $output->writeln('  To overwrite file, use the --overwrite option');
         }
         $output->writeln('');
+        $crudQuestionHelper->writeGeneratorSummary($output, []);
     }
 
     protected function interact(InputInterface $input, OutputInterface $output): void

@@ -121,7 +121,7 @@
 
 {%- block property_dockblock_validation %}
     {%- for validation in property.validations %}
-        {# @var validation Wame\GeneratorBundle\MetaData\MetaValidation #}
+    {#- @var validation Wame\GeneratorBundle\MetaData\MetaValidation #}
     {{-''}}
      * @Assert\{{ validation.annotationFormatted }}
     {%- endfor -%}

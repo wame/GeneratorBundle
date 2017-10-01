@@ -1,0 +1,148 @@
+<?php
+declare(strict_types=1);
+
+namespace Wame\GeneratorBundle\Controller;
+
+use Wame\GeneratorBundle\Entity\BookDetailInfo;
+use Wame\GeneratorBundle\Form\BookDetailInfoType;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Form\Form;
+use Wame\GeneratorBundle\Security\BookDetailInfoVoter;
+use Wame\GeneratorBundle\Datatable\DatatableResultService;
+use Wame\GeneratorBundle\Datatable\BookDetailInfoDatatable;
+use Symfony\Component\HttpFoundation\Response;
+
+/**
+ * @Route("/book_detail_info")
+ */
+class BookDetailInfoController extends Controller
+{
+    /**
+     * @Route("/", name="book_detail_info_index")
+     * @Method("GET")
+     */
+    public function indexAction(BookDetailInfoDatatable $datatable): Response
+    {
+        $this->denyAccessUnlessGranted(BookDetailInfoVoter::INDEX);
+
+        $datatable->buildDatatable();
+
+        return $this->render('book_detail_info/index.html.twig', [
+            'datatable' => $datatable,
+        ]);
+    }
+    /**
+     * @Route("/", name="book_detail_info_result")
+     * @Method("POST")
+     */
+    public function resultAction(BookDetailInfoDatatable $datatable, DatatableResultService $datatableResultService): Response
+    {
+        $this->denyAccessUnlessGranted(BookDetailInfoVoter::SEARCH);
+
+        return $datatableResultService->getDatatableResult($datatable);
+    }
+
+    /**
+     * @Route("/new", name="book_detail_info_new")
+     * @Method({"GET", "POST"})
+     */
+    public function newAction(Request $request): Response
+    {
+        $this->denyAccessUnlessGranted(BookDetailInfoVoter::CREATE);
+
+        $bookDetailInfo = new BookDetailInfo();
+        $form = $this->createForm(BookDetailInfoType::class, $bookDetailInfo);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($bookDetailInfo);
+            $em->flush();
+
+            $this->addFlash('success', 'book_detail_info.create_success');
+
+            return $this->redirectToRoute('book_detail_info_show', ['id' => $bookDetailInfo->getId()]);
+        }
+
+        return $this->render('book_detail_info/new.html.twig', [
+            'bookDetailInfo' => $bookDetailInfo,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/{id}", name="book_detail_info_show")
+     * @Method("GET")
+     */
+    public function showAction(BookDetailInfo $bookDetailInfo): Response
+    {
+        $this->denyAccessUnlessGranted(BookDetailInfoVoter::VIEW, $bookDetailInfo);
+        $deleteForm = $this->createDeleteForm($bookDetailInfo);
+
+        return $this->render('book_detail_info/show.html.twig', [
+            'bookDetailInfo' => $bookDetailInfo,
+            'delete_form' => $deleteForm->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/{id}/edit", name="book_detail_info_edit")
+     * @Method({"GET", "POST"})
+     */
+    public function editAction(Request $request, BookDetailInfo $bookDetailInfo): Response
+    {
+        $this->denyAccessUnlessGranted(BookDetailInfoVoter::EDIT, $bookDetailInfo);
+
+        $deleteForm = $this->createDeleteForm($bookDetailInfo);
+        $editForm = $this->createForm(BookDetailInfoType::class, $bookDetailInfo);
+        $editForm->handleRequest($request);
+
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
+            $this->getDoctrine()->getManager()->flush();
+
+            $this->addFlash('success', 'book_detail_info.edit_success');
+
+            return $this->redirectToRoute('book_detail_info_show', ['id' => $bookDetailInfo->getId()]);
+        }
+
+        return $this->render('book_detail_info/edit.html.twig', [
+            'bookDetailInfo' => $bookDetailInfo,
+            'edit_form' => $editForm->createView(),
+            'delete_form' => $deleteForm->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/{id}", name="book_detail_info_delete")
+     * @Method("DELETE")
+     */
+    public function deleteAction(Request $request, BookDetailInfo $bookDetailInfo): Response
+    {
+        $this->denyAccessUnlessGranted(BookDetailInfoVoter::DELETE, $bookDetailInfo);
+
+        $form = $this->createDeleteForm($bookDetailInfo);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($bookDetailInfo);
+            $em->flush();
+
+            $this->addFlash('success', 'book_detail_info.delete_success');
+        }
+
+        return $this->redirectToRoute('book_detail_info_index');
+    }
+
+    private function createDeleteForm(BookDetailInfo $bookDetailInfo): Form
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('book_detail_info_delete', ['id' => $bookDetailInfo->getId()]))
+            ->setMethod('DELETE')
+            ->getForm()
+        ;
+    }
+}

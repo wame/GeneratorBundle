@@ -1,0 +1,186 @@
+<?php
+declare(strict_types=1);
+
+namespace Wame\GeneratorBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
+use Gedmo\Timestampable\Traits\TimestampableEntity as Timestampable;
+use Gedmo\Blameable\Traits\BlameableEntity as Blameable;
+use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity as Softdeleteable;
+
+/**
+ * @ORM\Table(name="books")
+ * @ORM\Entity(repositoryClass="Wame\GeneratorBundle\Repository\BookRepository")
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
+ */
+class Book
+{
+    use Timestampable;
+    use Blameable;
+    use Softdeleteable;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="title", type="string", unique=true)
+     * @Assert\NotBlank
+     */
+    private $title;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="stock", type="int")
+     * @Assert\NotNull
+     * @Assert\GreaterThanOrEqual(0)
+     */
+    private $stock;
+
+    /**
+     * @var Collection|Person[]
+     *
+     * @ORM\OneToMany(targetEntity="Wame\GeneratorBundle\Entity\Person", mappedBy="book", orphanRemoval=true, cascade={"persist"})
+     * @Assert\Expression(value="value.count() > this.getStock()", message="A book cannot be borrowed more often than it exists in stock")
+     */
+    private $borrowers;
+
+    /**
+     * @var Author
+     *
+     * @ORM\ManyToOne(targetEntity="Wame\GeneratorBundle\Entity\Author", cascade={"persist"})
+     * @ORM\JoinColumn(name="author_id", referencedColumnName="id", nullable=false)
+     * @Assert\NotNull
+     * @Assert\Valid
+     */
+    private $author;
+
+    /**
+     * @var Collection|Library[]
+     *
+     * @ORM\ManyToMany(targetEntity="Wame\GeneratorBundle\Entity\Library", mappedBy="books", orphanRemoval=true, cascade={"persist"})
+     */
+    private $libraries;
+
+    /**
+     * @var BookDetailInfo
+     *
+     * @ORM\OneToOne(targetEntity="Wame\GeneratorBundle\Entity\BookDetailInfo", mappedBy="book", cascade={"persist"})
+     * @Assert\Valid
+     */
+    private $bookDetailInfo;
+
+    public function __construct()
+    {
+        $this->borrowers = new ArrayCollection();
+        $this->libraries = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): self
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getStock(): ?int
+    {
+        return $this->stock;
+    }
+
+    public function setStock(int $stock): self
+    {
+        $this->stock = $stock;
+
+        return $this;
+    }
+
+    public function getBorrowers(): ?Collection
+    {
+        return $this->borrowers;
+    }
+
+    public function addBorrower(Person $borrower): self
+    {
+        $this->borrowers->add($borrower);
+
+        return $this;
+    }
+
+    public function removeBorrower(Person $borrower): self
+    {
+        $this->borrowers->remove($borrower);
+
+        return $this;
+    }
+
+    public function getAuthor(): ?Author
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(Author $author): self
+    {
+        $this->author = $author;
+
+        return $this;
+    }
+
+    public function getLibraries(): ?Collection
+    {
+        return $this->libraries;
+    }
+
+    public function addLibrary(Library $library): self
+    {
+        $this->libraries->add($library);
+
+        return $this;
+    }
+
+    public function removeLibrary(Library $library): self
+    {
+        $this->libraries->remove($library);
+
+        return $this;
+    }
+
+    public function getBookDetailInfo(): ?BookDetailInfo
+    {
+        return $this->bookDetailInfo;
+    }
+
+    public function setBookDetailInfo(BookDetailInfo $bookDetailInfo): self
+    {
+        $this->bookDetailInfo = $bookDetailInfo;
+
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->getTitle() ?: '';
+    }
+}

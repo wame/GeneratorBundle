@@ -139,7 +139,7 @@ EOT
         $entityQuestionHelper->askDisplayField($input, $output);
     }
 
-    protected function parseFieldsAsjson(string $input): ?array
+    protected function parseFieldsAsJson(string $input): ?array
     {
         if (!$input) {
             return [];
@@ -157,7 +157,7 @@ EOT
         //Add quotes around keys => {key:value} becomes {"key":value}
         $input = preg_replace('/([,{])\'?([\w ]+)\'?:/i', '\1"\2":', $input);
         //Add quotes around values => {"key":some value} becomes {"key":"some value"}
-        $input = preg_replace('/:\'?([^,}{]+)\'?([,}])/i', ':"\1"\2', $input);
+        $input = preg_replace('/:\'?([^,}{\"]+)\'?([,}])/i', ':"\1"\2', $input);
         //Remove just added quotes from digits, null ands booleans => {"length":"255"} becomes {"length":255}
         $input = preg_replace('/:"(true|false|null|\d+)"/i', ':\1', $input);
         //Keys without value will become booleans => {nullable} will become {"nullable":true}
@@ -192,7 +192,7 @@ EOT
             return $input;
         }
         if ($input && strpos($input, '{') !== false) {
-            return $this->parseFieldsAsjson($input);
+            return $this->parseFieldsAsJson($input);
         }
 
         $input = $input ?: '';

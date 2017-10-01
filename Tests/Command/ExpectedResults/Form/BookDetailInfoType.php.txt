@@ -1,0 +1,46 @@
+<?php
+declare(strict_types=1);
+
+namespace Wame\GeneratorBundle\Form;
+
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Wame\GeneratorBundle\Entity\BookDetailInfo;
+
+class BookDetailInfoType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            
+            ->add('type', null, [
+                'label' => 'book_detail_info.type'
+            ])
+            ->add('subTitle', null, [
+                'label' => 'book_detail_info.sub_title'
+            ])
+            ->add('summary', null, [
+                'label' => 'book_detail_info.summary'
+            ])
+            ->add('inLibrarySince', null, [
+                'label' => 'book_detail_info.in_library_since'
+            ])
+            ->add('book', null, [
+                'label' => 'book_detail_info.book'
+            ])
+        ;
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => BookDetailInfo::class,
+        ]);
+    }
+
+    public function getBlockPrefix(): string
+    {
+        return 'book_detail_info_type';
+    }
+}
