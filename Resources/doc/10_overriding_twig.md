@@ -20,11 +20,14 @@ Just like the SensioGenerator, you can overwrite the twig skeleton files of the 
 in the following directory:
 `App/Resources/WameGeneratorBundle/skeleton`
 
-More than just crud, this bundle allows you to overwrite the following parts as well:
+More than just crud, this bundle allows you to overwrite any part:
+- crud
+- datatable
 - entity
+- enum
 - form
 - repository
-- voter
-- translation
+- security
+- translations
 
 For more information about overwriting skeleton files, see: http://symfony.com/doc/3.0/bundles/SensioGeneratorBundle/index.html#overriding-skeleton-templates

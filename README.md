@@ -3,7 +3,7 @@ WameGeneratorBundle
 
 This bundle is heaviliy altered version of the
 [SensioGeneratorBundle](http://symfony.com/doc/3.0/bundles/SensioGeneratorBundle/index.html).
-It specifically has many changes and extra features
+It specifically has changes and extra features
 regarding entity and CRUD generations.
 
 

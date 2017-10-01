@@ -50,7 +50,7 @@ If you so prefer, you can also use an array format:
 
     php bin/console wame:generate:enum StatusType --options="[
         [new,NEW,New],
-        [in-progress,IN_PROGRESS,In progress]
+        [in-progress,IN_PROGRESS,In progress],
         [completed,COMPLETED,Completed]
     ]"
 
