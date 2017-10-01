@@ -36,5 +36,5 @@ This should be implemented or the settings should be removed.
     For instance, some application may never use datatables, so that
     option should be possible to disable for those applications.
 - Tests:
-    - lots of tests need still to be added, like interactive tests
+    - lots of tests still need to be added, like interactive tests
      and testing expected failures.
