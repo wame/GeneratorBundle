@@ -43,7 +43,7 @@ class BookDetailInfo
     /**
      * @var string
      *
-     * @ORM\Column(name="BookType", nullable=true)
+     * @ORM\Column(name="type", nullable=true)
      * @EnumAssert\Enum(entity="Wame\GeneratorBundle\DBAL\Types\BookType")
      */
     private $type;

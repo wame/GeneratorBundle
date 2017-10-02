@@ -15,19 +15,19 @@ class BookDetailInfoType extends AbstractType
         $builder
             
             ->add('type', null, [
-                'label' => 'book_detail_info.type'
+                'label' => 'book_detail_info.type',
             ])
             ->add('subTitle', null, [
-                'label' => 'book_detail_info.sub_title'
+                'label' => 'book_detail_info.sub_title',
             ])
             ->add('summary', null, [
-                'label' => 'book_detail_info.summary'
+                'label' => 'book_detail_info.summary',
             ])
             ->add('inLibrarySince', null, [
-                'label' => 'book_detail_info.in_library_since'
+                'label' => 'book_detail_info.in_library_since',
             ])
             ->add('book', null, [
-                'label' => 'book_detail_info.book'
+                'label' => 'book_detail_info.book',
             ])
         ;
     }

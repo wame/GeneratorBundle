@@ -40,7 +40,7 @@
     {%- set nullable = property.nullable ? ', nullable=true' : '' %}
     {%- set unique = property.unique ? ', unique=true' : '' %}
     {{-''}}
-     * @ORM\Column(name="{{ property.enumType }}"{{ nullable ~ unique }})
+     * @ORM\Column(name="{{ property.columnName }}"{{ nullable ~ unique }})
      * @EnumAssert\Enum(entity="{{ property.entity.bundleNamespace }}\DBAL\Types\{{ property.enumType }}")
 {%- endblock %}
 

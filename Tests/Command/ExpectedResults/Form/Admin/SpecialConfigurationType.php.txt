@@ -15,7 +15,7 @@ class SpecialConfigurationType extends AbstractType
         $builder
             
             ->add('title', null, [
-                'label' => 'special_configuration.title'
+                'label' => 'special_configuration.title',
             ])
         ;
     }

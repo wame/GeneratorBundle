@@ -22,7 +22,6 @@ class DatatableResultService
         $this->responseService->setDatatable($datatable);
 
         $datatableQueryBuilder = $this->responseService->getDatatableQueryBuilder();
-        $datatableQueryBuilder->buildQuery();
 
         $qb = $datatableQueryBuilder->getQb();
         $datatable->modifyQuery($qb);

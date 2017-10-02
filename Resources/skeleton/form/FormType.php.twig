@@ -22,7 +22,7 @@ class {{ meta_entity.entityName }}Type extends AbstractType
             {% for property in meta_entity.properties if property.id == false -%}
             {{- '\n            ' -}}
             ->add('{{ property.name }}', null, [
-                'label' => '{{ meta_entity.entityName | tabalize ~ '.' ~ property.name | tabalize }}'
+                'label' => '{{ meta_entity.entityName | tabalize ~ '.' ~ property.name | tabalize }}',
             ])
             {%- endfor %}
             {{-''}}
