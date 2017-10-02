@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Wame\GeneratorBundle\Command;
 
+use Wame\GeneratorBundle\DBAL\Types\Type;
 use Wame\GeneratorBundle\Inflector\Inflector;
 
 class WameValidators extends Validators
@@ -260,6 +261,7 @@ class WameValidators extends Validators
             $field['columnName'] = $columnName;
 
             $type = $field['type'] ?? null;
+            $field['type'] = $type = Type::getTypeByAlias($type) ?: $type;
 
             if (in_array($type, ['many2one', 'one2one'], true)) {
                 if (substr($propertyName, -2) === 'Id') {

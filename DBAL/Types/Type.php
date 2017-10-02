@@ -58,4 +58,12 @@ abstract class Type extends \Doctrine\DBAL\Types\Type
     {
         return static::$aliases;
     }
+
+    public static function getTypeByAlias($alias): ?string
+    {
+        if (in_array($alias, static::$aliases, true)) {
+            return array_search($alias, static::$aliases);
+        }
+        return null;
+    }
 }

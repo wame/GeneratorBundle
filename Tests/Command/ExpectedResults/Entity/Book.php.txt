@@ -43,7 +43,7 @@ class Book
     /**
      * @var int
      *
-     * @ORM\Column(name="stock", type="int")
+     * @ORM\Column(name="stock", type="integer")
      * @Assert\NotNull
      * @Assert\GreaterThanOrEqual(0)
      */
