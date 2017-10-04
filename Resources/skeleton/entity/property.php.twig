@@ -2,7 +2,7 @@
 {# @var property \Wame\GeneratorBundle\MetaData\MetaProperty #}
 {%- block property %}
     {{- block('property_docblock') }}
-    private ${{ property.name }};
+    private ${{ property.name }}{{ property.default is not null ? ' = '~property.default : '' }};
 {%- endblock %}
 
 {%- block property_methods %}
@@ -18,7 +18,7 @@
 {%- endblock %}
 
 {%- block property_setter %}
-    {{-''}}
+
     public function set{{ property.name | classify }}({{ property.nullable ? '?' : '' }}{{ property.returnType }} ${{ property.name }}): self
     {
         $this->{{ property.name }} = ${{ property.name }};
@@ -28,28 +28,36 @@
 {%- endblock %}
 
 {%- block property_getter %}
-    {{-''}}
-    public function get{{ property.name | classify }}(): ?{{ property.returnType }}
+    {%- if property.collectionType %}
+
+    /** @return {{ property.returnType }}|{{ property.targetEntity }}[] */
+    {%- endif %}
+
+    public function get{{ property.name | classify }}(): {{ property.nullable != true and property.default ? '' : '?' }}{{ property.returnType }}
     {
         return $this->{{ property.name }};
     }
 {%- endblock %}
 
 {%- block property_adder %}
-    {{-''}}
+
     public function add{{ property.name | singularize | classify }}({{ property.targetEntity }} ${{ property.name | singularize }}): self
     {
         $this->{{ property.name }}->add(${{ property.name | singularize  }});
+        {%- if property.mappedBy is not null %}
+
+        ${{ property.name | singularize}}->set{{ property.mappedBy | classify }}($this);
+        {% endif %}
 
         return $this;
     }
 {%- endblock %}
 
 {%- block property_remover %}
-    {{-''}}
+
     public function remove{{ property.name | singularize | classify }}({{ property.targetEntity }} ${{ property.name | singularize }}): self
     {
-        $this->{{ property.name }}->remove(${{ property.name | singularize }});
+        $this->{{ property.name }}->removeElement(${{ property.name | singularize }});
 
         return $this;
     }

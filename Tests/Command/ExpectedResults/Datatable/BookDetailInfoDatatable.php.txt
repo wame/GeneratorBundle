@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Wame\GeneratorBundle\Datatable;
 
 use Sg\DatatablesBundle\Datatable\Column\Column;
+use Sg\DatatablesBundle\Datatable\Column\DateTimeColumn;
+
 
 class BookDetailInfoDatatable extends AppDatatable
 {
@@ -22,7 +24,7 @@ class BookDetailInfoDatatable extends AppDatatable
             ->add('summary', Column::class, [
                 'title' => $this->translator->trans('book_detail_info.summary'),
             ])
-            ->add('inLibrarySince', Column::class, [
+            ->add('inLibrarySince', DateTimeColumn::class, [
                 'title' => $this->translator->trans('book_detail_info.in_library_since'),
             ])
         ;

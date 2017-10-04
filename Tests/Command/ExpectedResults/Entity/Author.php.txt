@@ -109,6 +109,7 @@ class Author
         return $this;
     }
 
+    /** @return Collection|Book[] */
     public function getBooks(): ?Collection
     {
         return $this->books;
@@ -117,13 +118,14 @@ class Author
     public function addBook(Book $book): self
     {
         $this->books->add($book);
-
+        $book->setAuthor($this);
+        
         return $this;
     }
 
     public function removeBook(Book $book): self
     {
-        $this->books->remove($book);
+        $this->books->removeElement($book);
 
         return $this;
     }

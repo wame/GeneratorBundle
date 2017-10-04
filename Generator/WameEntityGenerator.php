@@ -50,6 +50,7 @@ class WameEntityGenerator extends Generator
                 ->setColumnName($field['columnName'] ?? $field['fieldName'])
                 ->setType($field['type'] ?? 'string')
                 ->setLength($field['length'] ?? null)
+                ->setDefault($field['default'] ?? null)
                 ->setUnique($field['unique'] ?? false)
                 ->setNullable($field['nullable'] ?? null)
                 ->setScale($field['scale'] ?? null)

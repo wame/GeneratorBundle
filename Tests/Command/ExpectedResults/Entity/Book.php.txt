@@ -117,6 +117,7 @@ class Book
         return $this;
     }
 
+    /** @return Collection|Person[] */
     public function getBorrowers(): ?Collection
     {
         return $this->borrowers;
@@ -125,13 +126,14 @@ class Book
     public function addBorrower(Person $borrower): self
     {
         $this->borrowers->add($borrower);
-
+        $borrower->setBook($this);
+        
         return $this;
     }
 
     public function removeBorrower(Person $borrower): self
     {
-        $this->borrowers->remove($borrower);
+        $this->borrowers->removeElement($borrower);
 
         return $this;
     }
@@ -148,6 +150,7 @@ class Book
         return $this;
     }
 
+    /** @return Collection|Library[] */
     public function getLibraries(): ?Collection
     {
         return $this->libraries;
@@ -156,13 +159,14 @@ class Book
     public function addLibrary(Library $library): self
     {
         $this->libraries->add($library);
-
+        $library->setBooks($this);
+        
         return $this;
     }
 
     public function removeLibrary(Library $library): self
     {
-        $this->libraries->remove($library);
+        $this->libraries->removeElement($library);
 
         return $this;
     }

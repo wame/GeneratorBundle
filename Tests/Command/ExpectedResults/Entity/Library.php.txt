@@ -75,6 +75,7 @@ class Library
         return $this;
     }
 
+    /** @return Collection|Book[] */
     public function getBooks(): ?Collection
     {
         return $this->books;
@@ -83,13 +84,12 @@ class Library
     public function addBook(Book $book): self
     {
         $this->books->add($book);
-
         return $this;
     }
 
     public function removeBook(Book $book): self
     {
-        $this->books->remove($book);
+        $this->books->removeElement($book);
 
         return $this;
     }

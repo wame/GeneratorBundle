@@ -19,6 +19,9 @@ class MetaProperty
     protected $columnName;
 
     /** @var string */
+    protected $default;
+
+    /** @var string */
     protected $type = Type::STRING;
 
     /** @var string */
@@ -84,7 +87,7 @@ class MetaProperty
         return $this->name;
     }
 
-    public function setName(string $name): MetaProperty
+    public function setName(string $name): self
     {
         $this->name = Inflector::camelize($name);
         return $this;
@@ -95,9 +98,29 @@ class MetaProperty
         return $this->type;
     }
 
-    public function setType(string $type): MetaProperty
+    public function setType(string $type): self
     {
         $this->type = $type;
+        return $this;
+    }
+
+    public function getDefault(): ?string
+    {
+        if (!$this->default) {
+            return null;
+        }
+        if ($this->getReturnType() === 'string') {
+            return '\''.$this->default.'\'';
+        }
+        if ($this->getReturnType() === '\\DateTime()') {
+            return 'new \DateTime(\''.$this->default.'\')';
+        }
+        return $this->default;
+    }
+
+    public function setDefault(?string $default): self
+    {
+        $this->default = $default;
         return $this;
     }
 

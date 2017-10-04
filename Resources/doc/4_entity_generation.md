@@ -155,7 +155,13 @@ To have the generator add the `__toString()` method, you can specify the
 display option for a field. This field will then be used in the toString
 method. Example:  
 `--fields="name:string(255 display)"`
-
+* **Default**  
+If you want a property to have a default value, you can use this option.
+This option will automatically be converted to a string in case of a
+string return-type. In case of a \DateTime return-type, the default
+value will be used a constructor in the DateTime. For example the
+value 'today' would result in new \DateTime('today'). 
+For other return types the default value won't be converted.
 
 #### fields option with json
 
