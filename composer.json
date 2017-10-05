@@ -1,7 +1,7 @@
 {
-    "name": "wame/generator-bundle",
+    "name": "wame/generator-bundle2",
     "description": "Generator for your symfony entities and crud",
-    "keywords": ["wame", "generator", "symfony", "symfony3"],
+    "keywords": ["wame", "generator", "generator2", "symfony", "symfony3"],
     "type": "symfony-bundle",
     "license": "MIT",
     "authors": [
@@ -19,7 +19,7 @@
         "symfony/console": "~3.0",
         "symfony/process": "~3.0",
         "symfony/yaml": "~3.0",
-        "twig/twig": "^2.0"
+        "twig/twig": "^1.28.2|^2.0"
     },
     "require-dev": {
         "symfony/doctrine-bridge": "~3.0",
