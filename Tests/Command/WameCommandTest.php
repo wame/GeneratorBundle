@@ -47,6 +47,17 @@ abstract class WameCommandTest extends KernelTestCase
         return  __DIR__ . '/../../Tests/Command/ExpectedResults/' .$fileName.'.txt';
     }
 
+    protected function createExample($fileName)
+    {
+        $filePath = $this->getTestFilePath($fileName);
+        $targetpath = $this->getResultFilePath($fileName);
+        $directory = dirname($targetpath);
+        if (!is_dir($directory)) {
+            mkdir($directory, 0777, true);
+        }
+        copy($filePath, $this->getResultFilePath($fileName));
+    }
+
     protected function assertFileEqualsTestFile(string $fileRelativePath)
     {
         $this->assertFileEquals($this->getTestFilePath($fileRelativePath), $this->getResultFilePath($fileRelativePath));

@@ -7,9 +7,9 @@ class WameDatatableCommandTest extends WameCommandTest
 {
     public function setUp()
     {
-        parent::setUp();
         //Create Book entity, so we can use this entity for the tests
-        copy($this->getTestFilePath('Entity/BookDetailInfo.php'), $this->getResultFilePath('Entity/BookDetailInfo.php'));
+        $this->createExample('Entity/BookDetailInfo.php');
+        parent::setUp();
     }
 
     /**

@@ -7,9 +7,8 @@ class WameVoterCommandTest extends WameCommandTest
 {
     public function setUp()
     {
+        $this->createExample('Entity/BookDetailInfo.php');
         parent::setUp();
-        //Create Book entity, so we can use this entity for the tests
-        copy($this->getTestFilePath('Entity/BookDetailInfo.php'), $this->getResultFilePath('Entity/BookDetailInfo.php'));
     }
 
     /**

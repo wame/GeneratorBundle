@@ -10,3 +10,8 @@ Form/*
 Controller/*
 DBAL/Types/*
 !DBAL/Types/Type.php
+Tests/Resources/*
+Tests/cache/*
+Tests/logs/*
+.idea/*
+phpunit.phar

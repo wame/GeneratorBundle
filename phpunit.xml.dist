@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <phpunit bootstrap="./vendor/autoload.php" colors="true">
+    <php>
+        <server name="KERNEL_DIR" value="Tests" />
+    </php>
     <testsuites>
         <testsuite name="WameGeneratorBundle">
             <directory suffix="Test.php">./Tests</directory>

@@ -7,11 +7,11 @@ class WameCrudCommandTest extends WameCommandTest
 {
     public function setUp()
     {
-        parent::setUp();
         //Create Book entity, so we can use this entity for the tests
-        copy($this->getTestFilePath('Entity/BookDetailInfo.php'), $this->getResultFilePath('Entity/BookDetailInfo.php'));
+        $this->createExample('Entity/BookDetailInfo.php');
         //Create entity test file for using subdirectories
-        copy($this->getTestFilePath('Entity/Admin/SpecialConfiguration.php'), $this->getResultFilePath('Entity/Admin/SpecialConfiguration.php'));
+        $this->createExample('Entity/Admin/SpecialConfiguration.php');
+        parent::setUp();
     }
 
     /**

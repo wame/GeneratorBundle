@@ -6,6 +6,7 @@ namespace Wame\GeneratorBundle\Datatable;
 use Sg\DatatablesBundle\Datatable\AbstractDatatable as SgDatatable;
 use Sg\DatatablesBundle\Datatable\Column\ActionColumn;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Common\Util\Inflector;
 
 abstract class AppDatatable extends SgDatatable
 {
@@ -117,7 +118,7 @@ abstract class AppDatatable extends SgDatatable
     protected function checkIsGranted($voterSuffix, $entryId): bool
     {
         return $this->authorizationChecker->isGranted(
-            strtoupper($this->getEntityName().'_'.$voterSuffix),
+            strtoupper(Inflector::tableize($this->getEntityName()).'_'.$voterSuffix),
             $this->getEntityManager()->getReference($this->getEntity(), $entryId)
         );
     }
