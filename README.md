@@ -1,10 +1,9 @@
 WameGeneratorBundle
 =====================
 
-This bundle is heaviliy altered version of the
+This bundle is a heaviliy altered version of the
 [SensioGeneratorBundle](http://symfony.com/doc/3.0/bundles/SensioGeneratorBundle/index.html).
-It specifically has changes and extra features
-regarding entity and CRUD generations.
+It specifically has changes and extra features regarding entity and CRUD generations.
 
 
 ## Documentation
@@ -38,3 +37,11 @@ This should be implemented or the settings should be removed.
 - Tests:
     - lots of tests still need to be added, like interactive tests
      and testing expected failures.
+     -  **Doctrine PSR-4 bug:**  
+The  [getBasePathForClass](https://github.com/doctrine/DoctrineBundle/blob/1.7.1/Mapping/DisconnectedMetadataFactory.php#L151) 
+method in 
+[DisconnectedMetadataFactory](https://github.com/doctrine/DoctrineBundle/blob/1.7.1/Mapping/DisconnectedMetadataFactory.php)
+checks entities by their namespace as if PSR-0 is used. Without this
+GeneratorBundle being in directory 'wame', the 
+[RuntimeException](https://github.com/doctrine/DoctrineBundle/blob/1.6.12/Mapping/DisconnectedMetadataFactory.php#L158) 
+will be thrown.

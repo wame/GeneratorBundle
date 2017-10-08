@@ -8,12 +8,12 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class BookDetailInfoVoter extends AppVoter
 {
-    const INDEX     = 'BOOK_DETAIL_INFO_INDEX';
-    const SEARCH    = 'BOOK_DETAIL_INFO_SEARCH';
-    const VIEW      = 'BOOK_DETAIL_INFO_VIEW';
-    const CREATE    = 'BOOK_DETAIL_INFO_CREATE';
-    const EDIT      = 'BOOK_DETAIL_INFO_EDIT';
-    const DELETE    = 'BOOK_DETAIL_INFO_DELETE';
+    const INDEX = 'BOOK_DETAIL_INFO_INDEX';
+    const SEARCH = 'BOOK_DETAIL_INFO_SEARCH';
+    const VIEW = 'BOOK_DETAIL_INFO_VIEW';
+    const CREATE = 'BOOK_DETAIL_INFO_CREATE';
+    const EDIT = 'BOOK_DETAIL_INFO_EDIT';
+    const DELETE = 'BOOK_DETAIL_INFO_DELETE';
 
     static protected $supportedAttributes = [
         self::INDEX,

@@ -13,12 +13,12 @@ use {{ meta_entity.bundleNamespace }}\Security\AppVoter;
 
 class {{ meta_entity.entityName }}Voter extends AppVoter
 {
-    const INDEX     = '{{ attributePrefix }}_INDEX';
-    const SEARCH    = '{{ attributePrefix }}_SEARCH';
-    const VIEW      = '{{ attributePrefix }}_VIEW';
-    const CREATE    = '{{ attributePrefix }}_CREATE';
-    const EDIT      = '{{ attributePrefix }}_EDIT';
-    const DELETE    = '{{ attributePrefix }}_DELETE';
+    const INDEX = '{{ attributePrefix }}_INDEX';
+    const SEARCH = '{{ attributePrefix }}_SEARCH';
+    const VIEW = '{{ attributePrefix }}_VIEW';
+    const CREATE = '{{ attributePrefix }}_CREATE';
+    const EDIT = '{{ attributePrefix }}_EDIT';
+    const DELETE = '{{ attributePrefix }}_DELETE';
 
     static protected $supportedAttributes = [
         self::INDEX,

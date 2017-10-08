@@ -13,5 +13,6 @@ DBAL/Types/*
 Tests/Resources/*
 Tests/cache/*
 Tests/logs/*
+Tests/config/*
 .idea/*
 phpunit.phar
