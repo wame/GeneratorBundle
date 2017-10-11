@@ -38,9 +38,4 @@ class BookDetailInfoType extends AbstractType
             'data_class' => BookDetailInfo::class,
         ]);
     }
-
-    public function getBlockPrefix(): string
-    {
-        return 'book_detail_info_type';
-    }
 }

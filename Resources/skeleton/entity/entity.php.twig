@@ -6,18 +6,18 @@ declare(strict_types=1);
 namespace {{ meta_entity.entityNameSpace(false) }};
 
 use Doctrine\ORM\Mapping as ORM;
-{% if meta_entity.hasTrait('SoftDeleteable') %}
-use Gedmo\Mapping\Annotation as Gedmo;
+{% if meta_entity.hasTrait('SoftDeleteable') -%}
+    use Gedmo\Mapping\Annotation as Gedmo;
 {% endif -%}
-{% if meta_entity.hasCollectionProperties  -%}
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
-{% endif -%}
+{% if meta_entity.hasCollectionProperties u%}
+    use Doctrine\Common\Collections\Collection;
+    use Doctrine\Common\Collections\ArrayCollection;
+{%u endif -%}
 {% if meta_entity.hasValidation  -%}
-use Symfony\Component\Validator\Constraints as Assert;
+    use Symfony\Component\Validator\Constraints as Assert;
 {% endif %}
 {% if meta_entity.hasEnumProperty  -%}
-use Fresh\DoctrineEnumBundle\Validator\Constraints as EnumAssert;
+    use Fresh\DoctrineEnumBundle\Validator\Constraints as EnumAssert;
 {% endif %}
 {% for trait in meta_entity.traits -%}
     use {{ trait.namespace }} as {{ trait.name | classify }};
@@ -29,9 +29,9 @@ use Fresh\DoctrineEnumBundle\Validator\Constraints as EnumAssert;
 /**
  * @ORM\Table(name="{{ meta_entity.tableName }}")
  * @ORM\Entity(repositoryClass="{{ meta_entity.bundleNamespace }}\Repository\{{ meta_entity.directory('\\') }}{{ meta_entity.entityName }}Repository")
-{% if meta_entity.hasTrait('SoftDeleteable') %}
- * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
-{% endif %}
+{% if meta_entity.hasTrait('SoftDeleteable') u%}
+     * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false)
+{%u endif %}
  */
 class {{ meta_entity.entityName }}
 {%- if meta_entity.interfaces.empty == false -%}
@@ -40,46 +40,42 @@ class {{ meta_entity.entityName }}
         {{- loop.first ? ' ' : ', '  -}}
         {{- interface.name -}}
     {%- endfor -%}
-{%- endif -%}
-{{-''}}
+{%- endif %}
+
 {
-    {%- for trait in meta_entity.traits -%}
-        {{- '\n    ' -}}
+    {%- for trait in meta_entity.traits u%}
+
         use {{ trait.name | classify }};
-        {%- if loop.last -%}
-            {{- '\n' -}}
-        {%- endif -%}
+        {{- loop.last ? '\n' : '' -}}
+    {%-u endfor %}
+
+    {%- for property in meta_entity.properties %}
+
+        {{_ block('property') }}
+    {%_ endfor -%}
+
+    {%_ if meta_entity.hasCollectionProperties u%}
+
+        public function __construct()
+        {
+            {%_ for property in meta_entity.collectionProperties u%}
+                $this->{{ property.name }} = new ArrayCollection();
+            {%_u endfor %}
+        }
+    {%_u endif -%}
+
+    {%- for property in meta_entity.properties %}
+
+        {{_ block('property_methods') }}
     {%- endfor -%}
 
-    {%- for property in meta_entity.properties -%}
-        {{- block('property') ~ '\n' -}}
-    {%- endfor -%}
+    {% set displayFieldProperty = meta_entity.getDisplayFieldProperty %}
+    {%- if displayFieldProperty is not null u%}
 
-    {%- if meta_entity.hasCollectionProperties -%}
-    {{-''}}
-    public function __construct()
-    {
-        {%- for property in meta_entity.collectionProperties -%}
-        {{-''}}
-        $this->{{ property.name }} = new ArrayCollection();
-        {%- endfor -%}
-        {{-''}}
-    }
-    {{- '\n' -}}
-    {%- endif -%}
-
-    {%- for property in meta_entity.properties -%}
-        {{- block('property_methods')  ~ '\n' -}}
-    {%- endfor -%}
-
-    {%- set displayFieldProperty =  meta_entity.getDisplayFieldProperty -%}
-    {%- if displayFieldProperty is not null -%}
-    {{-''}}
-    public function __toString(): string
-    {
-        return {{ displayFieldProperty.returnType == 'string' ? '' : '(string) ' -}}
-        $this->get{{ displayFieldProperty.name | classify }}() ?: '';
-    }
-    {{- '\n' -}}
-    {%- endif -%}
+        public function __toString(): string
+        {
+            return {{ displayFieldProperty.returnType == 'string' ? '' : '(string) ' -}}
+                $this->get{{ displayFieldProperty.name | classify }}() ?: '';
+        }
+    {%_u endif %}
 }

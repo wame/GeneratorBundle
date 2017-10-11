@@ -4,28 +4,28 @@ declare(strict_types=1);
 
 namespace {{ meta_entity.bundleNamespace }}\Form{{ meta_entity.directory ? '\\'~meta_entity.directory : '' }};
 
-{% block use_statements %}
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use {{ meta_entity.entityNameSpace }};
-{% endblock use_statements %}
+{% block use_statements u%}
+    use Symfony\Component\Form\AbstractType;
+    use Symfony\Component\Form\FormBuilderInterface;
+    use Symfony\Component\OptionsResolver\OptionsResolver;
+    use {{ meta_entity.entityNameSpace }};
+{%u endblock use_statements %}
 
-{% block class_definition %}
-class {{ meta_entity.entityName }}Type extends AbstractType
-{% endblock class_definition %}
+{% block class_definition u%}
+    class {{ meta_entity.entityName }}Type extends AbstractType
+{%u endblock class_definition %}
 {
 {% block class_body %}
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            {% for property in meta_entity.properties if property.id == false -%}
-            {{- '\n            ' -}}
-            ->add('{{ property.name }}', null, [
-                'label' => '{{ meta_entity.entityName | tabalize ~ '.' ~ property.name | tabalize }}',
-            ])
-            {%- endfor %}
-            {{-''}}
+            {% for property in meta_entity.properties if property.id == false u%}
+
+                ->add('{{ property.name }}', null, [
+                    'label' => '{{ meta_entity.entityName | tabalize ~ '.' ~ property.name | tabalize }}',
+                ])
+            {%-u endfor %}
+
         ;
     }
 
@@ -34,11 +34,6 @@ class {{ meta_entity.entityName }}Type extends AbstractType
         $resolver->setDefaults([
             'data_class' => {{ meta_entity.entityName }}::class,
         ]);
-    }
-
-    public function getBlockPrefix(): string
-    {
-        return '{{ meta_entity.entityName | tabalize ~ '_type' }}';
     }
 {% endblock class_body %}
 }

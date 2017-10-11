@@ -8,17 +8,17 @@ use Fresh\DoctrineEnumBundle\DBAL\Types\AbstractEnumType;
 
 final class {{ meta_enum.className }} extends AbstractEnumType
 {
-    {%- for option in meta_enum.options %}
+    {%- for option in meta_enum.options u%}
 
-    const {{ option.const | upper }} = '{{ option.value }}';
-    {%- endfor %}
+        const {{ option.const | upper }} = '{{ option.value }}';
+    {%-u endfor %}
 
 
     protected static $choices = [
-        {%- for option in meta_enum.options %}
+        {%- for option in meta_enum.options u%}
 
-        self::{{ option.const | upper }} => '{{ option.label }}',
-        {%- endfor %}
+            self::{{ option.const | upper }} => '{{ option.label }}',
+        {%-u endfor %}
 
     ];
 }

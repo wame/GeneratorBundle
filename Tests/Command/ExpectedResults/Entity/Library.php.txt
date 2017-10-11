@@ -84,6 +84,7 @@ class Library
     public function addBook(Book $book): self
     {
         $this->books->add($book);
+
         return $this;
     }
 

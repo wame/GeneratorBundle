@@ -1,28 +1,18 @@
     /**
-{% block phpdoc_method_annotations %}
-{% if 'annotation' == format %}
      * @Route("/", name="{{ route_name_prefix }}_index")
      * @Method("GET")
-{% endif %}
-{% endblock phpdoc_method_annotations %}
      */
-{% block method_definition %}
     public function indexAction(): Response
-{% endblock method_definition %}
     {
-{% block method_body %}
-    {%- if use_voter is defined and use_voter %}
-        $this->denyAccessUnlessGranted({{ entity_class }}Voter::INDEX);
-        {{- '\n\n' -}}
-    {%- endif %}
+        {%_ if use_voter is defined and use_voter u%}
+            $this->denyAccessUnlessGranted({{ entity_class }}Voter::INDEX);
+
+        {%_u endif %}
         $em = $this->getDoctrine()->getManager();
 
         ${{ entity_pluralized }} = $em->getRepository('{{ bundle }}:{{ entity }}')->findAll();
-{% endblock method_body %}
 
-{% block method_return %}
         return $this->render('{{ entity|tabalize|replace({'\\': '/'}) }}/index.html.twig', [
             '{{ entity_pluralized }}' => ${{ entity_pluralized }},
         ]);
-{% endblock method_return %}
     }

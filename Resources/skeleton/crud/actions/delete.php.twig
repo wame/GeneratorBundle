@@ -1,21 +1,14 @@
 
     /**
-{% block phpdoc_method_annotations %}
-{% if 'annotation' == format %}
      * @Route("/{{ '{' ~ identifier ~ '}' }}", name="{{ route_name_prefix }}_delete")
      * @Method("DELETE")
-{% endif %}
-{% endblock phpdoc_method_annotations %}
      */
-{% block method_definition %}
     public function deleteAction(Request $request, {{ entity_class }} ${{ entity_singularized }}): Response
-{% endblock method_definition %}
     {
-{% block method_body %}
-    {%- if use_voter is defined and use_voter %}
-        $this->denyAccessUnlessGranted({{ entity_class }}Voter::DELETE, ${{ entity_singularized }});
-        {{- '\n\n' -}}
-    {%- endif %}
+        {%_ if use_voter is defined and use_voter u%}
+            $this->denyAccessUnlessGranted({{ entity_class }}Voter::DELETE, ${{ entity_singularized }});
+
+        {%_u endif %}
         $form = $this->createDeleteForm(${{ entity_singularized }});
         $form->handleRequest($request);
 
@@ -26,11 +19,8 @@
 
             $this->addFlash('success', '{{ route_name_prefix }}.delete_success');
         }
-{% endblock method_body %}
 
-{% block method_return %}
         return $this->redirectToRoute('{{ route_name_prefix }}_index');
-{% endblock method_return %}
     }
 
 {% block form %}

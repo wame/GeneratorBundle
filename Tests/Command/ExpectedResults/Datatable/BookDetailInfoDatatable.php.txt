@@ -6,7 +6,6 @@ namespace Wame\GeneratorBundle\Datatable;
 use Sg\DatatablesBundle\Datatable\Column\Column;
 use Sg\DatatablesBundle\Datatable\Column\DateTimeColumn;
 
-
 class BookDetailInfoDatatable extends AppDatatable
 {
     protected function addColumns(?array $options = []): void

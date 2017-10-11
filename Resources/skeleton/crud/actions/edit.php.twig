@@ -1,22 +1,14 @@
 
     /**
-{% block phpdoc_method_header %}{% endblock phpdoc_method_header %}
-{% block phpdoc_method_annotations %}
-{% if 'annotation' == format %}
      * @Route("/{{ '{' ~ identifier ~ '}' }}/edit", name="{{ route_name_prefix }}_edit")
      * @Method({"GET", "POST"})
-{% endif %}
-{% endblock phpdoc_method_annotations %}
      */
-{% block method_definition %}
     public function editAction(Request $request, {{ entity_class }} ${{ entity_singularized }}): Response
-{% endblock method_definition %}
     {
-{% block method_body %}
-    {%- if use_voter is defined and use_voter %}
-        $this->denyAccessUnlessGranted({{ entity_class }}Voter::EDIT, ${{ entity_singularized }});
-        {{- '\n\n' -}}
-    {%- endif %}
+        {%_ if use_voter is defined and use_voter u%}
+            $this->denyAccessUnlessGranted({{ entity_class }}Voter::EDIT, ${{ entity_singularized }});
+
+        {%_u endif %}
         $deleteForm = $this->createDeleteForm(${{ entity_singularized }});
         $editForm = $this->createForm({{ entity_class }}Type::class, ${{ entity_singularized }});
         $editForm->handleRequest($request);
@@ -28,13 +20,10 @@
 
             return $this->redirectToRoute('{{ route_name_prefix }}_show', ['{{ identifier }}' => ${{ entity_singularized }}->get{{ identifier|capitalize }}()]);
         }
-{% endblock method_body %}
 
-{% block method_return %}
         return $this->render('{{ entity|tabalize|replace({'\\': '/'}) }}/edit.html.twig', [
             '{{ entity_singularized }}' => ${{ entity_singularized }},
             'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
         ]);
-{% endblock method_return %}
     }

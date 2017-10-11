@@ -7,9 +7,9 @@ namespace {{ meta_entity.bundleNamespace }}\Security{{ meta_entity.directory ? '
 
 use {{ meta_entity.entityNameSpace }};
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-{% if meta_entity.directory -%}
-use {{ meta_entity.bundleNamespace }}\Security\AppVoter;
-{% endif %}
+{% if meta_entity.directory u-%}
+    use {{ meta_entity.bundleNamespace }}\Security\AppVoter;
+{%u endif %}
 
 class {{ meta_entity.entityName }}Voter extends AppVoter
 {

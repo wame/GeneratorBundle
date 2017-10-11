@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Wame\GeneratorBundle\Generator;
 
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Wame\GeneratorBundle\Twig\UnIndentExtension;
+use Wame\GeneratorBundle\Twig\IndentLexer;
 use Wame\GeneratorBundle\Twig\InflectorExtension;
 
 class Generator
@@ -58,6 +60,9 @@ class Generator
             'autoescape' => false,
         ));
         $twigEnvironment->addExtension(new InflectorExtension());
+
+        $twigEnvironment->addExtension(new UnIndentExtension('    '));
+        $twigEnvironment->setLexer(new IndentLexer($twigEnvironment));
 
         return $twigEnvironment;
     }

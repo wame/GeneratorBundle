@@ -5,38 +5,38 @@ declare(strict_types=1);
 namespace {{ meta_entity.bundleNamespace }}\Datatable{{ meta_entity.directory ? '\\'~meta_entity.directory : '' }};
 
 {% if meta_entity.directory -%}
-use {{ meta_entity.bundleNamespace }}\Datatable\AppDatatable;
+    use {{ meta_entity.bundleNamespace }}\Datatable\AppDatatable;
 {% endif %}
 use Sg\DatatablesBundle\Datatable\Column\Column;
 {%- set break = false -%}
-{%- for property in meta_entity.properties if not break %}
-    {%- if property.returnType == '\\DateTime' -%}
-        {{- '\n' -}}
+{%- for property in meta_entity.properties if not break u-%}
+    {%_ if property.returnType == '\\DateTime' u%}
+
         use Sg\DatatablesBundle\Datatable\Column\DateTimeColumn;
-        {{- '\n' -}}
         {%- set break = true -%}
-    {%- endif -%}
-{%- endfor -%}
-{{- '\n\n' -}}
+    {%-u endif -%}
+{%-u endfor %}
+
+
 class {{ meta_entity.entityName }}Datatable extends AppDatatable
 {
     protected function addColumns(?array $options = []): void
     {
         $this->columnBuilder
-        {%- for property in meta_entity.properties -%}
-            {%- if property.returnType == '\\DateTime' -%}
-                {{- '\n            ' -}}
-            ->add('{{ property.name }}', DateTimeColumn::class, [
-                'title' => $this->translator->trans('{{ meta_entity.entityName | tabalize }}.{{ property.columnName }}'),
-            ])
-            {%- elseif property.relationType == false -%}
-                {{- '\n            ' -}}
-            ->add('{{ property.name }}', Column::class, [
-                'title' => $this->translator->trans('{{ meta_entity.entityName | tabalize }}.{{ property.columnName }}'),
-            ])
+        {%- for property in meta_entity.properties u%}
+            {%- if property.returnType == '\\DateTime' %}
+
+                ->add('{{ property.name }}', DateTimeColumn::class, [
+                    'title' => $this->translator->trans('{{ meta_entity.entityName | tabalize }}.{{ property.columnName }}'),
+                ])
+            {%- elseif property.relationType == false %}
+
+                ->add('{{ property.name }}', Column::class, [
+                    'title' => $this->translator->trans('{{ meta_entity.entityName | tabalize }}.{{ property.columnName }}'),
+                ])
             {%- endif -%}
-        {%- endfor -%}
-        {{-''}}
+        {%-u endfor %}
+
         ;
     }
 }

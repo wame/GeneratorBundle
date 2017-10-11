@@ -6,19 +6,19 @@
 {%- endblock %}
 
 {%- block property_methods %}
-    {{- block('property_getter') -}}
-    {%- if property.collectionType -%}
-        {{- '\n' ~ block('property_adder') -}}
-        {{- '\n' ~  block('property_remover') -}}
-    {%- else -%}
-        {%- if property.isId != true -%}
-            {{- '\n' ~ block('property_setter') -}}
-        {%- endif -%}
-    {%- endif -%}
+    {{_ block('property_getter') }}
+    {%_ if property.collectionType %}
+
+        {{_ block('property_adder') }}
+
+        {{_ block('property_remover') }}
+    {%_ elseif property.isId != true %}
+
+        {{_ block('property_setter') }}
+    {%_ endif %}
 {%- endblock %}
 
 {%- block property_setter %}
-
     public function set{{ property.name | classify }}({{ property.nullable ? '?' : '' }}{{ property.returnType }} ${{ property.name }}): self
     {
         $this->{{ property.name }} = ${{ property.name }};
@@ -28,11 +28,9 @@
 {%- endblock %}
 
 {%- block property_getter %}
-    {%- if property.collectionType %}
-
-    /** @return {{ property.returnType }}|{{ property.targetEntity }}[] */
-    {%- endif %}
-
+    {%_ if property.collectionType u%}
+        /** @return {{ property.returnType }}|{{ property.targetEntity }}[] */
+    {%_u endif %}
     public function get{{ property.name | classify }}(): {{ property.nullable != true and property.default ? '' : '?' }}{{ property.returnType }}
     {
         return $this->{{ property.name }};
@@ -40,21 +38,18 @@
 {%- endblock %}
 
 {%- block property_adder %}
-
     public function add{{ property.name | singularize | classify }}({{ property.targetEntity }} ${{ property.name | singularize }}): self
     {
         $this->{{ property.name }}->add(${{ property.name | singularize  }});
-        {%- if property.mappedBy is not null %}
-
-        ${{ property.name | singularize}}->set{{ property.mappedBy | classify }}($this);
-        {% endif %}
+        {%_ if property.mappedBy is not null u%}
+            ${{ property.name | singularize}}->set{{ property.mappedBy | classify }}($this);
+        {%u endif %}
 
         return $this;
     }
 {%- endblock %}
 
 {%- block property_remover %}
-
     public function remove{{ property.name | singularize | classify }}({{ property.targetEntity }} ${{ property.name | singularize }}): self
     {
         $this->{{ property.name }}->removeElement(${{ property.name | singularize }});

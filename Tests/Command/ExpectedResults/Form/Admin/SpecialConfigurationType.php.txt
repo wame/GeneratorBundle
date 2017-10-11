@@ -26,9 +26,4 @@ class SpecialConfigurationType extends AbstractType
             'data_class' => SpecialConfiguration::class,
         ]);
     }
-
-    public function getBlockPrefix(): string
-    {
-        return 'special_configuration_type';
-    }
 }
