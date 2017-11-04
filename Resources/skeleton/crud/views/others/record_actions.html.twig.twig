@@ -1,21 +1,23 @@
     <nav>
-        <a href="{{ "{{ path('" ~ route_name_prefix ~ "_index') }}" }}" class="btn btn-default">{{ "{{ 'action.back_to_list' | trans }}" }}</a>
+        {{+ "{% if is_granted('"~entity_singularized|tabalize|upper~"_INDEX') %}" }}
+            <a href="{{ "{{ path('" ~ route_name_prefix ~ "_index') }}" }}" class="btn btn-default">{{ "{{ 'action.back_to_list' | trans }}" }}</a>
+        {{+ "{% endif %}" }}
         {%- if ('edit' in actions) and (not hide_edit) %}
 
-        {{ "{% if is_granted('"~entity_singularized|upper~"_EDIT') %}" }}
+        {{+ "{% if is_granted('"~entity_singularized|tabalize|upper~"_EDIT') %}" }}
             <a href="{{ "{{ path('" ~ route_name_prefix ~ "_edit', { '"~ identifier ~"': " ~ entity_singularized ~ "."~ identifier ~" }) }}" }}" class="btn btn-warning">
-                {{ "{{ 'action.edit' | trans }}" }}
+                {{+ "{{ 'action.edit' | trans }}" }}
             </a>
-        {{ "{% endif %}" }}
+        {{+ "{% endif %}" }}
         {%- endif %}
         {%- if ('delete' in actions) and (not hide_delete) %}
 
-        {{ "{% if is_granted('"~entity_singularized|upper~"_DELETE') %}" }}
+        {{+ "{% if is_granted('"~entity_singularized|tabalize|upper~"_DELETE') %}" }}
             <a href="#delete" class="btn btn-danger" onclick="if(confirm('{{ "{{ 'crud.confirm_delete' | trans }}" }}')){ document.getElementById('{{ "{{ delete_form.vars.id }}" }}').submit() }">
-                {{ "{{ 'action.delete' | trans }}" }}
+                {{+ "{{ 'action.delete' | trans }}" }}
             </a>
-            {{ '{{ form(delete_form) }}' }}
-        {{ "{% endif %}" }}
+            {{+ '{{ form(delete_form) }}' }}
+        {{+ "{% endif %}" }}
         {%- endif %}
 
     </nav>

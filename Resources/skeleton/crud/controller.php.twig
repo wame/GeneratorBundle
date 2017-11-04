@@ -5,33 +5,33 @@ namespace {{ namespace }}\Controller{{ entity_namespace ? '\\' ~ entity_namespac
 
 {% block use_statements u%}
     use {{ namespace }}\Entity\{{ entity }};
-    {%_ if 'new' in actions or 'edit' in actions u%}
+    {% if 'new' in actions or 'edit' in actions u%}
         use {{ namespace }}\Form\{{ entity }}Type;
-    {%_u endif %}
+    {%u endif %}
     use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-    {%_ if 'annotation' == format u%}
+    {% if 'annotation' == format u%}
         use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
         use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-    {%_u endif %}
-    {%_ if 'new' in actions or 'edit' in actions or 'delete' in actions u%}
+    {%u endif %}
+    {% if 'new' in actions or 'edit' in actions or 'delete' in actions u%}
         use Symfony\Component\HttpFoundation\Request;
         use Symfony\Component\Form\Form;
-    {%_u endif %}
-    {%_ if use_voter is defined and use_voter u-%}
+    {%u endif %}
+    {% if use_voter is defined and use_voter u-%}
         use {{ namespace }}\Security\{{ entity }}Voter;
-    {%_u endif %}
-    {%_ if use_voter is defined and use_voter u-%}
+    {%u endif %}
+    {% if use_voter is defined and use_voter u-%}
         use {{ namespace }}\Datatable\DatatableResultService;
         use {{ namespace }}\Datatable\{{ entity }}Datatable;
-    {%_u endif %}
+    {%u endif %}
     use Symfony\Component\HttpFoundation\Response;
 {%u endblock use_statements %}
 
 {% block phpdoc_class_annotations u%}
     /**
-    {%_ if 'annotation' == format u%}
+    {% if 'annotation' == format u%}
          * @Route("{{ route_prefix|default('/') }}")
-    {%_u endif %}
+    {%u endif %}
      */
 {%u endblock phpdoc_class_annotations %}
 {% block class_definition u%}

@@ -25,7 +25,7 @@ class BookDetailInfoVoter extends AppVoter
     ];
 
     static protected $supportedClasses = [
-        BookDetailInfo::class
+        BookDetailInfo::class,
     ];
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)

@@ -127,7 +127,7 @@ class Book
     {
         $this->borrowers->add($borrower);
         $borrower->setBook($this);
-        
+
         return $this;
     }
 
@@ -160,7 +160,7 @@ class Book
     {
         $this->libraries->add($library);
         $library->setBooks($this);
-        
+
         return $this;
     }
 

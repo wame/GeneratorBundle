@@ -5,10 +5,10 @@
      */
     public function newAction(Request $request): Response
     {
-        {%_ if use_voter is defined and use_voter u%}
+        {% if use_voter is defined and use_voter u%}
             $this->denyAccessUnlessGranted({{ entity_class }}Voter::CREATE);
 
-        {%_u endif %}
+        {%u endif %}
         ${{ entity_singularized }} = new {{ entity_class }}();
         $form = $this->createForm({{ entity_class }}Type::class, ${{ entity_singularized }});
         $form->handleRequest($request);
@@ -20,11 +20,11 @@
 
             $this->addFlash('success', '{{ route_name_prefix }}.create_success');
 
-            {% if 'show' in actions -%}
+            {% if 'show' in actions u%}
                 return $this->redirectToRoute('{{ route_name_prefix }}_show', ['{{ identifier }}' => ${{ entity_singularized }}->get{{ identifier|capitalize }}()]);
-            {%- else -%}
+            {%-u else u%}
                 return $this->redirectToRoute('{{ route_name_prefix }}_index'));
-            {%- endif %}
+            {%-u endif %}
 
         }
 

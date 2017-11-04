@@ -32,7 +32,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                {{ '{% for ' ~ entity_singularized ~ ' in ' ~ entity_pluralized ~ ' %}' }}
+                {{+ '{% for ' ~ entity_singularized ~ ' in ' ~ entity_pluralized ~ ' %}' }}
                     <tr>
 
                 {%- for field, metadata in fields %}
@@ -76,7 +76,7 @@
                             {%- set btn_type = (action == 'edit' ? 'warning' : (action == 'delete' ? 'danger' : 'default')) %}
 
                             <a href="{{ "{{ path('" ~ route_name_prefix ~ "_" ~ action ~ "', { '"~ identifier ~"': " ~ entity_singularized ~ "."~ identifier ~" }) }}" }}" class="btn btn-{{ btn_type }}">
-                                {{ '{{ \'action.' ~action~ '\' | trans }}' }}
+                                {{+ '{{ \'action.' ~action~ '\' | trans }}' }}
                             </a>
                             {%- endfor %}
 
@@ -86,7 +86,7 @@
                 {%- endfor %}
 
                     </tr>
-                {{ '{% endfor %}' }}
+                {{+ '{% endfor %}' }}
                 </tbody>
             </table>
         </div>

@@ -18,7 +18,7 @@ class MetaProperty
     /** @var string */
     protected $columnName;
 
-    /** @var string */
+    /** @var mixed */
     protected $default;
 
     /** @var string */
@@ -106,7 +106,7 @@ class MetaProperty
 
     public function getDefault(): ?string
     {
-        if (!$this->default) {
+        if ($this->default === null) {
             return null;
         }
         if ($this->getReturnType() === 'string') {
@@ -115,10 +115,13 @@ class MetaProperty
         if ($this->getReturnType() === '\\DateTime()') {
             return 'new \DateTime(\''.$this->default.'\')';
         }
+        if ($this->getReturnType() === 'bool') {
+            return $this->default ? 'true' : 'false';
+        }
         return $this->default;
     }
 
-    public function setDefault(?string $default): self
+    public function setDefault($default): self
     {
         $this->default = $default;
         return $this;
@@ -371,6 +374,8 @@ class MetaProperty
             case Type::SIMPLE_ARRAY:
             case Type::JSON_ARRAY:
                 return 'array';
+            case Type::BOOLEAN:
+                return 'bool';
             default:
                 return $type;
         }

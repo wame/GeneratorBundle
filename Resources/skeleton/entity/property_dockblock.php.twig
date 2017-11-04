@@ -1,7 +1,7 @@
 {# @var property \Wame\GeneratorBundle\MetaData\MetaProperty #}
 {%- block property_docblock %}
     /**
-    {{_ block('property_dockblock_return_type') }}
+    {{ block('property_dockblock_return_type') }}
     {%- if property.type == 'one2many' %}
         {{- block('property_docblock_orm_part_one2many') }}
     {%- elseif property.type == 'many2one' %}
@@ -120,7 +120,7 @@
 {%- block property_dockblock_validation %}
     {%- for validation in property.validations %}
 
-    {#_ @var validation Wame\GeneratorBundle\MetaData\MetaValidation #}
+    {# @var validation Wame\GeneratorBundle\MetaData\MetaValidation #}
      * @Assert\{{ validation.annotationFormatted }}
     {%- endfor -%}
 {%- endblock %}

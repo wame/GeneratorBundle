@@ -119,7 +119,7 @@ class Author
     {
         $this->books->add($book);
         $book->setAuthor($this);
-        
+
         return $this;
     }
 

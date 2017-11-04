@@ -1,21 +1,21 @@
 {% use 'entity/property_dockblock.php.twig' %}
 {# @var property \Wame\GeneratorBundle\MetaData\MetaProperty #}
 {%- block property %}
-    {{- block('property_docblock') }}
+    {{ block('property_docblock') }}
     private ${{ property.name }}{{ property.default is not null ? ' = '~property.default : '' }};
 {%- endblock %}
 
 {%- block property_methods %}
-    {{_ block('property_getter') }}
-    {%_ if property.collectionType %}
+    {{ block('property_getter') }}
+    {% if property.collectionType %}
 
-        {{_ block('property_adder') }}
+        {{ block('property_adder') }}
 
-        {{_ block('property_remover') }}
-    {%_ elseif property.isId != true %}
+        {{ block('property_remover') }}
+    {% elseif property.isId != true %}
 
-        {{_ block('property_setter') }}
-    {%_ endif %}
+        {{ block('property_setter') }}
+    {% endif %}
 {%- endblock %}
 
 {%- block property_setter %}
@@ -28,9 +28,9 @@
 {%- endblock %}
 
 {%- block property_getter %}
-    {%_ if property.collectionType u%}
+    {% if property.collectionType u%}
         /** @return {{ property.returnType }}|{{ property.targetEntity }}[] */
-    {%_u endif %}
+    {%u endif %}
     public function get{{ property.name | classify }}(): {{ property.nullable != true and property.default ? '' : '?' }}{{ property.returnType }}
     {
         return $this->{{ property.name }};
@@ -41,7 +41,7 @@
     public function add{{ property.name | singularize | classify }}({{ property.targetEntity }} ${{ property.name | singularize }}): self
     {
         $this->{{ property.name }}->add(${{ property.name | singularize  }});
-        {%_ if property.mappedBy is not null u%}
+        {% if property.mappedBy is not null u%}
             ${{ property.name | singularize}}->set{{ property.mappedBy | classify }}($this);
         {%u endif %}
 

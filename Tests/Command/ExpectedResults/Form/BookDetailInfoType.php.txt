@@ -13,7 +13,6 @@ class BookDetailInfoType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            
             ->add('type', null, [
                 'label' => 'book_detail_info.type',
             ])

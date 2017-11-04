@@ -13,10 +13,10 @@ use Doctrine\ORM\Mapping as ORM;
     use Doctrine\Common\Collections\Collection;
     use Doctrine\Common\Collections\ArrayCollection;
 {%u endif -%}
-{% if meta_entity.hasValidation  -%}
+{% if meta_entity.hasValidation -%}
     use Symfony\Component\Validator\Constraints as Assert;
 {% endif %}
-{% if meta_entity.hasEnumProperty  -%}
+{% if meta_entity.hasEnumProperty -%}
     use Fresh\DoctrineEnumBundle\Validator\Constraints as EnumAssert;
 {% endif %}
 {% for trait in meta_entity.traits -%}
@@ -51,22 +51,22 @@ class {{ meta_entity.entityName }}
 
     {%- for property in meta_entity.properties %}
 
-        {{_ block('property') }}
-    {%_ endfor -%}
+        {{ block('property') }}
+    {% endfor -%}
 
-    {%_ if meta_entity.hasCollectionProperties u%}
+    {% if meta_entity.hasCollectionProperties u%}
 
         public function __construct()
         {
-            {%_ for property in meta_entity.collectionProperties u%}
+            {% for property in meta_entity.collectionProperties u%}
                 $this->{{ property.name }} = new ArrayCollection();
-            {%_u endfor %}
+            {%u endfor %}
         }
-    {%_u endif -%}
+    {%u endif -%}
 
     {%- for property in meta_entity.properties %}
 
-        {{_ block('property_methods') }}
+        {{ block('property_methods') }}
     {%- endfor -%}
 
     {% set displayFieldProperty = meta_entity.getDisplayFieldProperty %}
@@ -77,5 +77,5 @@ class {{ meta_entity.entityName }}
             return {{ displayFieldProperty.returnType == 'string' ? '' : '(string) ' -}}
                 $this->get{{ displayFieldProperty.name | classify }}() ?: '';
         }
-    {%_u endif %}
+    {%u endif %}
 }

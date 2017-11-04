@@ -26,7 +26,7 @@ class SpecialConfigurationVoter extends AppVoter
     ];
 
     static protected $supportedClasses = [
-        SpecialConfiguration::class
+        SpecialConfiguration::class,
     ];
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)

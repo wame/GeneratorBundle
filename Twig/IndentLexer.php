@@ -11,8 +11,10 @@ class IndentLexer extends \Twig_Lexer
     {
         $sourceCode = str_replace(array("\r\n", "\r"), "\n", $source->getCode());
 
-        //Remove spaces without removing newlines before {%_ or {{_ or {#
-        $sourceCode = preg_replace("/(    )*{(%|{|#)_/", "{\$2", $sourceCode);
+        //Here we remove all spaces (but no newlines) before {% and {# and {{
+        $sourceCode = preg_replace("/\n(    )*{(%|{|#)([^\+])/", "\n{\$2$3", $sourceCode);
+        //We make exceptions for space-removal if the {% or {# or {{ is preceded by a +, but the + needs to be removed afterwards
+        $sourceCode = preg_replace("/{(%|{|#)([\+])/", "{\$1", $sourceCode);
 
         //Inject the unindent-filter wherever 'u' is used like {%u or u%}
         $sourceCode= preg_replace("/u(-)?%}/", "%}{% filter unindent $1%}", $sourceCode);

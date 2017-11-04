@@ -10,7 +10,7 @@ namespace {{ meta_entity.bundleNamespace }}\Datatable{{ meta_entity.directory ? 
 use Sg\DatatablesBundle\Datatable\Column\Column;
 {%- set break = false -%}
 {%- for property in meta_entity.properties if not break u-%}
-    {%_ if property.returnType == '\\DateTime' u%}
+    {% if property.returnType == '\\DateTime' u%}
 
         use Sg\DatatablesBundle\Datatable\Column\DateTimeColumn;
         {%- set break = true -%}

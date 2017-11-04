@@ -4,16 +4,16 @@
 
 {% block body %}
 {{ "{% block page_title_text %}" }}
-    {{ "{{ '"~entity_singularized|tabalize~".new_title' | trans }}" }}
+    {{+ "{{ '"~entity_singularized|tabalize~".new_title' | trans }}" }}
 {{ "{% endblock %}" }}
 
 {{ "{% block body %}" }}
     <div class="panel">
         <div class="panel-body">
-            {{ '{{ form_start(form) }}' }}
-            {{ '{{ form_widget(form) }}' }}
+            {{+ '{{ form_start(form) }}' }}
+            {{+ '{{ form_widget(form) }}' }}
             <input type="submit" value="{{ "{{ 'button.create' | trans }}" }}" class="btn btn-primary" />
-            {{ '{{ form_end(form) }}' }}
+            {{+ '{{ form_end(form) }}' }}
         </div>
     </div>
 

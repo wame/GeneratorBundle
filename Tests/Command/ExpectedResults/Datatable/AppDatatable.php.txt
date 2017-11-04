@@ -10,13 +10,10 @@ use Doctrine\Common\Util\Inflector;
 
 abstract class AppDatatable extends SgDatatable
 {
-    /** @var callable */
-    protected $modifyQueryCallback;
-
     /**
      * {@inheritdoc}
      */
-    public function buildDatatable(?array $options = []): void
+    public function buildDatatable(?array $options = []): self
     {
         $this->language->set([]);
 
@@ -32,6 +29,8 @@ abstract class AppDatatable extends SgDatatable
         $this->addColumns($options);
 
         $this->addActions($options);
+
+        return $this;
     }
 
     protected function getAjaxOptions($options = []): array
@@ -47,22 +46,9 @@ abstract class AppDatatable extends SgDatatable
         return $this->router->generate($this->getRoute('result'));
     }
 
-    public function setModifyQueryCallback(callable $callback): void
-    {
-        $this->modifyQueryCallback = $callback;
-    }
-
-    public function getModifyQueryCallback(): ?callable
-    {
-        return $this->modifyQueryCallback;
-    }
-
     public function modifyQuery(QueryBuilder $qb): void
     {
-        $callback = $this->getModifyQueryCallback();
-        if ($callback) {
-            $callback($qb);
-        }
+        return;
     }
 
     abstract protected function addColumns(array $options = []): void;

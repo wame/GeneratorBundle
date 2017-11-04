@@ -28,12 +28,11 @@ class SpecialConfigurationController extends Controller
     {
         $this->denyAccessUnlessGranted(SpecialConfigurationVoter::INDEX);
 
-        $datatable->buildDatatable();
-
         return $this->render('admin/special_configuration/index.html.twig', [
-            'datatable' => $datatable,
+            'datatable' => $datatable->buildDatatable(),
         ]);
     }
+
     /**
      * @Route("/", name="admin_special_configuration_result")
      * @Method("POST")

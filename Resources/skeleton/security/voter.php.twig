@@ -7,9 +7,9 @@ namespace {{ meta_entity.bundleNamespace }}\Security{{ meta_entity.directory ? '
 
 use {{ meta_entity.entityNameSpace }};
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-{% if meta_entity.directory u-%}
+{% if meta_entity.directory -%}
     use {{ meta_entity.bundleNamespace }}\Security\AppVoter;
-{%u endif %}
+{% endif %}
 
 class {{ meta_entity.entityName }}Voter extends AppVoter
 {
@@ -30,7 +30,7 @@ class {{ meta_entity.entityName }}Voter extends AppVoter
     ];
 
     static protected $supportedClasses = [
-        {{ meta_entity.entityName }}::class
+        {{+ meta_entity.entityName }}::class,
     ];
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)

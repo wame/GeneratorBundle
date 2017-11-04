@@ -1,12 +1,13 @@
+
     /**
      * @Route("/", name="{{ route_name_prefix }}_result")
      * @Method("POST")
      */
     public function resultAction({{ entity_class }}Datatable $datatable, DatatableResultService $datatableResultService): Response
     {
-    {%_ if use_voter is defined and use_voter %}
+    {% if use_voter is defined and use_voter %}
         $this->denyAccessUnlessGranted({{ entity_class }}Voter::SEARCH);
-    {%_ endif %}
+    {% endif %}
 
         return $datatableResultService->getDatatableResult($datatable);
     }

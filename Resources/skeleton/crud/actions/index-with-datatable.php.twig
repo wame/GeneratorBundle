@@ -4,13 +4,11 @@
      */
     public function indexAction({{ entity_class }}Datatable $datatable): Response
     {
-        {%_ if use_voter is defined and use_voter u%}
+        {% if use_voter is defined and use_voter u%}
             $this->denyAccessUnlessGranted({{ entity_class }}Voter::INDEX);
 
-        {%_u endif %}
-        $datatable->buildDatatable();
-
+        {%u endif %}
         return $this->render('{{ entity|tabalize|replace({'\\': '/'}) }}/index.html.twig', [
-            'datatable' => $datatable,
+            'datatable' => $datatable->buildDatatable(),
         ]);
     }

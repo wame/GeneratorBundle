@@ -28,12 +28,11 @@ class BookDetailInfoController extends Controller
     {
         $this->denyAccessUnlessGranted(BookDetailInfoVoter::INDEX);
 
-        $datatable->buildDatatable();
-
         return $this->render('book_detail_info/index.html.twig', [
-            'datatable' => $datatable,
+            'datatable' => $datatable->buildDatatable(),
         ]);
     }
+
     /**
      * @Route("/", name="book_detail_info_result")
      * @Method("POST")

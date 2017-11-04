@@ -4,10 +4,10 @@
      */
     public function indexAction(): Response
     {
-        {%_ if use_voter is defined and use_voter u%}
+        {% if use_voter is defined and use_voter u%}
             $this->denyAccessUnlessGranted({{ entity_class }}Voter::INDEX);
 
-        {%_u endif %}
+        {%u endif %}
         $em = $this->getDoctrine()->getManager();
 
         ${{ entity_pluralized }} = $em->getRepository('{{ bundle }}:{{ entity }}')->findAll();

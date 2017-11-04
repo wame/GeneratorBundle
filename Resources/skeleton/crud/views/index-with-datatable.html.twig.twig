@@ -10,16 +10,16 @@
 {{ "{% block body %}" }}
     <div class="panel">
         <div class="panel-heading">
-            {%- if 'new' in actions %}
+            {%- if 'new' in actions u%}
 
                 <div class="pull-right">
                     <a href="{{ "{{ path('" ~ route_name_prefix ~ "_new') }}" }}" class="btn btn-primary">{{ "{{ 'action.create' | trans ~ ' ' ~ '"~entity_singularized | capitalize ~"' | trans | lower }}" }}</a>
                 </div>
-            {%- endif %}
+            {%-u endif %}
 
         </div>
         <div class="panel-body">
-            {{ '{{ sg_datatables_render_html(datatable) }}' }}
+            {{+ '{{ sg_datatables_render_html(datatable) }}' }}
         </div>
     </div>
 {{ "{% endblock %}" }}
@@ -27,7 +27,7 @@
 
 {% block javascripts %}
 {{ "{% block javascripts %}" }}
-    {{ '{{ parent() }}' }}
-    {{ '{{ sg_datatables_render_js(datatable) }}' }}
+    {{+ '{{ parent() }}' }}
+    {{+ '{{ sg_datatables_render_js(datatable) }}' }}
 {{ "{% endblock %}" }}
 {% endblock javascripts %}

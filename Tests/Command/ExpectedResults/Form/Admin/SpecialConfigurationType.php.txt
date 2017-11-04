@@ -13,7 +13,6 @@ class SpecialConfigurationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            
             ->add('title', null, [
                 'label' => 'special_configuration.title',
             ])
