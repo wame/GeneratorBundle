@@ -8,14 +8,12 @@ class EntityAdminSpecialConfiguration
     public static $commandOptions = [
         'entity' => 'Admin\SpecialConfiguration',
         '--behaviours' => ['blameable', 'timestampable', 'softdeleteable'],
-        '--fields' => "{
-            title : {
-                type: string,
-                display,
-                validation: {
-                    NotBlank
-                },
-            },
-        }"
+        '--fields' => "
+title:
+    type: string
+    display
+    validation:
+        NotBlank
+"
     ];
 }

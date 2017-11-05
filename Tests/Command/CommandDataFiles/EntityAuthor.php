@@ -8,32 +8,25 @@ class EntityAuthor
     public static $commandOptions = [
         'entity' => 'Author',
         '--behaviours' => ['blameable', 'timestampable', 'softdeleteable'],
-        '--fields' => "{
-            firstName : {
-                type: string,
-                display,
-                validation: {
-                    NotBlank
-                },
-            }, 
-            lastName : {
-                type: string,
-                validation: {
-                    NotBlank
-                },
-            },
-            email: {
-                type: string,
-                nullable,
-                validation: {
-                    Email
-                },
-            },
-            books: {
-                type: one2many,
-                targetEntity: Book,
-                mappedBy: author,
-            }
-        }"
+        '--fields' => "
+firstName:
+    type: string
+    display
+    validation:
+        NotBlank
+lastName:
+    type: string
+    validation:
+        NotBlank
+email:
+    type: string
+    nullable
+    validation:
+        Email
+books:
+    type: one2many
+    targetEntity: Book
+    mappedBy: author
+"
     ];
 }

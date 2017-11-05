@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Timestampable\Traits\TimestampableEntity as Timestampable;
 use Gedmo\Blameable\Traits\BlameableEntity as Blameable;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity as Softdeleteable;
@@ -34,7 +35,8 @@ class Library
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string")
+     * @ORM\Column(name="name", type="string", unique=true)
+     * @Assert\NotBlank
      */
     private $name;
 

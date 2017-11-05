@@ -8,20 +8,17 @@ class EntityLibrary
     public static $commandOptions = [
         'entity' => 'Library',
         '--behaviours' => ['blameable', 'timestampable', 'softdeleteable'],
-        '--fields' => "{
-            name : {
-                type: string,
-                display,
-                unique
-                validation: {
-                    NotBlank
-                },
-            },
-            books: {
-                type: many2many,
-                targetEntity: Book,
-                inversedBy: libraries,
-            }
-        }"
+        '--fields' => "
+name:
+    type: string
+    display
+    unique
+    validation:
+        NotBlank
+books:
+    type: many2many
+    targetEntity: Book
+    inversedBy: libraries
+"
     ];
 }

@@ -141,7 +141,7 @@ EOT
         $entityQuestionHelper->askDisplayField($input, $output);
     }
 
-    protected function parseFieldsAsYaml(string $input): ?array
+    protected function parseFieldsAsYaml(?string $input): ?array
     {
         if (!$input) {
             return [];
@@ -151,8 +151,14 @@ EOT
         $input = str_replace(['\r\n', '\n'], "\n", $input);
         //Replace tabs with four spaces
         $input = str_replace("\t", "    ", $input);
-        $parsedInput = Yaml::parse($input);
 
+        //Add ': true' to keys without value (use patter twice, to replace overlapping results)
+        $input = preg_replace(array_fill(0, 2, "/(,|{|\n)( *)(\w*)( *)(,|}|\n)/"), "$1$2$3: true$4$5", $input);
+
+        $parsedInput = Yaml::parse($input);
+        if (is_string($parsedInput)) {
+            throw new ParseException("Field input is not suitable to be parsed as yaml.");
+        }
 
         foreach ($parsedInput as $fieldName => &$fieldData) {
             $fieldData['fieldName'] = Inflector::camelize($fieldName);

@@ -176,16 +176,19 @@ the following example:
     php bin/console wame:generate:entity Contact --fields="
     email:
         type: string
-        nullable:
+        nullable
         validation:
-            Email:
-            NotBlank:
+            Email
+            NotBlank
             Length:
                 min: 5
                 max: 150
                 minMessage: We do not believe an email can have fewer than 5 characters.
                 maxMessage: For some inexplicable reason emails longer than 150 chars are not allowed here.
     "
+
+Note that keys without value will get the value true. So in this case
+`nullable` is the same as `nullable: true`.
 
 If your console converts newlines them to a single line, you may want to use the 
 [a different representation](http://symfony.com/doc/current/components/yaml.html#array-expansion-and-inlining)
@@ -194,10 +197,10 @@ instead:
     php bin/console wame:generate:entity Contact --fields="{
         email: {
             type: string,
-            nullable:,
+            nullable,
             validation: {
-                Email:,
-                NotBlank:, 
+                Email,
+                NotBlank, 
                 Length: {
                     min: 5,
                     max: 150,
@@ -211,7 +214,7 @@ instead:
 If your console doesn't accept newlines in a single command at all, you can use the
 same representation in a single line as well:
     
-    php bin/console wame:generate:entity Contact --fields="{ email: { type: string, nullable: , validation: { Email: , NotBlank:, Length: { min: 5, max: 150, minMessage: We do not believe an email can have fewer than 5 characters., maxMessage: For some inexplicable reason emails longer than 150 chars are not allowed here. } } } }"
+    php bin/console wame:generate:entity Contact --fields="{ email: { type: string, nullable, validation: { Email, NotBlank, Length: { min: 5, max: 150, minMessage: We do not believe an email can have fewer than 5 characters., maxMessage: For some inexplicable reason emails longer than 150 chars are not allowed here. } } } }"
 
 #### Name conversions
 
@@ -254,8 +257,8 @@ Product entity:
     php bin/console wame:generate:entity Product -n --fields="{
         name: {
             type: string,
-            display:,
-            unique:,
+            display,
+            unique,
             validations: {
                 NotBlank
             }
@@ -278,7 +281,7 @@ Product entity:
         firstDateOnMarket: {
             type: date
             validation: {
-                Date:,
+                Date,
                 LessThanOrEqual: {
                     value: today,
                     message: \"We do not have products that aren't on the market already, so a future date is not possible\"
@@ -289,14 +292,14 @@ Product entity:
             type: many2one,
             targetEntity: ProductCategory,
             validation: {
-                Valid:
+                Valid
             }
         },
         productRows: {
             type: one2many,
             targetEntity: ProductRow,
             mappedBy: product,
-            orphanRemoval:
+            orphanRemoval
         },
         productContactInfo: {
             type: one2one,
@@ -308,7 +311,7 @@ Product entity:
             targetEntity: productSale,
             inversedBy: products,
             validation: {
-                Valid:
+                Valid
             }
         },
     }" --behaviours=blameable --behaviours=timestampable --behaviours=softdeleteable
