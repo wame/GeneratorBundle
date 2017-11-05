@@ -5,6 +5,8 @@ namespace Wame\GeneratorBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Exception\InvalidOptionException;
+use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\Yaml\Yaml;
 use Wame\GeneratorBundle\Command\Helper\EntityQuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -66,7 +68,7 @@ EOT
         $entity = WameValidators::validateEntityName($input->getArgument('entity'));
         list($bundle, $entity) = $this->parseShortcutNotation($entity);
 
-        $fields = $this->parseFields($input->getOption('fields'));
+        $fields = $this->parseFields($input->getOption('fields'), $output);
         WameValidators::validateFields($fields);
         $fields = WameValidators::normalizeFields($fields);
 
@@ -139,69 +141,48 @@ EOT
         $entityQuestionHelper->askDisplayField($input, $output);
     }
 
-    protected function parseFieldsAsJson(string $input): ?array
+    protected function parseFieldsAsYaml(string $input): ?array
     {
         if (!$input) {
             return [];
         }
 
-        //Remove newlines, tabs, space-indents
-        $input = str_replace(["\r\n", "\n", "\t", '  '], '', $input);
-        //Remove comma's at the end of an 'array'
-        $input = preg_replace('/, ?}/i', '}', $input);
+        //Replace text-newlines with actual newlines
+        $input = str_replace(['\r\n', '\n'], "\n", $input);
+        //Replace tabs with four spaces
+        $input = str_replace("\t", "    ", $input);
+        $parsedInput = Yaml::parse($input);
 
-        //Remove spaces before and after json-characters (: , { } [ ])
-        $input = preg_replace('/ +([:,}{\[\]])/i', '\1', $input);
-        $input = preg_replace('/([:,}{\[\]]) +/i', '\1', $input);
 
-        //Add quotes around keys => {key:value} becomes {"key":value}
-        $input = preg_replace('/([,{])\'?([\w ]+)\'?:/i', '\1"\2":', $input);
-        //Add quotes around values => {"key":some value} becomes {"key":"some value"}
-        $input = preg_replace('/:\'?([^,}{\"]+)\'?([,}])/i', ':"\1"\2', $input);
-        //Remove just added quotes from digits, null ands booleans => {"length":"255"} becomes {"length":255}
-        $input = preg_replace('/:"(true|false|null|\d+)"/i', ':\1', $input);
-        //Keys without value will become booleans => {nullable} will become {"nullable":true}
-        $input = preg_replace('/([,{])([\w]+)([,}])/i', '\1"\2":true\3', $input);
-        //Repeat same expressiong, because {nullable,unique} would become {"nullable":true,unique} if executed only once
-        $input = preg_replace('/([,{])([\w]+)([,}])/i', '\1"\2":true\3', $input);
-
-        $decodedInput = json_decode($input, true);
-
-        if ($decodedInput === null) {
-            throw new \InvalidArgumentException('The input could not be converted to valid json. Please make sure there aren\'t any forgotten/misplaced characters.');
-        }
-
-        foreach ($decodedInput as $fieldName => &$fieldData) {
+        foreach ($parsedInput as $fieldName => &$fieldData) {
             $fieldData['fieldName'] = Inflector::camelize($fieldName);
             $fieldData['columnName'] = Inflector::tableize($fieldName);
         }
 
-        return $decodedInput;
+        return $parsedInput;
     }
 
-    /**
-     * Copy of parseFields in Sensio\Bundle\GeneratorBundle\Command\GenerateDoctrineEntityCommand
-     * with the exception of the first few lines that check if we should parse these fields as json
-     * or if we are dealing with an array already.
-     * @param string|array $input
-     * @return array
-     */
-    protected function parseFields($input): array
+    protected function parseFields($input, OutputInterface $output): array
     {
         if (is_array($input)) {
             return $input;
         }
-        if ($input && strpos($input, '{') !== false) {
-            return $this->parseFieldsAsJson($input);
+
+        try {
+            return $this->parseFieldsAsYaml($input);
+        } catch (ParseException $e) {
+            $output->writeln(sprintf('<error>Could not parse fields as yaml: %s</error>', $e->getMessage()));
         }
 
         $input = $input ?: '';
 
-        $fields = array();
+        // Below basically is a copy of parseFields in Sensio\Bundle\GeneratorBundle\Command\GenerateDoctrineEntityCommand
+
+        $fields = [];
         foreach (preg_split('{(?:\([^\(]*\))(*SKIP)(*F)|\s+}', $input) as $value) {
             $elements = explode(':', $value);
             $name = $elements[0];
-            $fieldAttributes = array();
+            $fieldAttributes = [];
             if (strlen($name)) {
                 $fieldAttributes['fieldName'] = $name;
                 $type = isset($elements[1]) ? $elements[1] : 'string';
@@ -212,7 +193,7 @@ EOT
                     $fieldAttributes['length'] = $length;
                 }
                 if (isset($matches[2][0]) && $length = $matches[2][0]) {
-                    $attributesFound = array();
+                    $attributesFound = [];
                     if (false !== strpos($length, '=')) {
                         preg_match_all('{([^,= ]+)=([^,= ]+)}', $length, $result);
                         $attributesFound = array_combine($result[1], $result[2]);
@@ -220,12 +201,12 @@ EOT
                         $fieldAttributes['length'] = $length;
                     }
                     $fieldAttributes = array_merge($fieldAttributes, $attributesFound);
-                    foreach (array('length', 'precision', 'scale') as $intAttribute) {
+                    foreach (['length', 'precision', 'scale'] as $intAttribute) {
                         if (isset($fieldAttributes[$intAttribute])) {
                             $fieldAttributes[$intAttribute] = (int) $fieldAttributes[$intAttribute];
                         }
                     }
-                    foreach (array('nullable', 'unique') as $boolAttribute) {
+                    foreach (['nullable', 'unique'] as $boolAttribute) {
                         if (isset($fieldAttributes[$boolAttribute])) {
                             $fieldAttributes[$boolAttribute] = filter_var($fieldAttributes[$boolAttribute], FILTER_VALIDATE_BOOLEAN);
                         }
@@ -239,7 +220,7 @@ EOT
 
     protected function addFields(InputInterface $input, OutputInterface $output, EntityQuestionHelper $entityQuestionHelper)
     {
-        $fields = $this->parseFields($input->getOption('fields'));
+        $fields = $this->parseFields($input->getOption('fields'), $output);
         $output->writeln(array(
             '',
             'You can add some fields now.',
@@ -318,7 +299,7 @@ EOT
 
         $entityQuestionHelper->writeSection($output, 'Using entity savepoint for '. $input->getArgument('entity'));
 
-        $fields = $this->parseFields($input->getOption('fields'));
+        $fields = $this->parseFields($input->getOption('fields'), $output);
 
         $output->writeln(sprintf('<info>Fields added so far: %s</info>', implode(', ', array_keys($fields))));
 

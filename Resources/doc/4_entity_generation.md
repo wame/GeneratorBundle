@@ -163,47 +163,55 @@ value will be used a constructor in the DateTime. For example the
 value 'today' would result in new \DateTime('today'). 
 For other return types the default value won't be converted.
 
-#### fields option with json
+#### fields option with yaml
 
 The --fields option can quickly become a mess if you're adding several
 fields or if you're using many settings. 
-Moreover, the used syntax has limitations that make it impossible to
-add options to you validation. What if you want to set a Range validation?
+Moreover, the standard syntax has limitations that make it impossible to
+add options to validations. What if you want to set a Range validation?
 
-For more complexity or better overview you can use a json-like syntax, like
+For more complexity or better overview you can use yaml, like
 the following example:
 
+    php bin/console wame:generate:entity Contact --fields="
+    email:
+        type: string
+        nullable:
+        validation:
+            Email:
+            NotBlank:
+            Length:
+                min: 5
+                max: 150
+                minMessage: We do not believe an email can have fewer than 5 characters.
+                maxMessage: For some inexplicable reason emails longer than 150 chars are not allowed here.
+    "
+
+If your console converts newlines them to a single line, you may want to use the 
+[a different representation](http://symfony.com/doc/current/components/yaml.html#array-expansion-and-inlining)
+instead:
+
     php bin/console wame:generate:entity Contact --fields="{
-        email:{
-            type:string,
-            nullable,
-            validation:{
-                Email,
-                NotBlank,
+        email: {
+            type: string,
+            nullable:,
+            validation: {
+                Email:,
+                NotBlank:, 
                 Length: {
                     min: 5,
                     max: 150,
                     minMessage: We do not believe an email can have fewer than 5 characters.,
-                    maxMessage: For some inexplicable emails longer than 150 chars are not allowed here.
+                    maxMessage: For some inexplicable reason emails longer than 150 chars are not allowed here.
                 }
             }
         }
     }"
-
-Saying 'json-like' is because the above example isn't actual json.
-You can use actual json-syntax if you want, but the entire --fields 
-option must be parsed as a string. Therefore all quotes would have to be escaped.
-
-The generator allows you to not specify values. It will automatically
-assume that keys without values are booleans with value true. 
-(nullable would become nullable: true).
-
-Depending on your console you can run the command exactly as the example above, but
-you can also run as one line of code. The generator will automatically
-strip newlines, tabs and too many spaces.
-
-Keep in mind that strings must be escape if they contain characters that would
-otherwise be interpreted as json, such as `,` and `}`. 
+    
+If your console doesn't accept newlines in a single command at all, you can use the
+same representation in a single line as well:
+    
+    php bin/console wame:generate:entity Contact --fields="{ email: { type: string, nullable: , validation: { Email: , NotBlank:, Length: { min: 5, max: 150, minMessage: We do not believe an email can have fewer than 5 characters., maxMessage: For some inexplicable reason emails longer than 150 chars are not allowed here. } } } }"
 
 #### Name conversions
 
@@ -246,8 +254,8 @@ Product entity:
     php bin/console wame:generate:entity Product -n --fields="{
         name: {
             type: string,
-            display,
-            unique,
+            display:,
+            unique:,
             validations: {
                 NotBlank
             }
@@ -270,7 +278,7 @@ Product entity:
         firstDateOnMarket: {
             type: date
             validation: {
-                Date,
+                Date:,
                 LessThanOrEqual: {
                     value: today,
                     message: \"We do not have products that aren't on the market already, so a future date is not possible\"
@@ -281,14 +289,14 @@ Product entity:
             type: many2one,
             targetEntity: ProductCategory,
             validation: {
-                Valid
+                Valid:
             }
         },
         productRows: {
             type: one2many,
             targetEntity: ProductRow,
             mappedBy: product,
-            orphanRemoval
+            orphanRemoval:
         },
         productContactInfo: {
             type: one2one,
@@ -300,7 +308,7 @@ Product entity:
             targetEntity: productSale,
             inversedBy: products,
             validation: {
-                Valid
+                Valid:
             }
         },
     }" --behaviours=blameable --behaviours=timestampable --behaviours=softdeleteable
