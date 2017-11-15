@@ -15,5 +15,5 @@
     delete_success: '{{ entity_humanized }} is succesvol verwijderd.'
     no_records_found: 'Er zijn geen resultaten gevonden voor {{ entity_humanized_lowered }}.'
 {% for property in meta_entity.properties %}
-    {{ property.name|tabalize }}: {{ property.name|humanize }}
+    {{+ property.name|tabalize }}: {{ property.name|humanize }}
 {% endfor %}
