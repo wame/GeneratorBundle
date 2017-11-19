@@ -22,7 +22,7 @@
         }
 
         return $this->render('{{ entity|tabalize|replace({'\\': '/'}) }}/edit.html.twig', [
-            '{{ entity_singularized }}' => ${{ entity_singularized }},
+            '{{ entity_singularized|tabalize }}' => ${{ entity_singularized }},
             'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
         ]);

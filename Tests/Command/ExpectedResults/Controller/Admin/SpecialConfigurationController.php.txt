@@ -67,7 +67,7 @@ class SpecialConfigurationController extends Controller
         }
 
         return $this->render('admin/special_configuration/new.html.twig', [
-            'specialConfiguration' => $specialConfiguration,
+            'special_configuration' => $specialConfiguration,
             'form' => $form->createView(),
         ]);
     }
@@ -82,7 +82,7 @@ class SpecialConfigurationController extends Controller
         $deleteForm = $this->createDeleteForm($specialConfiguration);
 
         return $this->render('admin/special_configuration/show.html.twig', [
-            'specialConfiguration' => $specialConfiguration,
+            'special_configuration' => $specialConfiguration,
             'delete_form' => $deleteForm->createView(),
         ]);
     }
@@ -108,7 +108,7 @@ class SpecialConfigurationController extends Controller
         }
 
         return $this->render('admin/special_configuration/edit.html.twig', [
-            'specialConfiguration' => $specialConfiguration,
+            'special_configuration' => $specialConfiguration,
             'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
         ]);

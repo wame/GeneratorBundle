@@ -13,7 +13,7 @@
         {%u endif %}
 
         return $this->render('{{ entity|tabalize|replace({'\\': '/'}) }}/show.html.twig', [
-            '{{ entity_singularized }}' => ${{ entity_singularized }},
+            '{{ entity_singularized|tabalize }}' => ${{ entity_singularized }},
             {% if 'delete' in actions u%}
                 'delete_form' => $deleteForm->createView(),
             {%u endif %}

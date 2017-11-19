@@ -67,7 +67,7 @@ class BookDetailInfoController extends Controller
         }
 
         return $this->render('book_detail_info/new.html.twig', [
-            'bookDetailInfo' => $bookDetailInfo,
+            'book_detail_info' => $bookDetailInfo,
             'form' => $form->createView(),
         ]);
     }
@@ -82,7 +82,7 @@ class BookDetailInfoController extends Controller
         $deleteForm = $this->createDeleteForm($bookDetailInfo);
 
         return $this->render('book_detail_info/show.html.twig', [
-            'bookDetailInfo' => $bookDetailInfo,
+            'book_detail_info' => $bookDetailInfo,
             'delete_form' => $deleteForm->createView(),
         ]);
     }
@@ -108,7 +108,7 @@ class BookDetailInfoController extends Controller
         }
 
         return $this->render('book_detail_info/edit.html.twig', [
-            'bookDetailInfo' => $bookDetailInfo,
+            'book_detail_info' => $bookDetailInfo,
             'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),
         ]);
