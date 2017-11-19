@@ -7,6 +7,7 @@ namespace {{ meta_entity.bundleNamespace }}\Datatable{{ meta_entity.directory ? 
 {% if meta_entity.directory -%}
     use {{ meta_entity.bundleNamespace }}\Datatable\AppDatatable;
 {% endif %}
+use {{ meta_entity.entityNameSpace }};
 use Sg\DatatablesBundle\Datatable\Column\Column;
 {%- set break = false -%}
 {%- for property in meta_entity.properties if not break u-%}
@@ -38,5 +39,10 @@ class {{ meta_entity.entityName }}Datatable extends AppDatatable
         {%-u endfor %}
 
         ;
+    }
+
+    public function getEntity(): string
+    {
+        return {{ meta_entity.entityName }}::class;
     }
 }

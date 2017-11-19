@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Wame\GeneratorBundle\Datatable;
 
+use Wame\GeneratorBundle\Entity\BookDetailInfo;
 use Sg\DatatablesBundle\Datatable\Column\Column;
 use Sg\DatatablesBundle\Datatable\Column\DateTimeColumn;
 
@@ -27,5 +28,10 @@ class BookDetailInfoDatatable extends AppDatatable
                 'title' => $this->translator->trans('book_detail_info.in_library_since'),
             ])
         ;
+    }
+
+    public function getEntity(): string
+    {
+        return BookDetailInfo::class;
     }
 }

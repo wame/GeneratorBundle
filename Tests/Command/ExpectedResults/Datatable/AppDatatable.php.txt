@@ -114,17 +114,9 @@ abstract class AppDatatable extends SgDatatable
         return str_replace('datatable', '', $this->getName()).$suffix;
     }
 
-    protected function getEntityName(): string
+    private function getEntityName(): string
     {
-        return str_replace(['AppBundle\Datatable', 'Datatable', '\\'], '', get_class($this));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntity(): string
-    {
-        return str_replace(['AppBundle\Datatable', 'Datatable'], ['AppBundle\Entity', ''], get_class($this));
+        return (new \ReflectionClass($this->getEntity()))->getShortName();
     }
 
     /**
@@ -132,8 +124,7 @@ abstract class AppDatatable extends SgDatatable
      */
     public function getName(): string
     {
-        $className = get_class($this);
-        $name = str_replace('Wame\GeneratorBundle\Datatable\\', '', $className);
+        $name = (new \ReflectionClass($this))->getShortName();
         //SomeDatatable becomes some_datatable
         return strtolower(preg_replace('/\B([A-Z])/', '_$1', $name));
     }

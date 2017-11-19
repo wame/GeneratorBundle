@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Wame\GeneratorBundle\Datatable\Admin;
 
+use Wame\GeneratorBundle\Entity\Admin\SpecialConfiguration;
 use Wame\GeneratorBundle\Datatable\AppDatatable;
 use Sg\DatatablesBundle\Datatable\Column\Column;
 
@@ -18,5 +19,10 @@ class SpecialConfigurationDatatable extends AppDatatable
                 'title' => $this->translator->trans('special_configuration.title'),
             ])
         ;
+    }
+
+    public function getEntity(): string
+    {
+        return SpecialConfiguration::class;
     }
 }
