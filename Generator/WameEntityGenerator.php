@@ -32,7 +32,7 @@ class WameEntityGenerator extends Generator
         'blameable'      => 'Gedmo\\Blameable\\Traits\\BlameableEntity',
     ];
 
-    public function generate(BundleInterface $bundle, $entity, array $fields, array $behaviours = []): void
+    public function generate(BundleInterface $bundle = null, $entity, array $fields, array $behaviours = []): void
     {
         $metaEntity = new MetaEntity($bundle, $entity);
         foreach ($behaviours as $behaviour) {
@@ -87,7 +87,8 @@ class WameEntityGenerator extends Generator
         $entityContent = $this->render('entity/entity.php.twig', [
             'meta_entity' => $metaEntity,
         ]);
-        $entityPath = $metaEntity->getBundle()->getPath().'/Entity/'.$metaEntity->getDirectory('/').$metaEntity->getEntityName().'.php';
+        $bundlePath = $metaEntity->getBundle() ? $metaEntity->getBundle()->getPath() : 'src';
+        $entityPath = $bundlePath.'/Entity/'.$metaEntity->getDirectory('/').$metaEntity->getEntityName().'.php';
         static::dump($entityPath, $entityContent);
 
         $includeRepo ? $this->repositoryGenerator->generateByMetaEntity($metaEntity) : null;

@@ -23,13 +23,13 @@ class WameGeneratorExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.yml');
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../config'));
+        $loader->load('services.yaml');
 
         if ($container->getParameter('kernel.environment') === 'test') {
             $config['default_bundle'] = 'WameGeneratorBundle';
         }
-        $container->setParameter('wame_generator.default_bundle', $config['default_bundle'] ?? 'AppBundle');
+        $container->setParameter('wame_generator.default_bundle', $config['default_bundle'] ?? null);
         $container->setParameter('wame_generator.enable_traits', $config['enable_traits'] ?? true);
         $container->setParameter('wame_generator.enable_datatables', $config['enable_datatables'] ?? true);
         $container->setParameter('wame_generator.enable_voters', $config['enable_voters'] ?? true);

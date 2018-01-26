@@ -77,10 +77,10 @@ EOT
         $withDatatable = $input->hasOption('with-datatable') ? $input->getOption('with-datatable') : false;
         $withVoter = $input->hasOption('with-voter') ? $input->getOption('with-voter') : false;
 
-        $entityClass = $this->getContainer()->get('doctrine')->getAliasNamespace($bundle).'\\'.$entity;
+        $entityClass = $bundle ? $this->getContainer()->get('doctrine')->getAliasNamespace($bundle).'\\'.$entity : 'App\\'.$entity;
         $metadata = $this->getEntityMetadata($entityClass);
 
-        $bundle = $this->getContainer()->get('kernel')->getBundle($bundle);
+        $bundle = $bundle ? $this->getContainer()->get('kernel')->getBundle($bundle) : null;
 
         $crudQuestionHelper->writeSection($output, 'CRUD generation');
 

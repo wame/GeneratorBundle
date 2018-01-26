@@ -34,7 +34,7 @@ class MetaEntity
     /** @var MetaProperty[]|ArrayCollection */
     protected $properties;
 
-    public function __construct(BundleInterface $bundle, string $entityName)
+    public function __construct(BundleInterface $bundle = null, string $entityName)
     {
         $this->bundle = $bundle;
         $this->setEntityName($entityName);
@@ -72,14 +72,14 @@ class MetaEntity
         return $this;
     }
 
-    public function getBundle(): BundleInterface
+    public function getBundle(): ?BundleInterface
     {
         return $this->bundle;
     }
 
     public function getBundleNamespace(): ?string
     {
-        return $this->getBundle() ? $this->getBundle()->getNamespace() : null;
+        return $this->getBundle() ? $this->getBundle()->getNamespace() : 'App';
     }
 
     public function getEntityNameSpace($withEntityName = true): ?string

@@ -41,7 +41,7 @@ class DoctrineCrudGenerator extends Generator
      *
      * @throws \RuntimeException
      */
-    public function generate(BundleInterface $bundle, $entity, ClassMetadataInfo $metadata, $routePrefix, $needWriteActions, $forceOverwrite, $useDatatable, $useVoter)
+    public function generate(BundleInterface $bundle = null, $entity, ClassMetadataInfo $metadata, $routePrefix, $needWriteActions, $forceOverwrite, $useDatatable, $useVoter)
     {
         $this->useDatatable = $useDatatable;
         $this->useVoter = $useVoter;
@@ -87,7 +87,7 @@ class DoctrineCrudGenerator extends Generator
 
     protected function generateControllerClass(bool $forceOverwrite): void
     {
-        $dir = $this->bundle->getPath();
+        $dir = $this->bundle ? $this->bundle->getPath() : 'src';
 
         $parts = explode('\\', $this->entity);
         $entityClass = array_pop($parts);
@@ -108,13 +108,13 @@ class DoctrineCrudGenerator extends Generator
             'actions' => $this->actions,
             'route_prefix' => $this->routePrefix,
             'route_name_prefix' => $this->routeNamePrefix,
-            'bundle' => $this->bundle->getName(),
+            'bundle' => $this->bundle ? $this->bundle->getName() : null,
             'entity' => $this->entity,
             'entity_singularized' => $this->entitySingularized,
             'entity_pluralized' => $this->entityPluralized,
             'identifier' => $this->metadata->identifier[0],
             'entity_class' => $entityClass,
-            'namespace' => $this->bundle->getNamespace(),
+            'namespace' => $this->bundle ? $this->bundle->getNamespace() : 'App',
             'entity_namespace' => $entityNamespace,
             'format' => 'annotation',
             // BC with Symfony 2.7

@@ -23,6 +23,7 @@ It specifically has changes and extra features regarding entity and CRUD generat
 
 #### TODO's
 
+- **Adaptions for Symfony4**
 - Usage of the 'Resources/translations/roles.(en|nl).yml.twig'
 - Configuration: 
     - There are configuration settings for using different trait-classes,

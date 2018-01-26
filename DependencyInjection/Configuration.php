@@ -23,7 +23,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('default_bundle')
-                    ->defaultValue('AppBundle')
+                    ->defaultValue(null)
                     ->validate()
                     ->ifTrue(function ($name) {
                         return !preg_match('/.Bundle$/', $name);

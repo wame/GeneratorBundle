@@ -37,6 +37,9 @@ class WameValidators extends Validators
     public static function getFieldNameValidator(array $fields = []): callable
     {
         return function ($name) use ($fields) {
+            if (!$name) {
+                return null;
+            }
             $name = Inflector::tableize($name);
             if ('id' === $name || isset($fields[$name])) {
                 throw new \InvalidArgumentException(sprintf('Field "%s" is already defined.', $name));

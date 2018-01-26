@@ -19,9 +19,8 @@ settings to specific needs.
 The following configuration show the default settings:
 
     wame_generator:
-        default_bundle: 'AppBundle' #The bundle used whenever none is specified.
+        default_bundle: null        #The bundle used whenever none is specified (null results the bundleless 'App' namespace).
         enable_voters: true         #use false if you don't plan on using voters
         enable_traits: true         #use false if you don't plan on using gedmo traits
         enable_datatables: true     #use false if you don't plan on using SgDatatables
 
- 

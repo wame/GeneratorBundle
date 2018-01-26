@@ -1,6 +1,6 @@
 parameters:
     wame_generator:
-        default_bundle: 'AppBundle'
+        default_bundle: null
 
 services:
     Wame\GeneratorBundle\Form\EntityType:

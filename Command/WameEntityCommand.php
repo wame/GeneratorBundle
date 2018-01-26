@@ -74,7 +74,7 @@ EOT
 
         $questionHelper->writeSection($output, 'Entity generation');
 
-        $bundle = $this->getContainer()->get('kernel')->getBundle($bundle);
+        $bundle = $bundle ? $this->getContainer()->get('kernel')->getBundle($bundle) : null;
 
         $behaviours = $input->hasOption('behaviours') ? $input->getOption('behaviours') : [];
 
@@ -119,7 +119,7 @@ EOT
             list($bundle, $entity) = $this->parseShortcutNotation($entity);
 
             $bundleNames = array_keys($this->getContainer()->get('kernel')->getBundles());
-            if (in_array($bundle, $bundleNames, true) === false) {
+            if ($bundle &&  in_array($bundle, $bundleNames, true) === false) {
                 $output->writeln(sprintf('<bg=red>Bundle "%s" does not exist.</>', $bundle));
                 return;
             }
