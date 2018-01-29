@@ -18,7 +18,7 @@ WameGeneratorBundle
 
 Just like the SensioGenerator, you can overwrite the twig skeleton files of the WameGenerator
 in the following directory:
-`App/Resources/WameGeneratorBundle/skeleton`
+`src/templates/WameGeneratorBundle/skeleton`
 
 More than just crud, this bundle allows you to overwrite any part:
 - crud

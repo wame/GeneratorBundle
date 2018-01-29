@@ -61,7 +61,7 @@ the generated code becomes hard to check in your interface as you need to be the
 
 A quick way to log in, without going though the process of setup up a full
  security setup first, 
-is to add the following to your `app/config/config_dev.yml`
+is to add the following to your `config/config_dev.yaml`
 
     security:
         encoders:

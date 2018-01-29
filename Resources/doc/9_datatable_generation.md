@@ -13,6 +13,16 @@ WameGeneratorBundle
 | 10. [Overriding twig files](10_overriding_twig.md#wamegeneratorbundle)
 | 11. [Extending this bundle](11_extending_bundle.md#wamegeneratorbundle)
 
+**Prerequisites**
+
+As of wrting, the current SgDatatable version (1.0.3) doesn't support Symfony 4. 
+You could use the 'master-dev' version instead.
+
+If you do so, you might have to add the following to your `services` in `config/services.yaml`:
+
+`Sg\DatatablesBundle\Response\DatatableResponse: "@sg_datatables.response"`
+
+If you don't, chances are that the generated `DatatableResultService` will crash due to its dependency.
 
 ## Datatable generation
 

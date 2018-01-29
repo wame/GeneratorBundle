@@ -23,7 +23,10 @@ It specifically has changes and extra features regarding entity and CRUD generat
 
 #### TODO's
 
-- **Adaptions for Symfony4**
+- Composer suggestion for `sg/datatablesbundle"` is currently set to `~1.0.4`, becuase the 
+most recent version (1.0.3) doesn't support symfony4 yet. In dev-master symfony4 is supported however, so
+the next version will probably support symfony4. We currently are not sure which version will be
+used: it might be 1.0.4, but 1.1.0 or even 2.0.0 might be possible as well.
 - Usage of the 'Resources/translations/roles.(en|nl).yml.twig'
 - Configuration: 
     - There are configuration settings for using different trait-classes,

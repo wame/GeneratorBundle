@@ -47,6 +47,9 @@ class Generator
      */
     protected function getTwigEnvironment()
     {
+        if (is_dir($dir = $this->rootDir.'/../templates/WameGeneratorBundle/skeleton')) {
+            $skeletonDirs[] = $dir;
+        }
         if (is_dir($dir = $this->rootDir.'/Resources/WameGeneratorBundle/skeleton')) {
             $skeletonDirs[] = $dir;
         }

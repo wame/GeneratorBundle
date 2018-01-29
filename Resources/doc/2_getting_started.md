@@ -17,23 +17,12 @@ WameGeneratorBundle
 ## Getting started
 Install the bundle for the dev-environment using composer.
 
-    composer require wame/generator-bundle:dev-master --dev
+    composer require wame/generator-bundle2:dev-master --dev
     
-In your `app/AppKernel.php` file, add the bundle for the development environment:
+In your `config/bundles.php` file, add the bundle for the development environment:
 
-     public function registerBundles()
-        {
-            ...
-            
-            if (in_array($this->getEnvironment(), ['dev', 'test'], true)) {
-                ...
-                $bundles[] = new \Wame\GeneratorBundle\WameGeneratorBundle();
-                if ('dev' === $this->getEnvironment()) {
-                    //Add the bundle here instead if you do not need any to change any configuration options.
-                }
-            }
-            ...
-        }
+    Wame\GeneratorBundle\WameGeneratorBundle::class => ['dev' => true, 'test' => true],
+
 
 If you are certain that you're not going to set any configurations for
 this generator, then you could add the bundle to the development environment

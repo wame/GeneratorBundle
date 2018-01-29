@@ -17,11 +17,11 @@ WameGeneratorBundle
 
 ## Introduction
 
-This bundle is a generator like the [SensioGeneratorBundle](http://symfony.com/doc/current/bundles/SensioGeneratorBundle/index.html)
-, with changes to fit
+This bundle is a generator like the [SensioGeneratorBundle](http://symfony.com/doc/current/bundles/SensioGeneratorBundle/index.html),
+with changes to fit
 specific needs:
 
-* Conform PHP 7.1 typehints
+* Compatibility with php 7.1 and Symfony 4
 * Other options for entity generation:
     * Usage of enums (by using [DoctrineEnumBundle](https://github.com/fre5h/DoctrineEnumBundle))
     * Usage of [StofDoctrineExtensionsBundle](http://symfony.com/doc/master/bundles/StofDoctrineExtensionsBundle/index.html): timestampable, softdeleteable, blameable
