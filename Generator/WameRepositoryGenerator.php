@@ -13,8 +13,7 @@ class WameRepositoryGenerator extends Generator
             'meta_entity' => $metaEntity,
         ]);
 
-        $bundlePath = $metaEntity->getBundle() ? $metaEntity->getBundle()->getPath() : 'src';
-        $path = $bundlePath.'/Repository/'.$metaEntity->getDirectory('/').$metaEntity->getEntityName().'Repository.php';
+        $path = $this->getBundlePath($metaEntity->getBundle()).'/Repository/'.$metaEntity->getDirectory('/').$metaEntity->getEntityName().'Repository.php';
         static::dump($path, $content);
 
         return $path;

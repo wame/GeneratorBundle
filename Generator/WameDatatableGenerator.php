@@ -9,7 +9,7 @@ class WameDatatableGenerator extends Generator
 {
     public function generate(MetaEntity $metaEntity, $allowOverride = false): bool
     {
-        $datatableDir = $metaEntity->getBundle()->getPath().'/Datatable';
+        $datatableDir = $this->getBundlePath($metaEntity->getBundle()).'/Datatable';
 
         $this->addAppDatatable($metaEntity, $datatableDir);
         $this->addDatatableResultService($metaEntity, $datatableDir);

@@ -15,12 +15,12 @@ namespace {{ namespace }}\Controller{{ entity_namespace ? '\\' ~ entity_namespac
     {%u endif %}
     {% if 'new' in actions or 'edit' in actions or 'delete' in actions u%}
         use Symfony\Component\HttpFoundation\Request;
-        use Symfony\Component\Form\Form;
+        use Symfony\Component\Form\FormInterface;
     {%u endif %}
     {% if use_voter is defined and use_voter u-%}
         use {{ namespace }}\Security\{{ entity }}Voter;
     {%u endif %}
-    {% if use_voter is defined and use_voter u-%}
+    {% if use_datatable is defined and use_datatable u-%}
         use {{ namespace }}\Datatable\DatatableResultService;
         use {{ namespace }}\Datatable\{{ entity }}Datatable;
     {%u endif %}
@@ -30,7 +30,7 @@ namespace {{ namespace }}\Controller{{ entity_namespace ? '\\' ~ entity_namespac
 {% block phpdoc_class_annotations u%}
     /**
     {% if 'annotation' == format u%}
-         * @Route("{{ route_prefix|default('/') }}")
+         * @Route("{{ route_prefix|default('/')|replace({'_':'-'}) }}")
     {%u endif %}
      */
 {%u endblock phpdoc_class_annotations %}

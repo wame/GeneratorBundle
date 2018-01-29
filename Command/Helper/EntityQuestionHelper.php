@@ -363,8 +363,11 @@ class EntityQuestionHelper extends QuestionHelper
     protected function guessFieldIsOneToMany(string $columnName): bool
     {
         foreach (array_keys($this->getExistingEntities()) as $existingEntity) {
+            if ($columnName === Inflector::pluralTableize($existingEntity)) {
+                return true;
+            }
             $entityParts = explode(':', $existingEntity);
-            if ($columnName === Inflector::pluralTableize($entityParts[1])) {
+            if (count($entityParts) > 1 && $columnName === Inflector::pluralTableize($entityParts[1])) {
                 return true;
             }
         }

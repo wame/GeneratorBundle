@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Wame\GeneratorBundle\Generator;
 
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Wame\GeneratorBundle\Twig\UnIndentExtension;
 use Wame\GeneratorBundle\Twig\IndentLexer;
 use Wame\GeneratorBundle\Twig\InflectorExtension;
@@ -72,6 +73,14 @@ class Generator
         self::mkdir(dirname($target));
 
         return self::dump($target, $this->render($template, $parameters));
+    }
+
+    protected function getBundlePath(?BundleInterface $bundle): string
+    {
+        if ($bundle) {
+            return $bundle->getPath();
+        }
+        return $this->rootDir;
     }
 
     public static function mkdir($dir, $mode = 0777, $recursive = true)

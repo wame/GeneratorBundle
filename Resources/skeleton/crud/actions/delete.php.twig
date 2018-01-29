@@ -24,7 +24,7 @@
     }
 
 {% block form %}
-    private function createDeleteForm({{ entity_class }} ${{ entity_singularized }}): Form
+    private function createDeleteForm({{ entity_class }} ${{ entity_singularized }}): FormInterface
     {
         return $this->createFormBuilder()
             ->setAction($this->generateUrl('{{ route_name_prefix }}_delete', ['{{ identifier }}' => ${{ entity_singularized }}->get{{ identifier|capitalize }}()]))

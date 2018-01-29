@@ -21,7 +21,7 @@
             return $this->redirectToRoute('{{ route_name_prefix }}_show', ['{{ identifier }}' => ${{ entity_singularized }}->get{{ identifier|capitalize }}()]);
         }
 
-        return $this->render('{{ entity|tabalize|replace({'\\': '/'}) }}/edit.html.twig', [
+        return $this->render('{{ twig_path_prefix }}/edit.html.twig', [
             '{{ entity_singularized|tabalize }}' => ${{ entity_singularized }},
             'edit_form' => $editForm->createView(),
             'delete_form' => $deleteForm->createView(),

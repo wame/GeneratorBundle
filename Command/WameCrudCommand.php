@@ -8,6 +8,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Wame\GeneratorBundle\Generator\DoctrineCrudGenerator;
 use Wame\GeneratorBundle\Generator\WameDatatableGenerator;
 use Wame\GeneratorBundle\Generator\WameFormGenerator;
@@ -65,6 +67,7 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output): void
     {
+        $io = new SymfonyStyle($input, $output);
         $crudQuestionHelper = $this->getCrudQuestionHelper();
 
         $this->validateEntityInput($input);
@@ -77,15 +80,27 @@ EOT
         $withDatatable = $input->hasOption('with-datatable') ? $input->getOption('with-datatable') : false;
         $withVoter = $input->hasOption('with-voter') ? $input->getOption('with-voter') : false;
 
-        $entityClass = $bundle ? $this->getContainer()->get('doctrine')->getAliasNamespace($bundle).'\\'.$entity : 'App\\'.$entity;
+        $entityClass = $bundle ? $this->getContainer()->get('doctrine')->getAliasNamespace($bundle).'\\'.$entity : 'App\\Entity\\'.$entity;
         $metadata = $this->getEntityMetadata($entityClass);
 
         $bundle = $bundle ? $this->getContainer()->get('kernel')->getBundle($bundle) : null;
 
         $crudQuestionHelper->writeSection($output, 'CRUD generation');
 
+        if ($withDatatable) {
+            $bundleNames = array_keys($this->getContainer()->get('kernel')->getBundles());
+            if (!\in_array('SgDatatablesBundle', $bundleNames, true)) {
+                $io->warning('Cannot use datatables. The SgDatatablesBundle is not enabled.');
+                $continue = $io->confirm('Would you like to continue without using datatables?');
+                if (!$continue) {
+                    return;
+                }
+                $withDatatable = false;
+            }
+        }
+
         try {
-            $this->getGenerator()->generate($bundle, $entity, $metadata[0], $prefix, $withWrite, $forceOverwrite, $withDatatable, $withVoter);
+            $this->getGenerator()->generate($bundle, $entity, $metadata, $prefix, $withWrite, $forceOverwrite, $withDatatable, $withVoter);
         } catch (\RuntimeException $exception) {
             //The generator may throw an exception because the controller already exists, but we still want to generate the other classes
             if ($forceOverwrite === false) {
@@ -95,7 +110,7 @@ EOT
             }
         }
 
-        $metaEntity = MetaEntityFactory::createFromClassMetadata($metadata[0], $bundle);
+        $metaEntity = MetaEntityFactory::createFromClassMetadata($metadata, $bundle);
 
         if ($withWrite) {
             $this->getFormGenerator()->generateByMetaEntity($metaEntity, $forceOverwrite);
