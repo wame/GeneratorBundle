@@ -47,7 +47,7 @@ class DoctrineCrudGenerator extends Generator
         $this->useVoter = $useVoter;
         $this->routePrefix = $routePrefix;
         $this->routeNamePrefix = self::getRouteNamePrefix($routePrefix);
-        $this->actions = $needWriteActions ? array('index', 'show', 'new', 'edit', 'delete') : array('index', 'show');
+        $this->actions = $needWriteActions ? ['index', 'show', 'new', 'edit', 'delete'] : ['index', 'show'];
 
         if (count($metadata->identifier) !== 1) {
             throw new \RuntimeException('The CRUD generator does not support entity classes with multiple or no primary keys.');
@@ -64,7 +64,11 @@ class DoctrineCrudGenerator extends Generator
 
         $this->generateControllerClass($forceOverwrite);
 
-        $dir = sprintf('%s/Resources/views/%s', $this->rootDir, Inflector::tableize($entity));
+        if ($bundle) {
+            $dir = sprintf('%s/Resources/views/%s', $this->getBundlePath($bundle), Inflector::tableize($entity));
+        } else {
+            $dir = $this->getBundlePath($bundle).'/../templates' .'/'. Inflector::tableize($entity);
+        }
 
         if (!file_exists($dir)) {
             self::mkdir($dir);
@@ -72,22 +76,22 @@ class DoctrineCrudGenerator extends Generator
 
         $this->generateIndexView($dir);
 
-        if (in_array('show', $this->actions, true)) {
+        if (\in_array('show', $this->actions, true)) {
             $this->generateShowView($dir);
         }
 
-        if (in_array('new', $this->actions, true)) {
+        if (\in_array('new', $this->actions, true)) {
             $this->generateNewView($dir);
         }
 
-        if (in_array('edit', $this->actions, true)) {
+        if (\in_array('edit', $this->actions, true)) {
             $this->generateEditView($dir);
         }
     }
 
     protected function generateControllerClass(bool $forceOverwrite): void
     {
-        $dir = $this->bundle ? $this->bundle->getPath() : 'src';
+        $dir = $this->getBundlePath($this->bundle);
 
         $parts = explode('\\', $this->entity);
         $entityClass = array_pop($parts);
@@ -104,92 +108,63 @@ class DoctrineCrudGenerator extends Generator
             throw new \RuntimeException('Unable to generate the controller as it already exists.');
         }
 
-        $this->renderFile('crud/controller.php.twig', $target, [
-            'actions' => $this->actions,
-            'route_prefix' => $this->routePrefix,
-            'route_name_prefix' => $this->routeNamePrefix,
-            'bundle' => $this->bundle ? $this->bundle->getName() : null,
-            'entity' => $this->entity,
-            'entity_singularized' => $this->entitySingularized,
-            'entity_pluralized' => $this->entityPluralized,
-            'identifier' => $this->metadata->identifier[0],
+        $twigPathPrefix = ($this->bundle ? '@'.str_replace('Bundle', '', $this->bundle->getName()) : '')
+            . DIRECTORY_SEPARATOR . str_replace('\\', '/', Inflector::tableize($this->entity));
+
+        $this->renderFile('crud/controller.php.twig', $target, array_merge($this->getTemplateParameters(), [
             'entity_class' => $entityClass,
-            'namespace' => $this->bundle ? $this->bundle->getNamespace() : 'App',
             'entity_namespace' => $entityNamespace,
-            'format' => 'annotation',
-            // BC with Symfony 2.7
-            'use_form_type_instance' => !method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix'),
-            'use_datatable' => $this->useDatatable,
-            'use_voter' => $this->useVoter,
-        ]);
+            'twig_path_prefix' => $twigPathPrefix
+        ]));
     }
 
     protected function generateIndexView(string $dir): void
     {
         $templateFile = $this->useDatatable ? 'crud/views/index-with-datatable.html.twig.twig' : 'crud/views/index.html.twig.twig';
-        $this->renderFile($templateFile, $dir.'/index.html.twig', [
-            'bundle' => $this->bundle->getName(),
-            'entity' => $this->entity,
-            'entity_pluralized' => $this->entityPluralized,
-            'entity_singularized' => $this->entitySingularized,
-            'identifier' => $this->metadata->identifier[0],
-            'fields' => $this->metadata->fieldMappings,
-            'actions' => $this->actions,
-            'record_actions' => $this->getRecordActions(),
-            'route_prefix' => $this->routePrefix,
-            'route_name_prefix' => $this->routeNamePrefix,
-            'use_voter' => $this->useVoter,
-        ]);
+        $this->renderFile($templateFile, $dir.'/index.html.twig', $this->getTemplateParameters());
     }
 
     protected function generateShowView(string $dir): void
     {
-        $this->renderFile('crud/views/show.html.twig.twig', $dir.'/show.html.twig', [
-            'bundle' => $this->bundle->getName(),
-            'entity' => $this->entity,
-            'entity_singularized' => $this->entitySingularized,
-            'identifier' => $this->metadata->identifier[0],
-            'fields' => $this->metadata->fieldMappings,
-            'actions' => $this->actions,
-            'route_prefix' => $this->routePrefix,
-            'route_name_prefix' => $this->routeNamePrefix,
-            'use_voter' => $this->useVoter,
-        ]);
+        $this->renderFile('crud/views/show.html.twig.twig', $dir.'/show.html.twig', $this->getTemplateParameters());
     }
 
     protected function generateNewView(string $dir): void
     {
-        $this->renderFile('crud/views/new.html.twig.twig', $dir.'/new.html.twig', [
-            'bundle' => $this->bundle->getName(),
-            'entity' => $this->entity,
-            'entity_singularized' => $this->entitySingularized,
-            'route_prefix' => $this->routePrefix,
-            'route_name_prefix' => $this->routeNamePrefix,
-            'actions' => $this->actions,
-            'fields' => $this->metadata->fieldMappings,
-            'use_voter' => $this->useVoter,
-        ]);
+        $this->renderFile('crud/views/new.html.twig.twig', $dir.'/new.html.twig', $this->getTemplateParameters());
     }
 
     protected function generateEditView(string $dir): void
     {
-        $this->renderFile('crud/views/edit.html.twig.twig', $dir.'/edit.html.twig', [
+        $this->renderFile('crud/views/edit.html.twig.twig', $dir.'/edit.html.twig', $this->getTemplateParameters());
+    }
+
+    protected function getTemplateParameters()
+    {
+        return [
             'route_prefix' => $this->routePrefix,
             'route_name_prefix' => $this->routeNamePrefix,
             'identifier' => $this->metadata->identifier[0],
             'entity' => $this->entity,
             'entity_singularized' => $this->entitySingularized,
             'fields' => $this->metadata->fieldMappings,
-            'bundle' => $this->bundle->getName(),
+            'bundle' => $this->bundle ? $this->bundle->getName() : null,
             'actions' => $this->actions,
             'use_voter' => $this->useVoter,
-        ]);
+            'entity_pluralized' => $this->entityPluralized,
+            'record_actions' => $this->getRecordActions(),
+            'namespace' => $this->bundle ? $this->bundle->getNamespace() : 'App',
+            'format' => 'annotation',
+            // BC with Symfony 2.7
+            'use_form_type_instance' => !method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix'),
+            'use_datatable' => $this->useDatatable,
+        ];
     }
 
     protected function getRecordActions(): array
     {
         return array_filter($this->actions, function ($item) {
-            return in_array($item, ['show', 'edit']);
+            return \in_array($item, ['show', 'edit'], true);
         });
     }
 

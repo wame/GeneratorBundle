@@ -31,7 +31,7 @@ class WameFormGenerator extends Generator
             'meta_entity' => $metaEntity,
         ]);
 
-        $path = $metaEntity->getBundle()->getPath().'/Form/'.$metaEntity->getDirectory('/').$metaEntity->getEntityName().'Type.php';
+        $path = $this->getBundlePath($metaEntity->getBundle()).'/Form/'.$metaEntity->getDirectory('/').$metaEntity->getEntityName().'Type.php';
 
         return static::dump($path, $content, $allowOverride) !== false;
     }

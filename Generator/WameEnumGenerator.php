@@ -16,7 +16,7 @@ class WameEnumGenerator extends Generator
 
     public function generateByMetaEnumType(MetaEnumType $metaEnumType, bool $forceOverwrite): string
     {
-        $path = $metaEnumType->getBundle()->getPath().'/DBAL/Types/'.$metaEnumType->getClassName().'.php';
+        $path = $this->getBundlePath($metaEnumType->getBundle()).'/DBAL/Types/'.$metaEnumType->getClassName().'.php';
          $content = $this->render('enum/enum.php.twig', [
              'meta_enum' => $metaEnumType,
          ]);

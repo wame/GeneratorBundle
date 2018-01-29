@@ -31,6 +31,11 @@ class WameDatatableCommand extends ContainerAwareCommand
         if ($this->enableDatatables === false) {
             throw new DisabledException('The configuration \'wame_generator.enable_datatables\' is set to false. Remove this setting from your config.yml if you wish to generate datatables.');
         }
+
+        $bundleNames = array_keys($this->getContainer()->get('kernel')->getBundles());
+        if (!\in_array('SgDatatablesBundle', $bundleNames, true)) {
+            throw new DisabledException('The SgDatatablesBundle is not available. Please make sure this bundle is installed and enabled first.');
+        }
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): void

@@ -28,7 +28,7 @@
 
         }
 
-        return $this->render('{{ entity|tabalize|replace({'\\': '/'}) }}/new.html.twig', [
+        return $this->render('{{ twig_path_prefix }}/new.html.twig', [
             '{{ entity_singularized|tabalize }}' => ${{ entity_singularized }},
             'form' => $form->createView(),
         ]);

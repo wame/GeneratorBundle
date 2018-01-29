@@ -32,9 +32,12 @@ trait HelperTrait
                     $bundle = $bundleName;
                 }
             }
-            $entities[$bundle . ':' . $shortName] = $meta;
+            if ($bundle) {
+                $entities[$bundle . ':' . $shortName] = $meta;
+            } else {
+                $entities[$shortName] = $meta;
+            }
         }
-
         return $entities;
     }
 

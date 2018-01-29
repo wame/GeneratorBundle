@@ -1,45 +1,16 @@
-parameters:
-    wame_generator:
-        default_bundle: null
-
 services:
-    Wame\GeneratorBundle\Form\EntityType:
-        arguments: ['@service_container']
-        tags: [form.type]
-    Wame\GeneratorBundle\Form\PropertyType:
-        arguments: ['@service_container']
-        tags: [form.type]
-    Wame\GeneratorBundle\Generator\WameDatatableGenerator:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+        bind:
+            $rootDir: '%kernel.root_dir%'
+            $locale: '%locale%'
+
+    Wame\GeneratorBundle\:
+        resource: '../*'
+        exclude: '../{Entity,Migrations,Tests}'
+
+    Wame\GeneratorBundle\Generator\:
+        resource: '../Generator/*'
         public: true
-        arguments:
-            - '%kernel.root_dir%'
-    Wame\GeneratorBundle\Generator\WameEnumGenerator:
-        public: true
-        arguments:
-            - '%kernel.root_dir%'
-    Wame\GeneratorBundle\Generator\WameFormGenerator:
-        public: true
-        arguments:
-            - '@doctrine'
-            - '%kernel.root_dir%'
-    Wame\GeneratorBundle\Generator\WameVoterGenerator:
-        public: true
-        arguments:
-            - '%kernel.root_dir%'
-    wame_repository_generator:
-        public: true
-        class: Wame\GeneratorBundle\Generator\WameRepositoryGenerator
-        arguments:
-            - '%kernel.root_dir%'
-    wame_translation_generator:
-        public: true
-        class:  Wame\GeneratorBundle\Generator\WameTranslationGenerator
-        arguments:
-            - '%kernel.root_dir%'
-            - '%locale%'
-    Wame\GeneratorBundle\Generator\WameEntityGenerator:
-        public: true
-        arguments:
-            - '@wame_translation_generator'
-            - '@wame_repository_generator'
-            - '%kernel.root_dir%'

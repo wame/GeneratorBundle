@@ -8,7 +8,7 @@
             $this->denyAccessUnlessGranted({{ entity_class }}Voter::INDEX);
 
         {%u endif %}
-        return $this->render('{{ entity|tabalize|replace({'\\': '/'}) }}/index.html.twig', [
+        return $this->render('{{ twig_path_prefix }}/index.html.twig', [
             'datatable' => $datatable->buildDatatable(),
         ]);
     }

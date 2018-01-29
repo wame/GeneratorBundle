@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
  */
 class MetaEntityFactory
 {
-    public static function createFromClassMetadata(ClassMetadata $classMetadata, BundleInterface $bundle)
+    public static function createFromClassMetadata(ClassMetadata $classMetadata, ?BundleInterface $bundle): MetaEntity
     {
         $reflectionClass = $classMetadata->getReflectionClass();
         $reflectionClass = $reflectionClass ?: new \ReflectionClass($classMetadata->name);

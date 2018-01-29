@@ -12,7 +12,7 @@
             $deleteForm = $this->createDeleteForm(${{ entity_singularized }});
         {%u endif %}
 
-        return $this->render('{{ entity|tabalize|replace({'\\': '/'}) }}/show.html.twig', [
+        return $this->render('{{ twig_path_prefix }}/show.html.twig', [
             '{{ entity_singularized|tabalize }}' => ${{ entity_singularized }},
             {% if 'delete' in actions u%}
                 'delete_form' => $deleteForm->createView(),

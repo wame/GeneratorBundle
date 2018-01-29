@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Wame\GeneratorBundle\Command;
 
-use Doctrine\Bundle\DoctrineBundle\Mapping\DisconnectedMetadataFactory;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityNotFoundException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -52,7 +54,8 @@ trait WameCommandTrait
         list($bundle, $entity) = $this->parseShortcutNotation($input->getArgument('entity'));
 
         try {
-            $entityClass = $this->getContainer()->get('doctrine')->getAliasNamespace($bundle).'\\'.$entity;
+            $bundleNameSpace = $bundle ? $this->getContainer()->get('doctrine')->getAliasNamespace($bundle) : 'App\\Entity';
+            $entityClass = $bundleNameSpace.'\\'.$entity;
             $metadata = $this->getEntityMetadata($entityClass);
         } catch (\Exception $e) {
             throw new \RuntimeException(sprintf('Entity "%s" does not exist in the "%s" bundle. Create it with the "doctrine:generate:entity" command and then execute this command again.', $entity, $bundle));
@@ -70,11 +73,17 @@ trait WameCommandTrait
         return [substr($entity, 0, $pos), substr($entity, $pos + 1)];
     }
 
-    protected function getEntityMetadata(string $entityClass): array
+    protected function getEntityMetadata(string $entityClass): ClassMetadata
     {
-        $factory = new DisconnectedMetadataFactory($this->getContainer()->get('doctrine'));
-
-        return $factory->getClassMetadata($entityClass)->getMetadata();
+        /** @var EntityManagerInterface $em */
+        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $entityMetadataItems = $em->getMetadataFactory()->getAllMetadata();
+        foreach ($entityMetadataItems as $entityMetadata) {
+            if ($entityMetadata->name === $entityClass) {
+                return $entityMetadata;
+            }
+        }
+        throw new EntityNotFoundException(sprintf('Could not find metaData for entity "%s"', $entityClass));
     }
 
     /**
@@ -89,14 +98,13 @@ trait WameCommandTrait
 
     protected function getMetaEntityFormInput(InputInterface $input)
     {
-
-        $entity = WameValidators::validateEntityName($input->getArgument('entity'));
+        $entity = WameValidators::validateEntityName($input->getArgument('entity'));;
         list($bundle, $entity) = $this->parseShortcutNotation($entity);
 
-        $entityClass = $this->getContainer()->get('doctrine')->getAliasNamespace($bundle).'\\'.$entity;
+        $entityClass = ($bundle ? $this->getContainer()->get('doctrine')->getAliasNamespace($bundle) : 'App\\Entity').'\\'.$entity;
         $metadata = $this->getEntityMetadata($entityClass);
-        $bundle = $this->getContainer()->get('kernel')->getBundle($bundle);
-        return MetaEntityFactory::createFromClassMetadata($metadata[0], $bundle);
+        $bundle = $bundle ? $this->getContainer()->get('kernel')->getBundle($bundle) : null;
+        return MetaEntityFactory::createFromClassMetadata($metadata, $bundle);
     }
 
     protected function getCrudQuestionHelper(): CrudQuestionHelper

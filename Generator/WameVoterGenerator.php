@@ -9,7 +9,7 @@ class WameVoterGenerator extends Generator
 {
     public function generateByMetaEntity(MetaEntity $metaEntity, $allowOverride = false): bool
     {
-        $securityDir = $metaEntity->getBundle()->getPath().'/Security';
+        $securityDir = $this->getBundlePath($metaEntity->getBundle()).'/Security';
 
         //Add the AppVoter if it doesn't exist yet.
         $path = $securityDir.'/AppVoter.php';
