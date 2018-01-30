@@ -66,7 +66,7 @@ EOT
         $questionHelper = $this->getQuestionHelper();
 
         $entity = WameValidators::validateEntityName($input->getArgument('entity'));
-        list($bundle, $entity) = $this->parseShortcutNotation($entity);
+        [$bundle, $entity] = $this->parseShortcutNotation($entity);
 
         $fields = $this->parseFields($input->getOption('fields'), $output);
         WameValidators::validateFields($fields);
@@ -116,7 +116,7 @@ EOT
 
             //Makes the entity-argument required
             $entity = WameValidators::validateEntityName($input->getArgument('entity'));
-            list($bundle, $entity) = $this->parseShortcutNotation($entity);
+            [$bundle, $entity] = $this->parseShortcutNotation($entity);
 
             $bundleNames = array_keys($this->getContainer()->get('kernel')->getBundles());
             if ($bundle &&  in_array($bundle, $bundleNames, true) === false) {
@@ -227,12 +227,12 @@ EOT
     protected function addFields(InputInterface $input, OutputInterface $output, EntityQuestionHelper $entityQuestionHelper)
     {
         $fields = $this->parseFields($input->getOption('fields'), $output);
-        $output->writeln(array(
+        $output->writeln([
             '',
             'You can add some fields now.',
             'Note that the primary key will be added automatically (named <comment>id</comment>).',
             '',
-        ));
+        ]);
 
         while (true) {
             $output->writeln('');
@@ -246,7 +246,7 @@ EOT
 
             $data = ['columnName' => $columnName, 'fieldName' => lcfirst(Container::camelize($columnName)), 'type' => $type];
 
-            list ($bundle) = $this->parseShortcutNotation($input->getArgument('entity'));
+            [$bundle] = $this->parseShortcutNotation($input->getArgument('entity'));
             if ($type === Type::STRING) {
                 $data['length'] = $entityQuestionHelper->askFieldLength($input, $output);
             } elseif ($type === Type::DECIMAL) {

@@ -47,12 +47,12 @@ class CrudQuestionHelper extends QuestionHelper
         // route prefix
         $prefix = $input->getOption('route-prefix') ?: str_replace('\\', '_', Inflector::tableize( $entity));
 
-        $output->writeln(array(
+        $output->writeln([
             '',
             'Determine the routes prefix (all the routes will be "mounted" under this',
             'prefix: /prefix/, /prefix/new, ...).',
             '',
-        ));
+        ]);
         $prefix = $this->ask($input, $output, new Question($this->getQuestion('Routes prefix', '/'.$prefix), '/'.$prefix));
         $input->setOption('route-prefix', $prefix);
     }
@@ -60,12 +60,12 @@ class CrudQuestionHelper extends QuestionHelper
     public function askWithWrite(InputInterface $input, OutputInterface $output)
     {
         $withWrite = $input->getOption('with-write') ?: true;
-        $output->writeln(array(
+        $output->writeln([
             '',
             'By default, the generator creates all actions.',
             'You can also ask it to generate only index and show.',
             '',
-        ));
+        ]);
         $question = new ConfirmationQuestion($this->getQuestion('Do you want to generate the "write" actions', $withWrite ? 'yes' : 'no', '?'), $withWrite);
 
         $withWrite = $this->ask($input, $output, $question);

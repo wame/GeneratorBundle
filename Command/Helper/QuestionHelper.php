@@ -24,10 +24,10 @@ class QuestionHelper extends BaseQuestionHelper
         if (!$errors) {
             $this->writeSection($output, 'Everything is OK! Now get to work :).');
         } else {
-            $this->writeSection($output, array(
+            $this->writeSection($output, [
                 'The command was not able to configure everything automatically.',
                 'You\'ll need to make the following changes manually.',
-            ), 'error');
+            ], 'error');
 
             $output->writeln($errors);
         }
@@ -49,11 +49,11 @@ class QuestionHelper extends BaseQuestionHelper
 
     public function writeSection(OutputInterface $output, $text, $style = 'bg=blue;fg=white')
     {
-        $output->writeln(array(
+        $output->writeln([
             '',
             $this->getHelperSet()->get('formatter')->formatBlock($text, $style, true),
             '',
-        ));
+        ]);
     }
 
     public function getQuestion($question, $default, $sep = ':')

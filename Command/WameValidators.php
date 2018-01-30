@@ -82,9 +82,9 @@ class WameValidators extends Validators
             }
             $length = (int) $length;
 
-            $result = filter_var($length, FILTER_VALIDATE_INT, array(
-                'options' => array('min_range' => 1),
-            ));
+            $result = filter_var($length, FILTER_VALIDATE_INT, [
+                'options' => ['min_range' => 1],
+            ]);
 
             if (false === $result) {
                 throw new \InvalidArgumentException(sprintf('Invalid length "%s".', $length));
@@ -112,9 +112,9 @@ class WameValidators extends Validators
                 return $precision;
             }
 
-            $result = filter_var($precision, FILTER_VALIDATE_INT, array(
-                'options' => array('min_range' => 1, 'max_range' => 65),
-            ));
+            $result = filter_var($precision, FILTER_VALIDATE_INT, [
+                'options' => ['min_range' => 1, 'max_range' => 65],
+            ]);
 
             if (false === $result) {
                 throw new \InvalidArgumentException(sprintf('Invalid precision "%s".', $precision));
@@ -131,9 +131,9 @@ class WameValidators extends Validators
                 return $scale;
             }
 
-            $result = filter_var($scale, FILTER_VALIDATE_INT, array(
-                'options' => array('min_range' => 0, 'max_range' => 30),
-            ));
+            $result = filter_var($scale, FILTER_VALIDATE_INT, [
+                'options' => ['min_range' => 0, 'max_range' => 30],
+            ]);
 
             if (false === $result) {
                 throw new \InvalidArgumentException(sprintf('Invalid scale "%s".', $scale));

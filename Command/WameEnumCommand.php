@@ -53,7 +53,7 @@ class WameEnumCommand extends ContainerAwareCommand
 
         $enumOptions = $this->parseEnumOptions($input->getOption('options'));
 
-        list($bundle, $enum) = $this->parseShortcutNotation($input->getArgument('enum'));
+        [$bundle, $enum] = $this->parseShortcutNotation($input->getArgument('enum'));
         $bundle = $this->getContainer()->get('kernel')->getBundle($bundle);
 
         $questionHelper->writeSection($output, 'ENUM generation');
@@ -184,7 +184,7 @@ class WameEnumCommand extends ContainerAwareCommand
     {
         $questionHelper = $this->getQuestionHelper();
 
-        list($bundle, $enumName) = $this->parseShortcutNotation($input->getArgument('enum'));
+        [$bundle, $enumName] = $this->parseShortcutNotation($input->getArgument('enum'));
         $bundle = $this->getContainer()->get('kernel')->getBundle($bundle);
 
         $class = $bundle->getNamespace().'\\DBAL\\Types\\'.$enumName;

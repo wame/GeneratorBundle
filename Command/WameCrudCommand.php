@@ -71,7 +71,7 @@ EOT
 
         $this->validateEntityInput($input);
         $entity = WameValidators::validateEntityName($input->getArgument('entity'));
-        list($bundle, $entity) = $this->parseShortcutNotation($entity);
+        [$bundle, $entity] = $this->parseShortcutNotation($entity);
 
         $prefix = $input->getOption('route-prefix') ?: Inflector::tableize($entity);
         $withWrite = $input->getOption('with-write');
@@ -135,7 +135,7 @@ EOT
         $crudQuestionHelper->writeSection($output, 'Welcome to the WAME CRUD generator');
 
         $entity = $input->getArgument('entity');
-        list($bundle, $entity) = $this->parseShortcutNotation($entity);
+        [$bundle, $entity] = $this->parseShortcutNotation($entity);
 
         $crudQuestionHelper->askRoutePrefix($input, $output, $entity);
         $crudQuestionHelper->askWithWrite($input, $output);

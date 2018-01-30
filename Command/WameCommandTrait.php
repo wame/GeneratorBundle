@@ -51,7 +51,7 @@ trait WameCommandTrait
 
     protected function validateEntityInput(InputInterface $input): void
     {
-        list($bundle, $entity) = $this->parseShortcutNotation($input->getArgument('entity'));
+        [$bundle, $entity] = $this->parseShortcutNotation($input->getArgument('entity'));
 
         try {
             $bundleNameSpace = $bundle ? $this->getContainer()->get('doctrine')->getAliasNamespace($bundle) : 'App\\Entity';
@@ -99,7 +99,7 @@ trait WameCommandTrait
     protected function getMetaEntityFormInput(InputInterface $input)
     {
         $entity = WameValidators::validateEntityName($input->getArgument('entity'));;
-        list($bundle, $entity) = $this->parseShortcutNotation($entity);
+        [$bundle, $entity] = $this->parseShortcutNotation($entity);
 
         $entityClass = ($bundle ? $this->getContainer()->get('doctrine')->getAliasNamespace($bundle) : 'App\\Entity').'\\'.$entity;
         $metadata = $this->getEntityMetadata($entityClass);
