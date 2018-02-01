@@ -318,7 +318,7 @@ class MetaProperty
 
     public function setColumnName(?string $columnName): self
     {
-        $this->columnName = Inflector::tableize($columnName);
+        $this->columnName = $columnName ? Inflector::tableize($columnName) : null;
         return $this;
     }
 

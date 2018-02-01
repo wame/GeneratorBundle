@@ -10,7 +10,7 @@
         {%u endif %}
         $em = $this->getDoctrine()->getManager();
 
-        ${{ entity_pluralized }} = $em->getRepository({{ entity }}::class)->findAll();
+        ${{ entity_pluralized }} = $em->getRepository({{ entity_class }}::class)->findAll();
 
         return $this->render('{{ twig_path_prefix }}/index.html.twig', [
             '{{ entity_pluralized }}' => ${{ entity_pluralized }},
