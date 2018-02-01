@@ -151,7 +151,7 @@ class WameValidators extends Validators
                 return $existingEntityOptions[$entity];
             }
             if (strpos($entity, ':') === false) {
-                $entity = $bundle . ':' . $entity;
+                $entity = $bundle ? $bundle . ':' . $entity : $entity;
             }
             return $entity;
         };

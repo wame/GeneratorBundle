@@ -52,6 +52,9 @@ class MetaProperty
     protected $targetEntity;
 
     /** @var string */
+    protected $targetEntityNamespace;
+
+    /** @var string */
     protected $referencedColumnName = 'id';
 
     /** @var string */
@@ -217,20 +220,47 @@ class MetaProperty
 
     public function getTargetEntity(): ?string
     {
-        if (strpos($this->targetEntity, ':') !== false) {
-            $targetEntityParts = explode(':', $this->targetEntity);
-            return $targetEntityParts[1];
-        }
-        return $this->targetEntity;
+        $targetEntity = $this->targetEntity;
+        $parts = preg_split("/(:|\\\)/", $targetEntity);
+        if ($parts !== false) {
+            $targetEntity = array_pop($parts);
+        };
+        return $targetEntity;
+
+
+//        $targetEntity = $this->targetEntity;
+//        $bundle = null;
+//        if (strpos($this->targetEntity, ':') !== false) {
+//            $targetEntityParts = explode(':', $targetEntity);
+//            $bundle = $targetEntityParts[0];
+//            $targetEntity = $targetEntityParts[1];
+//        }
+//        //Check for subdirectory/namespace: if the entity is in the same subdirecty, then we should not include this in the namespace.
+//        $entityBundleName = $this->getEntity()->getBundle() ? $this->getEntity()->getBundle()->getName() : null;
+//        if ($entityBundleName === $bundle && strpos($this->targetEntity, '\\') !== false) {
+//            $targetEntityParts = explode('\\', $targetEntity);
+//            $targetEntityWithoutSubDir = array_pop($targetEntityParts);
+//            $targetEntitySubDir = implode('\\', $targetEntityParts);
+//            $entitySubDir = str_replace('/', '\\', $this->getEntity()->getDirectory());
+//            if ($entitySubDir === $targetEntitySubDir) {
+//                $targetEntity = $targetEntityWithoutSubDir;
+//            }
+//        }
+//        return $targetEntity;
     }
 
-    public function getTargetEntityNamespace(): ?string
+    public function getTargetEntityNamespace(bool $withEntityName = true): ?string
     {
-        if (strpos($this->targetEntity, ':') !== false) {
-            $targetEntityParts = explode(':', $this->targetEntity);
-            return $targetEntityParts[0].'\\Entity\\'.$targetEntityParts[1];
+        if (!$withEntityName) {
+            return str_replace('\\'.$this->getTargetEntity(), '', $this->targetEntityNamespace);
         }
-        return $this->getEntity()->getBundleNamespace().'\\Entity\\'.$this->targetEntity;
+        return $this->targetEntityNamespace;
+    }
+
+    public function setTargetEntityNamespace(?string $targetEntityNamespace): self
+    {
+        $this->targetEntityNamespace = $targetEntityNamespace;
+        return $this;
     }
 
     public function setTargetEntity(?string $targetEntity): MetaProperty

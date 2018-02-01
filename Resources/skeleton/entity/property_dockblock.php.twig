@@ -62,7 +62,7 @@
 {%- endblock -%}
 
 {%- block orm_relation_properties -%}
-    targetEntity="{{ property.entity.bundleNamespace ~ '\\Entity\\' ~ property.targetEntity }}"
+    targetEntity="{{ property.targetEntityNamespace }}"
     {%- if property.mappedBy -%}
         , mappedBy="{{ property.mappedBy }}"
     {%- elseif property.inversedBy -%}

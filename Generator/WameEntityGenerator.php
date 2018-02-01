@@ -56,6 +56,7 @@ class WameEntityGenerator extends Generator
                 ->setScale($field['scale'] ?? null)
                 ->setPrecision($field['precision'] ?? null)
                 ->setTargetEntity($field['targetEntity'] ?? null)
+                ->setTargetEntityNamespace($field['targetEntityNamespace'] ?? null)
                 ->setMappedBy($field['mappedBy'] ?? null)
                 ->setInversedBy($field['inversedBy'] ?? null)
                 ->setDisplayField($field['display'] ?? false)

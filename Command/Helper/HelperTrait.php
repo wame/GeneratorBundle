@@ -26,6 +26,13 @@ trait HelperTrait
         foreach ($entityMetadata as $meta) {
             $entityNamespace = $meta->getName();
             $shortName = $meta->reflClass->getShortName();
+
+            $namespacePartsBeforeAndAfterEntity = explode('\\Entity\\', $entityNamespace);
+            $subDir = '';
+            if ($namespacePartsBeforeAndAfterEntity[1] !== $shortName) {
+                $subDir = str_replace($shortName, '', $namespacePartsBeforeAndAfterEntity[1]);
+            }
+
             $bundle = null;
             foreach ($this->bundles as $bundleName => $bundleNamespace) {
                 if (strpos(str_replace('\\','',$entityNamespace), $bundleName) !== false) {
@@ -33,9 +40,9 @@ trait HelperTrait
                 }
             }
             if ($bundle) {
-                $entities[$bundle . ':' . $shortName] = $meta;
+                $entities[$bundle . ':' . $subDir . $shortName] = $meta;
             } else {
-                $entities[$shortName] = $meta;
+                $entities[$subDir . $shortName] = $meta;
             }
         }
         return $entities;

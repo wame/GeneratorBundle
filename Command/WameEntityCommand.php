@@ -253,7 +253,15 @@ EOT
                 $data['precision'] = $entityQuestionHelper->askFieldPrecision($input, $output);
                 $data['scale'] = $entityQuestionHelper->askFieldScale($input, $output);
             } elseif (Type::isRelationType($type)) {
-                $data['targetEntity'] = $entityQuestionHelper->askTargetEntity($input, $output, $bundle, $columnName);
+                $targetEntity = $entityQuestionHelper->askTargetEntity($input, $output, $bundle, $columnName);
+                $data['targetEntity'] = $targetEntity;
+                if (strpos($targetEntity, ':') !== false) {
+                    $targetEntityParts = explode(':', $targetEntity);
+                    $bundle = $this->getContainer()->get('kernel')->getBundle($targetEntityParts[0]);
+                    $data['targetEntityNamespace'] = $bundle->getNamespace().'\\Entity\\'.$targetEntityParts[1];
+                } else {
+                    $data['targetEntityNamespace'] = 'App\\Entity\\'.$targetEntity;
+                }
                 $data['referencedColumnName'] = $entityQuestionHelper->askReferenceColumnName($input, $output, $data['targetEntity']);
             } elseif (Type::ENUM === $type) {
                 $data['enumType'] = $entityQuestionHelper->askFieldEnumType($input, $output);

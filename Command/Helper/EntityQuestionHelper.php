@@ -171,7 +171,7 @@ class EntityQuestionHelper extends QuestionHelper
         return $this->ask($input, $output, $question);
     }
 
-    public function askTargetEntity(InputInterface $input, OutputInterface $output, string $bundleName, string $columnName): ?string
+    public function askTargetEntity(InputInterface $input, OutputInterface $output, ?string $bundleName, string $columnName): ?string
     {
         $existingEntities = $this->getExistingEntities();
 
@@ -381,10 +381,11 @@ class EntityQuestionHelper extends QuestionHelper
         $columnNameAsEntityName = Inflector::classify(str_replace('_id', '', $columnName));
         foreach (array_keys($this->getExistingEntities()) as $existingEntity) {
             $entityParts = explode(':', $existingEntity);
-            if ($columnNameAsPluralEntityName === $entityParts[1] || $columnNameAsEntityName === $entityParts[1]) {
+            $entityName = $entityParts[1] ?? $existingEntity;
+            if ($columnNameAsPluralEntityName === $entityName || $columnNameAsEntityName === $entityName) {
                 $defaultEntityOption = $existingEntity;
             }
-            if (strpos($entityParts[1], $columnNameAsEntityName) !== false) {
+            if (strpos($entityName, $columnNameAsEntityName) !== false) {
                 $defaultEntityOption = $existingEntity; //Use this option, but don't break loop for there might still be an exact match
             }
         }

@@ -1,4 +1,5 @@
 {# @var meta_entity \Wame\GeneratorBundle\MetaData\MetaEntity #}
+{# @var collection_property \Wame\GeneratorBundle\MetaData\MetaProperty #}
 {% use 'entity/property.php.twig' %}
 <?php
 declare(strict_types=1);
@@ -24,6 +25,11 @@ use Doctrine\ORM\Mapping as ORM;
 {% endfor %}
 {% for interface in meta_entity.interfaces -%}
     use {{ interface.namespace }} as {{ interface.name }};
+{% endfor %}
+{% for collection_property in meta_entity.properties -%}
+    {% if collection_property.relationType and collection_property.targetEntityNamespace(false) != meta_entity.entityNameSpace(false) -%}
+    use {{ collection_property.targetEntityNamespace }};
+    {% endif %}
 {% endfor %}
 
 /**
