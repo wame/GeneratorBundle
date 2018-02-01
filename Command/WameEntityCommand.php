@@ -130,7 +130,12 @@ EOT
             }
 
             if ($this->enableTraitOptions) {
-                $entityQuestionHelper->askBehaviours($input, $output);
+                try {
+                    $this->getContainer()->get('kernel')->getBundle('StofDoctrineExtensionsBundle');
+                    $entityQuestionHelper->askBehaviours($input, $output);
+                } catch (\InvalidArgumentException $exception) {
+                    $output->writeln('<bg=red> Cannot ask behaviour questions; StofDoctrineExtensionsBundle is not installed/enabled</>');
+                }
             }
         }
 
