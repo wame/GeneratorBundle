@@ -8,7 +8,7 @@ use Wame\GeneratorBundle\MetaData\MetaEnumType;
 
 class WameEnumGenerator extends Generator
 {
-    public function generate(BundleInterface $bundle, string $className, array $enumOptions, bool $forceOverwrite): string
+    public function generate(?BundleInterface $bundle, string $className, array $enumOptions, bool $forceOverwrite): string
     {
         $metaEnum = MetaEnumType::createFromArray($enumOptions)->setBundle($bundle)->setClassName($className);
         return $this->generateByMetaEnumType($metaEnum, $forceOverwrite);

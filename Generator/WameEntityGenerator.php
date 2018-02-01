@@ -32,7 +32,7 @@ class WameEntityGenerator extends Generator
         'blameable'      => 'Gedmo\\Blameable\\Traits\\BlameableEntity',
     ];
 
-    public function generate(BundleInterface $bundle = null, $entity, array $fields, array $behaviours = []): void
+    public function generate(?BundleInterface $bundle = null, $entity, array $fields, array $behaviours = []): void
     {
         $metaEntity = new MetaEntity($bundle, $entity);
         foreach ($behaviours as $behaviour) {

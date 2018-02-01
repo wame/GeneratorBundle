@@ -68,10 +68,15 @@ class MetaEnumType
         return $this->bundle;
     }
 
-    public function setBundle(BundleInterface $bundle): self
+    public function setBundle(?BundleInterface $bundle): self
     {
         $this->bundle = $bundle;
         return $this;
+    }
+
+    public function getBundleNamespace(): string
+    {
+        return $this->getBundle() ? $this->getBundle()->getNamespace() : 'App';
     }
 
     public function getClassName(): ?string

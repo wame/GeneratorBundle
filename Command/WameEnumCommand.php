@@ -14,6 +14,7 @@ use Symfony\Component\Yaml\Yaml;
 use Wame\GeneratorBundle\Command\Helper\QuestionHelper;
 use Wame\GeneratorBundle\Generator\WameEnumGenerator;
 use Wame\GeneratorBundle\Inflector\Inflector;
+use Symfony\Component\Security\Core\Exception\DisabledException;
 
 class WameEnumCommand extends ContainerAwareCommand
 {
@@ -32,6 +33,12 @@ class WameEnumCommand extends ContainerAwareCommand
 
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
+        try {
+            $this->getContainer()->get('kernel')->getBundle('FreshDoctrineEnumBundle');
+        } catch (\InvalidArgumentException $exception) {
+            throw new DisabledException('The FreshDoctrineEnumBundle is not available. Please make sure this bundle is installed and enabled first.');
+        }
+
         $this->initializeBaseSettings($input, $output);
 
         if (!$input->hasArgument('enum') || !$input->getArgument('enum')) {
@@ -54,7 +61,7 @@ class WameEnumCommand extends ContainerAwareCommand
         $enumOptions = $this->parseEnumOptions($input->getOption('options'));
 
         [$bundle, $enum] = $this->parseShortcutNotation($input->getArgument('enum'));
-        $bundle = $this->getContainer()->get('kernel')->getBundle($bundle);
+        $bundle = $bundle ? $this->getContainer()->get('kernel')->getBundle($bundle) : null;
 
         $questionHelper->writeSection($output, 'ENUM generation');
 
@@ -185,9 +192,9 @@ class WameEnumCommand extends ContainerAwareCommand
         $questionHelper = $this->getQuestionHelper();
 
         [$bundle, $enumName] = $this->parseShortcutNotation($input->getArgument('enum'));
-        $bundle = $this->getContainer()->get('kernel')->getBundle($bundle);
+        $bundleNamespace = $bundle ? $this->getContainer()->get('kernel')->getBundle($bundle)->getNamespace() : 'App';
 
-        $class = $bundle->getNamespace().'\\DBAL\\Types\\'.$enumName;
+        $class = $bundleNamespace.'\\DBAL\\Types\\'.$enumName;
 
         if ($input->isInteractive()) {
             $question = new ConfirmationQuestion($questionHelper->getQuestion('Confirm automatic update of the config', 'yes', '?'), true);
@@ -198,7 +205,7 @@ class WameEnumCommand extends ContainerAwareCommand
 
         $output->write('Registering the doctrine enum type: ');
 
-        $configFile = $this->getContainer()->getParameter('kernel.root_dir').'/config/config.yml';
+        $configFile = $this->getContainer()->getParameter('kernel.root_dir').'/../config/packages/doctrine.yaml';
         $config = file_get_contents($configFile);
 
         $configYaml = Yaml::parse($config);
