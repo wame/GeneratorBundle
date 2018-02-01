@@ -53,6 +53,11 @@ class DoctrineCrudGenerator extends Generator
             throw new \RuntimeException('The CRUD generator does not support entity classes with multiple or no primary keys.');
         }
 
+        if (strpos('/', $entity) !== false) {
+            $entityParts = explode('/', $entity);
+            $entity = array_pop($entityParts);
+        }
+
         $this->entity = $entity;
         $entity = str_replace('\\', '/', $entity);
         $entityParts = explode('/', $entity);
