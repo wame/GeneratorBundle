@@ -28,6 +28,12 @@ trait HelperTrait
             $shortName = $meta->reflClass->getShortName();
 
             $namespacePartsBeforeAndAfterEntity = explode('\\Entity\\', $entityNamespace);
+
+            //If found entity does not reside in a namespace that contains entity, then skip this metadata
+            if (count($namespacePartsBeforeAndAfterEntity) < 2) {
+                continue;
+            }
+
             $subDir = '';
             if ($namespacePartsBeforeAndAfterEntity[1] !== $shortName) {
                 $subDir = str_replace($shortName, '', $namespacePartsBeforeAndAfterEntity[1]);
